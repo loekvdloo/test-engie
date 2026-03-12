@@ -20,6 +20,7 @@ nl\engie\allocation\repository\ProcessingStepRepository.class
 nl\engie\allocation\model\enums\MessageStatus.class
 nl\engie\allocation\repository\ProcessingLogRepository.class
 nl\engie\allocation\model\entity\MarketMessage.class
+nl\engie\allocation\controller\TestDataController.class
 nl\engie\allocation\pipeline\step\Step5cLoggingVerzendtijd.class
 nl\engie\allocation\pipeline\PipelineStep.class
 nl\engie\allocation\pipeline\step\Step4eNackConfiguratie.class

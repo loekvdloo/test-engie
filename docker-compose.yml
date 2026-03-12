@@ -1,21 +1,20 @@
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: engie-mysql
+  postgres:
+    image: postgres:16
+    container_name: engie-postgres
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: market_messages
-      MYSQL_USER: engie
-      MYSQL_PASSWORD: engie123
+      POSTGRES_DB: market_messages
+      POSTGRES_USER: engie
+      POSTGRES_PASSWORD: engie123
     ports:
-      - "3306:3306"
+      - "5433:5432"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U engie -d market_messages"]
       interval: 10s
       timeout: 5s
       retries: 5
 
 volumes:
-  mysql-data:
+  postgres-data:

@@ -25,7 +25,7 @@ public class MarketMessage {
     private MessageType messageType;
 
     @Lob
-    @Column(name = "xml_content", nullable = false, columnDefinition = "MEDIUMTEXT")
+    @Column(name = "xml_content", nullable = false, columnDefinition = "TEXT")
     private String xmlContent;
 
     @Enumerated(EnumType.STRING)

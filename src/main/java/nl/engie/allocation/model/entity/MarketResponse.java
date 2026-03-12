@@ -31,7 +31,7 @@ public class MarketResponse {
     private String errorMessages;
 
     @Lob
-    @Column(name = "xml_response", nullable = false, columnDefinition = "MEDIUMTEXT")
+    @Column(name = "xml_response", nullable = false, columnDefinition = "TEXT")
     private String xmlResponse;
 
     @Column(name = "sent_at")

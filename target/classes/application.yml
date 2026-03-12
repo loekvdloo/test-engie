@@ -41,22 +41,22 @@ logging:
     org.hibernate.SQL: WARN
 
 ---
-# MySQL profile - activate with: --spring.profiles.active=mysql
-# Start MySQL first: docker compose up -d
+# PostgreSQL profile - activate with: --spring.profiles.active=postgres
+# Start PostgreSQL first: docker compose up -d
 spring:
   config:
     activate:
-      on-profile: mysql
+      on-profile: postgres
 
   datasource:
-    url: jdbc:mysql://localhost:3306/market_messages?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:postgresql://localhost:5433/market_messages
     username: engie
     password: engie123
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
 
   h2:
     console:
       enabled: false
 
   jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect

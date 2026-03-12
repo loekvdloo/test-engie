@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Step 3D: Validatieregels configureerbaar - Execute configurable validation rules.
@@ -91,7 +92,11 @@ public class Step3dConfigureerbareRegels implements PipelineStep {
         } else if (expr.startsWith("NOT_CONTAINS:")) {
             return !xml.contains(expr.substring("NOT_CONTAINS:".length()));
         } else if (expr.startsWith("REGEX:")) {
-            return xml.matches("(?s)" + expr.substring("REGEX:".length()));
+            String pattern = expr.substring("REGEX:".length());
+            return Pattern.compile(pattern).matcher(xml).find();
+        } else if (expr.startsWith("LOOKUP:") || expr.startsWith("CHECK:")) {
+            // LOOKUP and CHECK rules are handled by dedicated steps (3A, 3B, 3G)
+            return true;
         }
         return xml.contains(expr);
     }

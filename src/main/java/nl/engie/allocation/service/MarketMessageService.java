@@ -134,20 +134,12 @@ public class MarketMessageService {
     }
 
     /**
-     * Get all messages.
+     * Get all messages with steps and response type.
      */
     @Transactional(readOnly = true)
     public List<MessageStatusResponse> getAllMessages() {
         return messageRepository.findAll().stream()
-                .map(m -> new MessageStatusResponse(
-                        m.getMessageUuid(),
-                        m.getMessageType() != null ? m.getMessageType().name() : null,
-                        m.getStatus().name(),
-                        m.getCurrentStep() != null ? m.getCurrentStep().name() : null,
-                        m.getReceivedAt(),
-                        m.getCompletedAt(),
-                        m.getPriority(),
-                        null, null, null))
+                .map(m -> getMessageStatus(m.getMessageUuid()))
                 .toList();
     }
 
