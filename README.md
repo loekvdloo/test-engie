@@ -22,6 +22,7 @@ Berichten doorlopen **29 stappen** in **6 fases**, strikt op volgorde (1A → 1B
 13. [Postman collectie](#postman-collectie)
 14. [Configuratie](#configuratie)
 15. [Projectstructuur](#projectstructuur)
+16. [Specificatiedocument](#specificatiedocument)
 
 ---
 
@@ -720,3 +721,18 @@ src/main/java/nl/engie/allocation/
 └── service/
     └── MarketMessageService.java     # Business logic
 ```
+
+---
+
+## Specificatiedocument
+
+Het volledige specificatiedocument met alle foutcodes, berichtdefinities, procesregels en validatievoorschriften is opgenomen in het project:
+
+📄 **[docs/Business-Service-Uitwisselen-allocatiegegevens-elektriciteit-v4.0.pdf](docs/Business-Service-Uitwisselen-allocatiegegevens-elektriciteit-v4.0.pdf)**
+
+Dit document is de bron voor:
+- Alle foutcodes en hun betekenis
+- De volledige pipeline-stappen en hun functie
+- Validatieregels per berichttype
+- Berichtformaten en veldspecificaties
+- Procesafspraken tussen marktpartijen
