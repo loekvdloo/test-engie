@@ -1,5 +1,6 @@
 package nl.engie.allocation.pipeline.step;
 
+import nl.engie.allocation.model.enums.ErrorCode;
 import nl.engie.allocation.model.enums.StepCode;
 import nl.engie.allocation.pipeline.PipelineContext;
 import nl.engie.allocation.pipeline.PipelineStep;
@@ -54,10 +55,10 @@ public class Step3aBrpRegister implements PipelineStep {
         if (eanCode != null && !eanCode.isBlank()) {
             boolean exists = brpRegisterRepository.existsByEanCodeAndIsActiveTrue(eanCode);
             if (!exists) {
-                context.addValidationError("BRP001",
-                        "EAN code " + eanCode + " niet gevonden in BRP register");
-                log.warn("[3A] EAN {} niet gevonden in BRP register", eanCode);
-                return StepResult.success("BRP register controle: EAN niet gevonden");
+                context.addValidationError(ErrorCode.E_765.getCode(),
+                        ErrorCode.E_765.getFoutmelding() + " EAN: " + eanCode);
+                log.warn("[3A] EAN {} niet gevonden in BRP register (foutcode {})", eanCode, ErrorCode.E_765.getCode());
+                return StepResult.success("BRP register controle: EAN niet gevonden (" + ErrorCode.E_765.getCode() + ")");
             }
             log.info("[3A] EAN {} gevonden in BRP register", eanCode);
             return StepResult.success("BRP register controle: EAN geldig");

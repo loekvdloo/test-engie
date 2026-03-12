@@ -1,5 +1,6 @@
 package nl.engie.allocation.pipeline.step;
 
+import nl.engie.allocation.model.enums.ErrorCode;
 import nl.engie.allocation.model.enums.StepCode;
 import nl.engie.allocation.pipeline.PipelineContext;
 import nl.engie.allocation.pipeline.PipelineStep;
@@ -37,7 +38,7 @@ public class Step3cControleVerplicht implements PipelineStep {
 
         for (String element : requiredElements) {
             if (!xml.contains("<" + element + ">") && !xml.contains("<" + element + " ")) {
-                context.addValidationError("VLD001",
+                context.addValidationError(ErrorCode.E_999.getCode(),
                         "Verplicht veld ontbreekt: " + element);
             }
         }

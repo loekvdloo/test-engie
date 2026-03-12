@@ -457,30 +457,73 @@ Het bericht doorloopt **strikt in volgorde** alle 29 stappen. Als een stap faalt
 
 ## Foutcodes
 
-### Validatiefouten (pipeline stap 3)
+Alle foutcodes komen uit de officiële specificatie: **Business-Service-Uitwisselen-allocatiegegevens-elektriciteit-v4.0.pdf** (pagina's 17-19).
 
-| Code   | Stap | Betekenis                                                |
-|--------|------|----------------------------------------------------------|
-| BRP001 | 3A   | EAN-code niet gevonden in BRP register                   |
-| BIZ001 | 3B   | Ongeldige productsoort (moet 023 of 8716867000016 zijn)  |
-| BIZ002 | 3B   | Allocatiegroep ontbreekt bij geaggregeerd bericht        |
-| VLD001 | 3C   | Verplicht veld ontbreekt (product/startDateTime/endDateTime/resolution) |
-| TVL001 | 3E   | Einddatum ligt voor startdatum                           |
-| TVL002 | 3E   | Startdatum ligt meer dan 3 dagen in de toekomst          |
-| TVL003 | 3E   | Bericht is ouder dan 30 dagen                            |
-| VOL001 | 3F   | Posities zijn niet sequentieel (bijv. 1,3 i.p.v. 1,2)   |
-| HBR001 | 3G   | mRID is geen geldig UUID-formaat                         |
-| HBR002 | 3G   | Datum is niet in ISO 8601 formaat                        |
+### Officiële foutcodes – Tijdserie-niveau
+
+| Code | Foutmelding                                        | Controle                                               | Rol       |
+|------|----------------------------------------------------|--------------------------------------------------------|-----------|
+| 651  | Ongeldige EAN-codelijst                            | Controle of EAN-18 code geldig is                      | BRP / LNB |
+| 663  | Periode niet juist                                 | Controle of einddatum na startdatum ligt               | BRP / LNB |
+| 669  | MessageID niet uniek / ongeldig formaat            | Controle of mRID een geldig UUID is                    | BRP / LNB |
+| 670  | Versie van het bericht niet juist                  | Controle op berichtversie                              | BRP / LNB |
+| 671  | Type bericht niet juist                            | Controle op geldig berichttype                         | BRP / LNB |
+| 676  | Eerste positie is niet '1'                         | Controle of eerste tijdserie-positie = 1               | BRP / LNB |
+| 681  | Volgorde posities onjuist                          | Controle sequentiële volgorde binnen tijdserie         | BRP / LNB |
+| 686  | Volume negatief (niet toegestaan)                  | Controle op negatieve volumes (excl. PRF)              | BRP / LNB |
+| 701  | Ontbrekende/ongeldige afzender                     | Controle of afzender bekend is                         | BRP / LNB |
+| 704  | Ontbrekende/ongeldige ontvanger                    | Controle of ontvanger klopt                            | BRP / LNB |
+| 745  | Tijdzone ontbreekt/ongeldig                        | Controle of tijdzone correct is meegegeven             | BRP / LNB |
+| 747  | Datum notatie onjuist                              | Controle of datum ISO 8601 formaat heeft               | BRP / LNB |
+| 754  | Aansluitingcode meetpunt ongeldig                  | Controle EAN-meetpunt code                             | BRP / LNB |
+| 758  | Ontbrekende/ongeldige EAN-13 code meetpunt         | Controle of EAN-13 meetpunt geldig is                  | BRP / LNB |
+| 761  | Verplicht element ontbreekt                        | Controle op aanwezigheid verplichte XML-elementen      | BRP / LNB |
+| 763  | Oplevering te laat (dagrapport)                    | Controle of bericht binnen geldige leverdatum valt     | BRP / LNB |
+| 764  | Tijdserie past niet bij allocatiegroep             | Controle of allocatiegroep overeenkomt                 | BRP / LNB |
+| 765  | BRP/leverancier niet bekend/erkend                 | Controle of BRP in register staat                      | BRP / LNB |
+| 769  | Verdeelfactor buiten bereik [0,1]                  | Controle of verdeelfactor tussen 0 en 1 ligt           | BRP / LNB |
+| 771  | Ongeldig kwalificatie/status veld                  | Controle op geldig kwalificatieveld                    | BRP / LNB |
+| 772  | Data heeft betrekking op de toekomst               | Controle of data niet in de toekomst ligt              | BRP / LNB |
+| 773  | Resolutie past niet bij productsoort               | Controle of resolutie klopt (PT15M bij elektriciteit)  | BRP / LNB |
+| 774  | Aantal posities past niet bij resolutie/periode    | Controle of er 96 waarden zijn per dag bij PT15M       | BRP / LNB |
+| 776  | Volume onjuist aantal decimalen                    | Controle of volumes exact 3 decimalen hebben           | BRP / LNB |
+| 777  | Verdeelfactoren tellen niet op tot 1               | Controle of som van fracties = 1                       | BRP / LNB |
+| 779  | Dubbel bericht (reeds ontvangen)                   | Controle op duplicaat berichten                        | BRP / LNB |
+| 780  | Meetpunt niet gekoppeld aan EAN-18 leverancier     | Controle of meetpunt bij leverancier hoort             | BRP / LNB |
+| 781  | Rekenresultaat niet reproduceerbaar                | Controle of berekening klopt                           | BRP / LNB |
+| 782  | Increment is niet '1'                              | Controle of position-increment altijd 1 is             | BRP / LNB |
+
+### Officiële foutcodes – Header- en berichtniveau
+
+| Code | Foutmelding                                        | Controle                                               | Rol       |
+|------|----------------------------------------------------|--------------------------------------------------------|-----------|
+| 999  | Overige fout / generieke validatiefout              | Diverse controles die niet onder specifiek code vallen | BRP / LNB |
+
+### Waar worden foutcodes gegenereerd?
+
+| Stap | Bestand                            | Foutcodes die gegenereerd worden                                       |
+|------|------------------------------------|------------------------------------------------------------------------|
+| 3A   | Step3aBrpRegister.java             | 765 (BRP niet bekend)                                                  |
+| 3B   | Step3bMarktBusinessValidaties.java | 999 (productsoort), 764 (allocatiegroep), 773 (resolutie), 758 (EAN-13), 686 (negatief volume) |
+| 3C   | Step3cControleVerplicht.java       | 999 (verplicht veld ontbreekt)                                         |
+| 3E   | Step3eTijdvenster.java             | 663 (periode onjuist), 772 (toekomst), 763 (te laat)                   |
+| 3F   | Step3fVolgordelijkheid.java        | 676 (eerste positie ≠ 1), 782 (increment ≠ 1)                         |
+| 3G   | Step3gHerbruikbareRegels.java      | 669 (MessageID), 999 (datetime formaat), 776 (decimalen), 651 (EAN-18) |
 
 ### Configureerbare foutcodes (uit `validation_rules` tabel)
 
-| Code | Regel  | Betekenis                                                |
-|------|--------|----------------------------------------------------------|
-| 001  | GEN001 | XML header ontbreekt                                     |
-| 002  | GEN002 | Productsoort moet elektriciteit (023) zijn               |
-| 003  | GEN003 | Resolutie moet PT15M zijn                                |
-| 010  | AGG001 | Geldige allocatiegroep (PRF/TMT/SMA/NVL/DIM) vereist    |
-| 020  | RCF001 | Datumversie RCF is verplicht voor RCF-berichten          |
+| Foutcode | Regel            | Controle                                                 |
+|----------|------------------|----------------------------------------------------------|
+| 999      | XML_SCHEMA       | XML header aanwezig                                      |
+| 999      | PRODUCTSOORT     | Productsoort elektriciteit (023)                         |
+| 773      | RESOLUTIE        | Resolutie moet PT15M zijn                                |
+| 764      | ALLOCATIEGROEP   | Geldige allocatiegroep (PRF/TMT/SMA/NVL/DIM) aanwezig   |
+| 999      | RCF_DATUM        | Datumversie RCF verplicht voor RCF-berichten             |
+| 651      | EAN_18           | EAN-18 code geldig (18 cijfers)                          |
+| 758      | EAN_13           | EAN-13 code meetpunt geldig (13 cijfers)                 |
+| 765      | BRP_BEKENDHEID   | BRP bekend in register                                   |
+| 776      | VOLUME_DECIMALEN | Volume exact 3 decimalen                                 |
+| 686      | NEGATIEF_VOLUME  | Volume niet negatief (behalve PRF)                       |
 
 ### Pipeline fouten
 
@@ -585,7 +628,7 @@ Invoke-RestMethod -Uri http://localhost:8080/api/messages -Method POST -ContentT
 
 **Verwacht resultaat:**
 - `responseType`: `NACK`
-- Foutcode `BRP001` in de respons
+- Foutcode `765` in de respons (BRP/leverancier niet bekend/erkend)
 
 ---
 

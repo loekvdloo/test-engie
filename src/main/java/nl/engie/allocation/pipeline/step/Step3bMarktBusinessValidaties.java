@@ -1,5 +1,6 @@
 package nl.engie.allocation.pipeline.step;
 
+import nl.engie.allocation.model.enums.ErrorCode;
 import nl.engie.allocation.model.enums.StepCode;
 import nl.engie.allocation.pipeline.PipelineContext;
 import nl.engie.allocation.pipeline.PipelineStep;
@@ -29,7 +30,7 @@ public class Step3bMarktBusinessValidaties implements PipelineStep {
         // Validate product type
         if (xml.contains("<product>") || xml.contains("<identification>")) {
             if (!xml.contains("023") && !xml.contains("8716867000016")) {
-                context.addValidationError("BIZ001",
+                context.addValidationError(ErrorCode.E_999.getCode(),
                         "Ongeldige productsoort - verwacht elektriciteit (023)");
             }
         }
@@ -41,18 +42,38 @@ public class Step3bMarktBusinessValidaties implements PipelineStep {
                     if (!xml.contains("PRF") && !xml.contains("TMT")
                             && !xml.contains("SMA") && !xml.contains("NVL")
                             && !xml.contains("DIM")) {
-                        context.addValidationError("BIZ002",
-                                "Ongeldige allocatiegroep voor geaggregeerd bericht");
+                        context.addValidationError(ErrorCode.E_764.getCode(),
+                                ErrorCode.E_764.getFoutmelding());
                     }
                 }
                 case ALLOCATION_FACTOR_SERIES -> {
                     if (!xml.contains("PT15M")) {
-                        context.addValidationError("BIZ003",
-                                "Resolutie moet PT15M zijn voor elektriciteit");
+                        context.addValidationError(ErrorCode.E_773.getCode(),
+                                ErrorCode.E_773.getFoutmelding());
                     }
                 }
                 default -> {}
             }
+        }
+
+        // Validate EAN-13 presence (foutcode 758)
+        if (!xml.contains("<mRID>") && !xml.contains("<ean>") && !xml.contains("<EAN>")) {
+            context.addValidationError(ErrorCode.E_758.getCode(),
+                    ErrorCode.E_758.getFoutmelding());
+        }
+
+        // Validate volumes are not negative (foutcode 686)
+        java.util.regex.Matcher volMatcher = java.util.regex.Pattern
+                .compile("<quantity>(-?[\\d.]+)</quantity>").matcher(xml);
+        while (volMatcher.find()) {
+            try {
+                double vol = Double.parseDouble(volMatcher.group(1));
+                if (vol < 0 && !xml.contains("PRF")) {
+                    context.addValidationError(ErrorCode.E_686.getCode(),
+                            ErrorCode.E_686.getFoutmelding() + " Waarde: " + volMatcher.group(1));
+                    break;
+                }
+            } catch (NumberFormatException ignored) {}
         }
 
         int errorCount = context.getValidationErrors().size();

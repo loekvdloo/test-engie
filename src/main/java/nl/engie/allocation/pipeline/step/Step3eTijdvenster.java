@@ -1,5 +1,6 @@
 package nl.engie.allocation.pipeline.step;
 
+import nl.engie.allocation.model.enums.ErrorCode;
 import nl.engie.allocation.model.enums.StepCode;
 import nl.engie.allocation.pipeline.PipelineContext;
 import nl.engie.allocation.pipeline.PipelineStep;
@@ -29,20 +30,20 @@ public class Step3eTijdvenster implements PipelineStep {
 
         if (message.getStartDateTime() != null && message.getEndDateTime() != null) {
             if (message.getEndDateTime().isBefore(message.getStartDateTime())) {
-                context.addValidationError("TVL001",
-                        "Einddatumtijd ligt voor startdatumtijd");
+                context.addValidationError(ErrorCode.E_663.getCode(),
+                        ErrorCode.E_663.getFoutmelding());
             }
-            if (message.getStartDateTime().isAfter(LocalDateTime.now().plusDays(2))) {
-                context.addValidationError("TVL002",
-                        "Startdatumtijd ligt meer dan 2 dagen in de toekomst");
+            if (message.getStartDateTime().isAfter(LocalDateTime.now())) {
+                context.addValidationError(ErrorCode.E_772.getCode(),
+                        ErrorCode.E_772.getFoutmelding());
             }
         }
 
         if (message.getReceivedAt() != null) {
             LocalDateTime maxAge = LocalDateTime.now().minusDays(30);
             if (message.getReceivedAt().isBefore(maxAge)) {
-                context.addValidationError("TVL003",
-                        "Bericht is ouder dan 30 dagen");
+                context.addValidationError(ErrorCode.E_763.getCode(),
+                        ErrorCode.E_763.getFoutmelding());
             }
         }
 

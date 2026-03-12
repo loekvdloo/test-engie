@@ -14,6 +14,7 @@ C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\model\entity\Processi
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\model\entity\ProcessingStep.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\model\entity\ValidationResult.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\model\entity\ValidationRule.java
+C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\model\enums\ErrorCode.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\model\enums\MessageStatus.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\model\enums\MessageType.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\model\enums\ResponseType.java

@@ -1,5 +1,6 @@
 package nl.engie.allocation.pipeline.step;
 
+import nl.engie.allocation.model.enums.ErrorCode;
 import nl.engie.allocation.model.enums.StepCode;
 import nl.engie.allocation.pipeline.PipelineContext;
 import nl.engie.allocation.pipeline.PipelineStep;
@@ -26,13 +27,13 @@ public class Step3gHerbruikbareRegels implements PipelineStep {
         var message = context.getMessage();
         String xml = message.getXmlContent();
 
-        // 1. UUID format validation for mRID
+        // 1. UUID format validation for mRID / MessageID
         if (xml.contains("<mRID>")) {
             String mrid = extractValue(xml, "mRID");
             if (mrid != null && !mrid.matches(
                     "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")) {
-                context.addValidationError("HBR001",
-                        "mRID is geen geldig UUID formaat: " + mrid);
+                context.addValidationError(ErrorCode.E_669.getCode(),
+                        ErrorCode.E_669.getFoutmelding() + ": " + mrid);
             }
         }
 
@@ -40,7 +41,7 @@ public class Step3gHerbruikbareRegels implements PipelineStep {
         for (String field : new String[]{"startDateTime", "endDateTime"}) {
             String value = extractValue(xml, field);
             if (value != null && !value.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z")) {
-                context.addValidationError("HBR002",
+                context.addValidationError(ErrorCode.E_999.getCode(),
                         field + " is niet in ISO 8601 formaat: " + value);
             }
         }
@@ -48,7 +49,20 @@ public class Step3gHerbruikbareRegels implements PipelineStep {
         // 3. Volume values must have 3 decimal places
         String quantity = extractValue(xml, "quantity");
         if (quantity != null && !quantity.matches("-?\\d+\\.\\d{3}")) {
-            context.addWarning("Volume waarde heeft niet exact 3 decimalen: " + quantity);
+            context.addValidationError(ErrorCode.E_776.getCode(),
+                    ErrorCode.E_776.getFoutmelding() + ": " + quantity);
+        }
+
+        // 4. EAN-18 code validation (must be exactly 18 digits)
+        String senderEan = extractValue(xml, "sender_MarketParticipant.mRID");
+        if (senderEan != null && !senderEan.matches("\\d{18}")) {
+            context.addValidationError(ErrorCode.E_651.getCode(),
+                    ErrorCode.E_651.getFoutmelding() + ": " + senderEan);
+        }
+        String receiverEan = extractValue(xml, "receiver_MarketParticipant.mRID");
+        if (receiverEan != null && !receiverEan.matches("\\d{18}")) {
+            context.addValidationError(ErrorCode.E_651.getCode(),
+                    ErrorCode.E_651.getFoutmelding() + ": " + receiverEan);
         }
 
         log.info("[3G] Herbruikbare validatieregels uitgevoerd");

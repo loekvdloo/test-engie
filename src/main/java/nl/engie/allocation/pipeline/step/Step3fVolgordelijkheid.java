@@ -1,5 +1,6 @@
 package nl.engie.allocation.pipeline.step;
 
+import nl.engie.allocation.model.enums.ErrorCode;
 import nl.engie.allocation.model.enums.StepCode;
 import nl.engie.allocation.pipeline.PipelineContext;
 import nl.engie.allocation.pipeline.PipelineStep;
@@ -46,15 +47,20 @@ public class Step3fVolgordelijkheid implements PipelineStep {
                     String posStr = positions.item(i).getTextContent().trim();
                     try {
                         int pos = Integer.parseInt(posStr);
+                        if (i == 0 && pos != 1) {
+                            context.addValidationError(ErrorCode.E_676.getCode(),
+                                    ErrorCode.E_676.getFoutmelding() + " (gevonden: " + pos + ")");
+                            break;
+                        }
                         if (pos != expectedPosition) {
-                            context.addValidationError("VOL001",
-                                    "Volgordelijkheid verbroken bij positie " + pos
+                            context.addValidationError(ErrorCode.E_782.getCode(),
+                                    ErrorCode.E_782.getFoutmelding() + " bij positie " + pos
                                             + " (verwacht: " + expectedPosition + ")");
                             break;
                         }
                         expectedPosition++;
                     } catch (NumberFormatException e) {
-                        context.addValidationError("VOL002",
+                        context.addValidationError(ErrorCode.E_782.getCode(),
                                 "Ongeldige positiewaarde: " + posStr);
                     }
                 }

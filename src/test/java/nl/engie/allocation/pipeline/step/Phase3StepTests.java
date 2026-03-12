@@ -99,7 +99,7 @@ class Phase3StepTests {
 
             assertTrue(result.isSuccess()); // Step succeeds but adds validation error
             assertFalse(ctx.getValidationErrors().isEmpty());
-            assertEquals("BRP001", ctx.getValidationErrors().get(0).code());
+            assertEquals("765", ctx.getValidationErrors().get(0).code());
         }
 
         @Test
@@ -153,7 +153,7 @@ class Phase3StepTests {
             step.execute(ctx);
 
             boolean hasBiz001 = ctx.getValidationErrors().stream()
-                    .anyMatch(e -> e.code().equals("BIZ001"));
+                    .anyMatch(e -> e.code().equals("999"));
             assertTrue(hasBiz001);
         }
 
@@ -171,7 +171,7 @@ class Phase3StepTests {
             step.execute(ctx);
 
             boolean hasBiz002 = ctx.getValidationErrors().stream()
-                    .anyMatch(e -> e.code().equals("BIZ002"));
+                    .anyMatch(e -> e.code().equals("764"));
             assertTrue(hasBiz002);
         }
     }
@@ -212,7 +212,7 @@ class Phase3StepTests {
 
             // Missing: product, startDateTime, endDateTime, resolution (4 errors)
             long vld001Count = ctx.getValidationErrors().stream()
-                    .filter(e -> e.code().equals("VLD001"))
+                    .filter(e -> e.code().equals("999"))
                     .count();
             assertEquals(4, vld001Count);
         }
@@ -322,7 +322,7 @@ class Phase3StepTests {
             step.execute(ctx);
 
             long tvlErrors = ctx.getValidationErrors().stream()
-                    .filter(e -> e.code().startsWith("TVL"))
+                    .filter(e -> e.code().equals("663") || e.code().equals("772") || e.code().equals("763"))
                     .count();
             assertEquals(0, tvlErrors);
         }
@@ -337,7 +337,7 @@ class Phase3StepTests {
             step.execute(ctx);
 
             boolean hasTvl001 = ctx.getValidationErrors().stream()
-                    .anyMatch(e -> e.code().equals("TVL001"));
+                    .anyMatch(e -> e.code().equals("663"));
             assertTrue(hasTvl001);
         }
 
@@ -351,7 +351,7 @@ class Phase3StepTests {
             step.execute(ctx);
 
             boolean hasTvl002 = ctx.getValidationErrors().stream()
-                    .anyMatch(e -> e.code().equals("TVL002"));
+                    .anyMatch(e -> e.code().equals("772"));
             assertTrue(hasTvl002);
         }
 
@@ -364,7 +364,7 @@ class Phase3StepTests {
             step.execute(ctx);
 
             boolean hasTvl003 = ctx.getValidationErrors().stream()
-                    .anyMatch(e -> e.code().equals("TVL003"));
+                    .anyMatch(e -> e.code().equals("763"));
             assertTrue(hasTvl003);
         }
     }
@@ -391,7 +391,7 @@ class Phase3StepTests {
             step.execute(ctx);
 
             long volErrors = ctx.getValidationErrors().stream()
-                    .filter(e -> e.code().startsWith("VOL"))
+                    .filter(e -> e.code().equals("782") || e.code().equals("676"))
                     .count();
             assertEquals(0, volErrors);
         }
@@ -409,7 +409,7 @@ class Phase3StepTests {
             step.execute(ctx);
 
             boolean hasVol001 = ctx.getValidationErrors().stream()
-                    .anyMatch(e -> e.code().equals("VOL001"));
+                    .anyMatch(e -> e.code().equals("782"));
             assertTrue(hasVol001);
         }
     }
@@ -436,7 +436,7 @@ class Phase3StepTests {
             step.execute(ctx);
 
             boolean hasHbr001 = ctx.getValidationErrors().stream()
-                    .anyMatch(e -> e.code().equals("HBR001"));
+                    .anyMatch(e -> e.code().equals("669"));
             assertFalse(hasHbr001);
         }
 
@@ -452,7 +452,7 @@ class Phase3StepTests {
             step.execute(ctx);
 
             boolean hasHbr001 = ctx.getValidationErrors().stream()
-                    .anyMatch(e -> e.code().equals("HBR001"));
+                    .anyMatch(e -> e.code().equals("669"));
             assertTrue(hasHbr001);
         }
 
@@ -462,7 +462,7 @@ class Phase3StepTests {
             step.execute(ctx);
 
             boolean hasHbr002 = ctx.getValidationErrors().stream()
-                    .anyMatch(e -> e.code().equals("HBR002"));
+                    .anyMatch(e -> e.code().equals("999"));
             assertFalse(hasHbr002);
         }
 
@@ -479,7 +479,7 @@ class Phase3StepTests {
             step.execute(ctx);
 
             boolean hasHbr002 = ctx.getValidationErrors().stream()
-                    .anyMatch(e -> e.code().equals("HBR002"));
+                    .anyMatch(e -> e.code().equals("999"));
             assertTrue(hasHbr002);
         }
     }
