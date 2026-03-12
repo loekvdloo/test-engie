@@ -14,7 +14,36 @@ const App = {
     /* ---------- Init ---------- */
 
     init() {
+        this.bindEvents();
         this.refresh();
+    },
+
+    /* ---------- Event bindings (CSP-compliant, geen inline handlers) ---------- */
+
+    bindEvents() {
+        // Header buttons
+        document.getElementById('seedBtn').addEventListener('click', () => this.seedTestData());
+        document.getElementById('refreshBtn').addEventListener('click', () => this.refresh());
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+            btn.addEventListener('click', () => this.setFilter(btn.dataset.filter));
+        });
+
+        // Sort buttons
+        document.querySelectorAll('.filter-btn[data-sort]').forEach(btn => {
+            btn.addEventListener('click', () => this.setSort(btn.dataset.sort));
+        });
+
+        // Detail panel: overlay + close button
+        document.getElementById('overlay').addEventListener('click', () => this.closeDetail());
+        document.getElementById('closeDetailBtn').addEventListener('click', () => this.closeDetail());
+
+        // Message list: event delegation for dynamically rendered items
+        document.getElementById('messageList').addEventListener('click', (e) => {
+            const item = e.target.closest('.message-item[data-uuid]');
+            if (item) this.openDetail(item.dataset.uuid);
+        });
     },
 
     /* ---------- Data ---------- */

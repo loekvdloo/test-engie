@@ -1,5 +1,7 @@
 package nl.engie.allocation.controller;
 
+import jakarta.validation.Valid;
+import nl.engie.allocation.config.InputSanitizer;
 import nl.engie.allocation.dto.MessageStatusResponse;
 import nl.engie.allocation.dto.MessageSubmitRequest;
 import nl.engie.allocation.model.enums.MessageStatus;
@@ -7,7 +9,9 @@ import nl.engie.allocation.service.MarketMessageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +30,7 @@ public class MarketMessageController {
      * The message goes through all steps: 1A -> 1B -> ... -> 6B
      */
     @PostMapping
-    public ResponseEntity<Map<String, String>> submitMessage(@RequestBody MessageSubmitRequest request) {
+    public ResponseEntity<Map<String, String>> submitMessage(@Valid @RequestBody MessageSubmitRequest request) {
         String uuid = messageService.submitMessage(request);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(Map.of(
@@ -41,6 +45,12 @@ public class MarketMessageController {
      */
     @PostMapping(value = "/xml", consumes = {"application/xml", "text/xml"})
     public ResponseEntity<Map<String, String>> submitXml(@RequestBody String xmlContent) {
+        if (xmlContent == null || xmlContent.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "XML content mag niet leeg zijn");
+        }
+        if (!InputSanitizer.isWithinSizeLimit(xmlContent)) {
+            throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "XML content te groot (max 2 MB)");
+        }
         MessageSubmitRequest request = new MessageSubmitRequest(xmlContent, false, null);
         String uuid = messageService.submitMessage(request);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
@@ -56,6 +66,9 @@ public class MarketMessageController {
      */
     @GetMapping("/{uuid}")
     public ResponseEntity<MessageStatusResponse> getMessageStatus(@PathVariable String uuid) {
+        if (!InputSanitizer.isValidUuid(uuid)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ongeldig UUID formaat");
+        }
         MessageStatusResponse status = messageService.getMessageStatus(uuid);
         return ResponseEntity.ok(status);
     }
@@ -73,8 +86,14 @@ public class MarketMessageController {
      */
     @GetMapping("/status/{status}")
     public ResponseEntity<List<MessageStatusResponse>> getByStatus(@PathVariable String status) {
-        MessageStatus messageStatus = MessageStatus.valueOf(status.toUpperCase());
-        return ResponseEntity.ok(messageService.getMessagesByStatus(messageStatus));
+        try {
+            MessageStatus messageStatus = MessageStatus.valueOf(status.toUpperCase());
+            return ResponseEntity.ok(messageService.getMessagesByStatus(messageStatus));
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Ongeldige status. Toegestane waarden: " +
+                    String.join(", ", Arrays.stream(MessageStatus.values()).map(Enum::name).toList()));
+        }
     }
 
     /**
@@ -82,6 +101,9 @@ public class MarketMessageController {
      */
     @PostMapping("/{uuid}/reprocess")
     public ResponseEntity<Map<String, String>> reprocessMessage(@PathVariable String uuid) {
+        if (!InputSanitizer.isValidUuid(uuid)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ongeldig UUID formaat");
+        }
         String result = messageService.reprocessMessage(uuid);
         return ResponseEntity.ok(Map.of(
                 "messageUuid", result,

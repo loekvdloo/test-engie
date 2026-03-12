@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -231,12 +232,26 @@ class Phase4StepTests {
         void execute_withNack_shouldSaveInvalidResult() {
             PipelineContext ctx = new PipelineContext(createMessage());
             ctx.setNack(true);
+            ctx.addValidationError("765", "BRP niet erkend");
+            ctx.addValidationError("773", "Resolutie onjuist");
             step.execute(ctx);
 
             ArgumentCaptor<ValidationResult> captor = ArgumentCaptor.forClass(ValidationResult.class);
-            verify(validationResultRepository).save(captor.capture());
-            assertFalse(captor.getValue().getIsValid());
-            assertEquals("VALIDATION_FAILED", captor.getValue().getErrorCode());
+            verify(validationResultRepository, times(3)).save(captor.capture());
+
+            // First two: individual error entries
+            List<ValidationResult> saved = captor.getAllValues();
+            assertEquals("765", saved.get(0).getErrorCode());
+            assertEquals("BRP niet erkend", saved.get(0).getErrorMessage());
+            assertFalse(saved.get(0).getIsValid());
+            assertEquals("773", saved.get(1).getErrorCode());
+            assertEquals("Resolutie onjuist", saved.get(1).getErrorMessage());
+            assertFalse(saved.get(1).getIsValid());
+
+            // Third: overall result
+            assertEquals("OVERALL", saved.get(2).getRuleCode());
+            assertEquals("VALIDATION_FAILED", saved.get(2).getErrorCode());
+            assertFalse(saved.get(2).getIsValid());
         }
     }
 

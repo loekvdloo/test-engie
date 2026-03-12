@@ -55,7 +55,7 @@ const Render = {
 
         return `
         <div class="message-item ${isFailed ? 'failed' : ''}"
-             onclick="App.openDetail('${Utils.escapeHtml(msg.messageUuid)}')">
+             data-uuid="${Utils.escapeHtml(msg.messageUuid)}">
             <div class="message-main">
                 <span class="status-icon">${statusIcon}</span>
                 <div class="message-info">

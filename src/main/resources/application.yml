@@ -11,8 +11,7 @@ spring:
 
   h2:
     console:
-      enabled: true
-      path: /h2-console
+      enabled: false    # Beveiligingsmaatregel: H2 console standaard uit
 
   jpa:
     hibernate:
@@ -27,8 +26,24 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
+  # Beveiliging: beperk request grootte
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+
 server:
   port: 8080
+  # Beveiliging: beperk request grootte op Tomcat niveau
+  tomcat:
+    max-http-form-post-size: 2MB
+    max-swallow-size: 2MB
+  # Beveiliging: verberg server info
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-exception: false
+    include-binding-errors: never
 
 # Application-specific configuration
 pipeline:
@@ -37,8 +52,9 @@ pipeline:
 
 logging:
   level:
-    nl.engie.allocation: DEBUG
+    nl.engie.allocation: INFO
     org.hibernate.SQL: WARN
+    org.springframework.security: WARN
 
 ---
 # PostgreSQL profile - activate with: --spring.profiles.active=postgres
@@ -59,4 +75,6 @@ spring:
       enabled: false
 
   jpa:
+    hibernate:
+      ddl-auto: update    # Eerste keer 'update' voor schema aanmaak, daarna wijzigen naar 'validate'
     database-platform: org.hibernate.dialect.PostgreSQLDialect

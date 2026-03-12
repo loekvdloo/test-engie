@@ -21,8 +21,8 @@
 <header>
     <h1><span class="accent">⚡</span> ENGIE Market Messages</h1>
     <div class="header-actions">
-        <button class="btn btn-blue" id="seedBtn" onclick="App.seedTestData()">🧪 Laad Test Data</button>
-        <button class="btn" onclick="App.refresh()">🔄 Vernieuwen</button>
+        <button class="btn btn-blue" id="seedBtn">🧪 Laad Test Data</button>
+        <button class="btn" id="refreshBtn">🔄 Vernieuwen</button>
     </div>
 </header>
 
@@ -52,13 +52,13 @@
     <!-- Filter & sort bar -->
     <div class="filter-bar">
         <span class="label">Filter:</span>
-        <button class="btn filter-btn active" data-filter="all"     onclick="App.setFilter('all')">Alle berichten</button>
-        <button class="btn filter-btn btn-green" data-filter="success" onclick="App.setFilter('success')">✓ Geslaagd</button>
-        <button class="btn filter-btn btn-red"   data-filter="failed"  onclick="App.setFilter('failed')">✗ Gefaald</button>
+        <button class="btn filter-btn active" data-filter="all">Alle berichten</button>
+        <button class="btn filter-btn btn-green" data-filter="success">✓ Geslaagd</button>
+        <button class="btn filter-btn btn-red" data-filter="failed">✗ Gefaald</button>
 
         <span class="label spacer">Sorteer:</span>
-        <button class="btn filter-btn active" data-sort="newest" onclick="App.setSort('newest')">Nieuwste eerst</button>
-        <button class="btn filter-btn"        data-sort="oldest" onclick="App.setSort('oldest')">Oudste eerst</button>
+        <button class="btn filter-btn active" data-sort="newest">Nieuwste eerst</button>
+        <button class="btn filter-btn" data-sort="oldest">Oudste eerst</button>
     </div>
 
     <!-- Message list -->
@@ -68,7 +68,7 @@
 </div>
 
 <!-- ==================== DETAIL SLIDE-IN PANEL ==================== -->
-<div class="overlay" id="overlay" onclick="App.closeDetail()"></div>
+<div class="overlay" id="overlay"></div>
 
 <div class="detail-panel" id="detailPanel">
     <div class="detail-header">
@@ -76,7 +76,7 @@
             <h2 id="detailTitle">Bericht Details</h2>
             <div class="uuid-label" id="detailUuid"></div>
         </div>
-        <button class="close-btn" onclick="App.closeDetail()">×</button>
+        <button class="close-btn" id="closeDetailBtn">×</button>
     </div>
     <div class="detail-body" id="detailBody"></div>
 </div>

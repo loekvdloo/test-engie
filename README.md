@@ -3,26 +3,30 @@
 Pipeline-gebaseerde verwerker voor marktberichten in de Nederlandse energiemarkt (allocatiegegevens).
 Berichten doorlopen **29 stappen** in **6 fases**, strikt op volgorde (1A → 1B → ... → 6B).
 
+Bevat een **live dashboard** op `http://localhost:8080` met statusoverzicht, pipeline-visualisatie en test-data seeder.
+
 ---
 
 ## Inhoudsopgave
 
 1. [Vereisten](#vereisten)
 2. [Snel starten (H2)](#snel-starten-h2)
-3. [Database opzetten (MySQL)](#database-opzetten-mysql)
-4. [Database schema](#database-schema)
-5. [Seed data (automatisch)](#seed-data-automatisch)
-6. [API Endpoints](#api-endpoints)
-7. [Pipeline: alle 29 stappen](#pipeline-alle-29-stappen)
-8. [Foutcodes](#foutcodes)
-9. [Berichttypes](#berichttypes)
-10. [Message statussen](#message-statussen)
-11. [Testen van begin tot einde](#testen-van-begin-tot-einde)
-12. [Unit tests draaien](#unit-tests-draaien)
-13. [Postman collectie](#postman-collectie)
-14. [Configuratie](#configuratie)
-15. [Projectstructuur](#projectstructuur)
-16. [Specificatiedocument](#specificatiedocument)
+3. [Database opzetten (PostgreSQL)](#database-opzetten-postgresql)
+4. [Dashboard](#dashboard)
+5. [Database schema](#database-schema)
+6. [Seed data (automatisch)](#seed-data-automatisch)
+7. [API Endpoints](#api-endpoints)
+8. [Pipeline: alle 29 stappen](#pipeline-alle-29-stappen)
+9. [Foutcodes](#foutcodes)
+10. [Berichttypes](#berichttypes)
+11. [Message statussen](#message-statussen)
+12. [Beveiliging](#beveiliging)
+13. [Testen van begin tot einde](#testen-van-begin-tot-einde)
+14. [Unit tests draaien](#unit-tests-draaien)
+15. [Postman collectie](#postman-collectie)
+16. [Configuratie](#configuratie)
+17. [Projectstructuur](#projectstructuur)
+18. [Specificatiedocument](#specificatiedocument)
 
 ---
 
@@ -32,7 +36,7 @@ Berichten doorlopen **29 stappen** in **6 fases**, strikt op volgorde (1A → 1B
 |--------------|-----------|--------------------------------------|
 | Java (JDK)   | 21+       | Getest met OpenJDK Temurin 25        |
 | Maven        | 3.9+      | Wrapper aanwezig in project          |
-| Docker       | 20+       | Alleen nodig voor MySQL-profiel      |
+| Docker       | 20+       | Alleen nodig voor PostgreSQL-profiel |
 
 ---
 
@@ -50,57 +54,82 @@ mvn compile
 # 3. Start de applicatie
 mvn spring-boot:run
 
-# 4. De API draait nu op http://localhost:8080
-# 5. H2 Console: http://localhost:8080/h2-console
+# 4. Open het dashboard op http://localhost:8080
 ```
 
-**H2 Console inloggen:**
-
-| Veld      | Waarde                                        |
-|-----------|-----------------------------------------------|
-| JDBC URL  | `jdbc:h2:file:./data/market_messages`         |
-| Username  | `sa`                                          |
-| Password  | *(leeg laten)*                                |
+> **Let op:** De H2 console is uitgeschakeld vanwege beveiliging. Gebruik het dashboard of de API endpoints om data te bekijken.
 
 De database wordt opgeslagen als bestand: `data/market_messages.mv.db`
 
 ---
 
-## Database opzetten (MySQL)
+## Database opzetten (PostgreSQL)
 
-### Stap 1: Start MySQL via Docker
+### Stap 1: Start PostgreSQL via Docker
 
 ```powershell
 docker compose up -d
 ```
 
-Dit start een MySQL 8.0 container met:
+Dit start een **PostgreSQL 16** container met:
 - **Database:** `market_messages`
 - **User:** `engie` / **Password:** `engie123`
-- **Root password:** `root`
-- **Poort:** `3306`
+- **Poort:** `5433` (host) → `5432` (container)
+- **Volume:** `postgres-data` (data blijft bewaard)
+- **Healthcheck:** automatisch via `pg_isready`
 
-### Stap 2: Start de applicatie met MySQL-profiel
+### Stap 2: Start de applicatie met PostgreSQL-profiel
 
 ```powershell
-mvn spring-boot:run -Dspring-boot.run.profiles=mysql
+mvn spring-boot:run "-Dspring-boot.run.profiles=postgres"
 ```
 
 Of via environment variabele:
 ```powershell
-$env:SPRING_PROFILES_ACTIVE="mysql"; mvn spring-boot:run
+$env:SPRING_PROFILES_ACTIVE="postgres"; mvn spring-boot:run
 ```
 
 ### Stap 3: Schema wordt automatisch aangemaakt
 
 Hibernate `ddl-auto: update` maakt alle tabellen automatisch aan bij de eerste start. **Je hoeft geen SQL-migraties handmatig uit te voeren.**
 
-### MySQL stoppen
+### PostgreSQL stoppen
 
 ```powershell
 docker compose down          # Stop container (data blijft)
 docker compose down -v       # Stop container + verwijder data
 ```
+
+### Database legen
+
+```powershell
+docker exec engie-postgres psql -U engie -d market_messages -c "TRUNCATE processing_steps, processing_logs, validation_results, market_responses, delivery_records, market_messages RESTART IDENTITY CASCADE;"
+```
+
+---
+
+## Dashboard
+
+De applicatie bevat een **volledig interactief dashboard** op `http://localhost:8080`.
+
+### Functies
+
+- **Statistieken:** Totaal berichten, ACK/NACK percentages, gemiddelde verwerkingstijd
+- **Berichtenlijst:** Alle berichten met status, type, EAN-code en respons type
+- **Filters:** Filter op status (COMPLETED, FAILED, PARKED, etc.)
+- **Pipeline-visualisatie:** Klik op een bericht om alle 29 stappen te zien per fase
+- **Test Data Seeder:** "Laad Testdata" knop om snel testberichten aan te maken (mix van ACK en NACK)
+- **NACK-indicatie:** Stappen met warnings worden oranje gemarkeerd in de pipeline
+
+### Techniek
+
+Het dashboard is gebouwd met vanilla HTML, CSS en JavaScript (geen framework).
+
+| Onderdeel | Bestanden |
+|-----------|-----------|
+| HTML      | `index.html` |
+| CSS       | 10 modulaire bestanden (`base.css`, `components.css`, `detail-panel.css`, `errors.css`, `filters.css`, `header.css`, `messages.css`, `pipeline.css`, `stats.css`, `variables.css`) |
+| JavaScript | 4 bestanden (`api.js` voor API calls, `app.js` voor initialisatie, `render.js` voor DOM rendering, `utils.js` voor hulpfuncties) |
 
 ---
 
@@ -125,7 +154,7 @@ brp_register                                       standalone
 | `id`               | BIGINT PK     | nee      | Auto-increment ID                    |
 | `message_uuid`     | VARCHAR(36)   | nee      | Uniek UUID (unique constraint)       |
 | `message_type`     | VARCHAR(50)   | ja       | Enum: berichttype                    |
-| `xml_content`      | MEDIUMTEXT    | nee      | Originele XML inhoud                 |
+| `xml_content`      | TEXT          | nee      | Originele XML inhoud                 |
 | `status`           | VARCHAR(20)   | nee      | Huidige verwerkingsstatus            |
 | `priority`         | INT           | ja       | Prioriteit (1=hoog, 5=normaal)       |
 | `current_step`     | VARCHAR(10)   | ja       | Huidige pipeline stap                |
@@ -206,7 +235,7 @@ brp_register                                       standalone
 | `response_type`    | VARCHAR(10)   | nee      | ACK of NACK                          |
 | `error_codes`      | TEXT          | ja       | Komma-gescheiden foutcodes           |
 | `error_messages`   | TEXT          | ja       | Foutmeldingen                        |
-| `xml_response`     | MEDIUMTEXT    | nee      | Volledige XML respons                |
+| `xml_response`     | TEXT          | nee      | Volledige XML respons                |
 | `sent_at`          | TIMESTAMP     | ja       | Verstuurd op                         |
 | `created_at`       | TIMESTAMP     | nee      | Aangemaakt op                        |
 
@@ -261,6 +290,20 @@ Bij de eerste opstart worden automatisch testdata geladen via `DataInitializer`:
 | AGG001 | Allocatiegroep aanwezig      | `REGEX:.*(?:PRF\|TMT\|SMA\|NVL\|DIM).*` | AGGREGATED_ALLOCATION_SERIES   |
 | RCF001 | RCF datumversie aanwezig     | `CONTAINS:dateRCF_version`               | ALLOCATION_FACTOR_SERIES       |
 
+### Test data via dashboard of API
+
+Via het dashboard (knop "Laad Testdata") of via de API:
+
+```powershell
+# Database wissen
+Invoke-RestMethod -Uri http://localhost:8080/api/test/clear -Method POST
+
+# Testdata laden (20 berichten)
+Invoke-RestMethod -Uri http://localhost:8080/api/test/seed -Method POST
+```
+
+Dit maakt testberichten aan met diverse scenario's (ACK en NACK). Zie de sectie [Test Data Seeder](#7-test-data-seeder-apitestseed) voor details.
+
 ---
 
 ## API Endpoints
@@ -277,17 +320,17 @@ Content-Type: application/json
 **Request body:**
 ```json
 {
-    "xmlContent": "<?xml version=\"1.0\"?><AllocationSeriesNotification>...</AllocationSeriesNotification>",
+    "xmlContent": "<?xml version=\"1.0\"?><AllocationSeries>...</AllocationSeries>",
     "manualEntry": false,
     "eanCode": "871686700000000001"
 }
 ```
 
-| Veld          | Type    | Verplicht | Omschrijving                              |
+| Veld          | Type    | Verplicht | Validatie                                  |
 |---------------|---------|-----------|-------------------------------------------|
-| `xmlContent`  | string  | ja        | Het XML marktbericht                      |
+| `xmlContent`  | string  | ja        | Niet leeg, max 2 MB                       |
 | `manualEntry` | boolean | nee       | `true` = handmatig opgevoerd              |
-| `eanCode`     | string  | nee       | EAN-code voor BRP register validatie      |
+| `eanCode`     | string  | nee       | 13 of 18 cijfers (EAN-13/EAN-18 formaat)  |
 
 **Response (202 Accepted):**
 ```json
@@ -307,7 +350,7 @@ POST /api/messages/xml
 Content-Type: application/xml
 ```
 
-**Request body:** Het ruwe XML bericht als plain text.
+**Request body:** Het ruwe XML bericht als plain text (max 2 MB).
 
 **Response (202 Accepted):** Zelfde formaat als hierboven.
 
@@ -318,6 +361,8 @@ Content-Type: application/xml
 ```
 GET /api/messages/{uuid}
 ```
+
+> UUID moet geldig UUID-formaat zijn (bijv. `550e8400-e29b-41d4-a716-446655440000`).
 
 **Response (200 OK):**
 ```json
@@ -387,6 +432,43 @@ POST /api/messages/{uuid}/reprocess
     "message": "Bericht wordt opnieuw verwerkt"
 }
 ```
+
+---
+
+### 7. Test Data Seeder (`/api/test`)
+
+```
+POST /api/test/seed    — 20 testberichten laden
+POST /api/test/clear   — alle data wissen (TRUNCATE CASCADE)
+```
+
+> Alleen beschikbaar in niet-productie profielen (`default`, `dev`, `test`, `postgres`).
+> Rate limited: max 5 requests per minuut per IP.
+
+Maakt de volgende testberichten aan:
+
+| # | Scenario                                    | EAN-code             | Verwacht resultaat        |
+|---|---------------------------------------------|----------------------|---------------------------|
+| 1 | Geldig allocatiebericht (Engie)             | `871686700000000001` | ACK                       |
+| 2 | Geldig allocatiebericht (Vattenfall)        | `871686700000000002` | ACK                       |
+| 3 | Geldig bericht, handmatige opvoer (Essent)  | `871686700000000003` | ACK                       |
+| 4 | Geaggregeerd allocatiebericht met PRF       | `871686700000000001` | ACK                       |
+| 5 | RCF / Profielfracties bericht               | `871686700000000002` | ACK                       |
+| 6 | Negatief volume (PRF groep, toegestaan)     | `871686700000000001` | ACK                       |
+| 7 | Groot bericht met 96 posities (volledig dag)| `871686700000000001` | ACK                       |
+| 8 | Meerdere tijdseries in één bericht          | `871686700000000003` | ACK                       |
+| 9 | Ongeldig productcode                        | `871686700000000001` | NACK (validatiefout)      |
+| 10| Geen EAN-code meegegeven                    | *(geen)*             | NACK (BRP onbekend)       |
+| 11| Ongeldige XML (niet parseerbaar)            | `871686700000000001` | NACK (technisch)          |
+| 12| Onbekende BRP EAN                           | `999999999999999999` | NACK (765: BRP niet gevonden) |
+| 13| Foutieve resolutie (PT1H i.p.v. PT15M)     | `871686700000000001` | NACK (773: resolutie)     |
+| 14| Periode fout (eind voor start)              | `871686700000000001` | NACK (663: periode onjuist) |
+| 15| Ongeldige UUID in mRID                      | `871686700000000001` | NACK (669: ongeldig mRID) |
+| 16| Negatief volume (niet-PRF, niet toegestaan) | `871686700000000001` | NACK (686: negatief volume) |
+| 17| Volgorde posities fout (begint bij 2)       | `871686700000000001` | NACK (676/782: volgorde)  |
+| 18| Lege XML content                            | `871686700000000001` | FAILED (stap 1A)          |
+| 19| Toekomstdata (ver in toekomst)              | `871686700000000001` | NACK (772: toekomst)      |
+| 20| Dubbele EAN-codes in bericht                | `871686700000000004` | ACK (Liander, DDM rol)    |
 
 ---
 
@@ -461,43 +543,22 @@ Alle foutcodes komen uit de officiële specificatie: **Business-Service-Uitwisse
 
 ### Officiële foutcodes – Tijdserie-niveau
 
-| Code | Foutmelding                                        | Controle                                               | Rol       |
-|------|----------------------------------------------------|--------------------------------------------------------|-----------|
-| 651  | Ongeldige EAN-codelijst                            | Controle of EAN-18 code geldig is                      | BRP / LNB |
-| 663  | Periode niet juist                                 | Controle of einddatum na startdatum ligt               | BRP / LNB |
-| 669  | MessageID niet uniek / ongeldig formaat            | Controle of mRID een geldig UUID is                    | BRP / LNB |
-| 670  | Versie van het bericht niet juist                  | Controle op berichtversie                              | BRP / LNB |
-| 671  | Type bericht niet juist                            | Controle op geldig berichttype                         | BRP / LNB |
-| 676  | Eerste positie is niet '1'                         | Controle of eerste tijdserie-positie = 1               | BRP / LNB |
-| 681  | Volgorde posities onjuist                          | Controle sequentiële volgorde binnen tijdserie         | BRP / LNB |
-| 686  | Volume negatief (niet toegestaan)                  | Controle op negatieve volumes (excl. PRF)              | BRP / LNB |
-| 701  | Ontbrekende/ongeldige afzender                     | Controle of afzender bekend is                         | BRP / LNB |
-| 704  | Ontbrekende/ongeldige ontvanger                    | Controle of ontvanger klopt                            | BRP / LNB |
-| 745  | Tijdzone ontbreekt/ongeldig                        | Controle of tijdzone correct is meegegeven             | BRP / LNB |
-| 747  | Datum notatie onjuist                              | Controle of datum ISO 8601 formaat heeft               | BRP / LNB |
-| 754  | Aansluitingcode meetpunt ongeldig                  | Controle EAN-meetpunt code                             | BRP / LNB |
-| 758  | Ontbrekende/ongeldige EAN-13 code meetpunt         | Controle of EAN-13 meetpunt geldig is                  | BRP / LNB |
-| 761  | Verplicht element ontbreekt                        | Controle op aanwezigheid verplichte XML-elementen      | BRP / LNB |
-| 763  | Oplevering te laat (dagrapport)                    | Controle of bericht binnen geldige leverdatum valt     | BRP / LNB |
-| 764  | Tijdserie past niet bij allocatiegroep             | Controle of allocatiegroep overeenkomt                 | BRP / LNB |
-| 765  | BRP/leverancier niet bekend/erkend                 | Controle of BRP in register staat                      | BRP / LNB |
-| 769  | Verdeelfactor buiten bereik [0,1]                  | Controle of verdeelfactor tussen 0 en 1 ligt           | BRP / LNB |
-| 771  | Ongeldig kwalificatie/status veld                  | Controle op geldig kwalificatieveld                    | BRP / LNB |
-| 772  | Data heeft betrekking op de toekomst               | Controle of data niet in de toekomst ligt              | BRP / LNB |
-| 773  | Resolutie past niet bij productsoort               | Controle of resolutie klopt (PT15M bij elektriciteit)  | BRP / LNB |
-| 774  | Aantal posities past niet bij resolutie/periode    | Controle of er 96 waarden zijn per dag bij PT15M       | BRP / LNB |
-| 776  | Volume onjuist aantal decimalen                    | Controle of volumes exact 3 decimalen hebben           | BRP / LNB |
-| 777  | Verdeelfactoren tellen niet op tot 1               | Controle of som van fracties = 1                       | BRP / LNB |
-| 779  | Dubbel bericht (reeds ontvangen)                   | Controle op duplicaat berichten                        | BRP / LNB |
-| 780  | Meetpunt niet gekoppeld aan EAN-18 leverancier     | Controle of meetpunt bij leverancier hoort             | BRP / LNB |
-| 781  | Rekenresultaat niet reproduceerbaar                | Controle of berekening klopt                           | BRP / LNB |
-| 782  | Increment is niet '1'                              | Controle of position-increment altijd 1 is             | BRP / LNB |
-
-### Officiële foutcodes – Header- en berichtniveau
-
-| Code | Foutmelding                                        | Controle                                               | Rol       |
-|------|----------------------------------------------------|--------------------------------------------------------|-----------|
-| 999  | Overige fout / generieke validatiefout              | Diverse controles die niet onder specifiek code vallen | BRP / LNB |
+| Code | Foutmelding                                        | Controle                                               |
+|------|----------------------------------------------------|--------------------------------------------------------|
+| 651  | Ongeldige EAN-codelijst                            | Controle of EAN-18 code geldig is                      |
+| 663  | Periode niet juist                                 | Controle of einddatum na startdatum ligt               |
+| 669  | MessageID niet uniek / ongeldig formaat            | Controle of mRID een geldig UUID is                    |
+| 676  | Eerste positie is niet '1'                         | Controle of eerste tijdserie-positie = 1               |
+| 686  | Volume negatief (niet toegestaan)                  | Controle op negatieve volumes (excl. PRF)              |
+| 758  | Ontbrekende/ongeldige EAN-13 code meetpunt         | Controle of EAN-13 meetpunt geldig is                  |
+| 763  | Oplevering te laat (dagrapport)                    | Controle of bericht binnen geldige leverdatum valt     |
+| 764  | Tijdserie past niet bij allocatiegroep             | Controle of allocatiegroep overeenkomt                 |
+| 765  | BRP/leverancier niet bekend/erkend                 | Controle of BRP in register staat                      |
+| 772  | Data heeft betrekking op de toekomst               | Controle of data niet in de toekomst ligt              |
+| 773  | Resolutie past niet bij productsoort               | Controle of resolutie klopt (PT15M bij elektriciteit)  |
+| 776  | Volume onjuist aantal decimalen                    | Controle of volumes exact 3 decimalen hebben           |
+| 782  | Increment is niet '1'                              | Controle of position-increment altijd 1 is             |
+| 999  | Overige fout / generieke validatiefout             | Diverse controles die niet onder specifiek code vallen |
 
 ### Waar worden foutcodes gegenereerd?
 
@@ -509,28 +570,6 @@ Alle foutcodes komen uit de officiële specificatie: **Business-Service-Uitwisse
 | 3E   | Step3eTijdvenster.java             | 663 (periode onjuist), 772 (toekomst), 763 (te laat)                   |
 | 3F   | Step3fVolgordelijkheid.java        | 676 (eerste positie ≠ 1), 782 (increment ≠ 1)                         |
 | 3G   | Step3gHerbruikbareRegels.java      | 669 (MessageID), 999 (datetime formaat), 776 (decimalen), 651 (EAN-18) |
-
-### Configureerbare foutcodes (uit `validation_rules` tabel)
-
-| Foutcode | Regel            | Controle                                                 |
-|----------|------------------|----------------------------------------------------------|
-| 999      | XML_SCHEMA       | XML header aanwezig                                      |
-| 999      | PRODUCTSOORT     | Productsoort elektriciteit (023)                         |
-| 773      | RESOLUTIE        | Resolutie moet PT15M zijn                                |
-| 764      | ALLOCATIEGROEP   | Geldige allocatiegroep (PRF/TMT/SMA/NVL/DIM) aanwezig   |
-| 999      | RCF_DATUM        | Datumversie RCF verplicht voor RCF-berichten             |
-| 651      | EAN_18           | EAN-18 code geldig (18 cijfers)                          |
-| 758      | EAN_13           | EAN-13 code meetpunt geldig (13 cijfers)                 |
-| 765      | BRP_BEKENDHEID   | BRP bekend in register                                   |
-| 776      | VOLUME_DECIMALEN | Volume exact 3 decimalen                                 |
-| 686      | NEGATIEF_VOLUME  | Volume niet negatief (behalve PRF)                       |
-
-### Pipeline fouten
-
-| Code             | Betekenis                                         |
-|------------------|---------------------------------------------------|
-| VALIDATION_FAILED| Overall validatie gefaald (opgeslagen in validation_results) |
-| OVERALL          | Overall validatie geslaagd                         |
 
 ---
 
@@ -563,6 +602,54 @@ Alle foutcodes komen uit de officiële specificatie: **Business-Service-Uitwisse
 
 ---
 
+## Beveiliging
+
+De applicatie bevat uitgebreide beveiligingsmaatregelen voor productiegericht gebruik.
+
+### Security headers
+
+| Header                    | Waarde                                         |
+|---------------------------|-------------------------------------------------|
+| Content-Security-Policy   | `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:` |
+| X-Frame-Options           | `DENY` (voorkomt clickjacking)                  |
+| X-Content-Type-Options    | `nosniff`                                       |
+| Strict-Transport-Security | `max-age=31536000; includeSubDomains` (HSTS)    |
+| Referrer-Policy           | `strict-origin-when-cross-origin`               |
+| Permissions-Policy        | `camera=(), microphone=(), geolocation=(), payment=()` |
+
+### Input validatie
+
+- **XML content:** Verplicht, max 2 MB
+- **EAN-code:** Optioneel, moet 13 of 18 cijfers zijn (EAN-13/EAN-18 formaat)
+- **UUID parameters:** Worden gevalideerd op geldig UUID-formaat
+- **XXE bescherming:** XML parsing met `disallow-doctype-decl` in alle 4 de XML-parsers
+
+### Rate limiting (per IP-adres)
+
+| Endpoint             | Limiet       |
+|----------------------|--------------|
+| `POST /api/messages` | 30 per minuut |
+| `POST /api/test/*`   | 5 per minuut  |
+| `GET /api/*`         | 120 per minuut |
+
+Overschrijding geeft een `429 Too Many Requests` respons met `X-RateLimit-Remaining` header.
+
+### CORS
+
+- Alleen `GET` en `POST` methoden toegestaan
+- Alleen `Content-Type` en `Accept` headers toegestaan
+- Geconfigureerd voor `/api/**` endpoints
+
+### Overige maatregelen
+
+- **Geen interne foutdetails:** Stack traces en exception messages worden nooit aan clients getoond
+- **H2 console uitgeschakeld:** Voorkomt directe database-toegang via browser
+- **Test endpoints afgeschermd:** `/api/test/seed` en `/api/test/clear` zijn alleen beschikbaar in niet-productie profielen
+- **Request size limiet:** Maximum 2 MB op servlet- en Tomcat-niveau
+- **Logging:** Productieniveau (INFO), security events op WARN
+
+---
+
 ## Testen van begin tot einde
 
 ### Test 1: Geldig bericht → ACK (alle 29 stappen doorlopen)
@@ -571,7 +658,7 @@ Alle foutcodes komen uit de officiële specificatie: **Business-Service-Uitwisse
 
 ```powershell
 $body = @{
-    xmlContent = '<?xml version="1.0" encoding="UTF-8"?><AllocationSeriesNotification><mRID>550e8400-e29b-41d4-a716-446655440000</mRID><product><identification>8716867000016</identification><measureUnit>KWH</measureUnit></product><group_businessType>PRF</group_businessType><DateAndOrTime><startDateTime>2026-03-10T23:00:00Z</startDateTime><endDateTime>2026-03-11T23:00:00Z</endDateTime></DateAndOrTime><Detail_Series><resolution>PT15M</resolution><MarketEvaluationPoint><mRID>871686700000000001</mRID></MarketEvaluationPoint><MarketParticipant><mRID>871686700000000001</mRID><MarketRole><type>DDK</type></MarketRole></MarketParticipant><Product><identification>8716867000016</identification></Product><Point><position>1</position><quantity>123.456</quantity></Point><Point><position>2</position><quantity>234.567</quantity></Point></Detail_Series></AllocationSeriesNotification>'
+    xmlContent = '<?xml version="1.0" encoding="UTF-8"?><AllocationSeries><mRID>550e8400-e29b-41d4-a716-446655440000</mRID><sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID><receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID><product><identification>023</identification></product><startDateTime>2025-01-01T00:00:00Z</startDateTime><endDateTime>2025-01-02T00:00:00Z</endDateTime><resolution>PT15M</resolution><position>1</position><quantity>150.000</quantity><position>2</position><quantity>200.000</quantity></AllocationSeries>'
     manualEntry = $false
     eanCode = "871686700000000001"
 } | ConvertTo-Json
@@ -593,32 +680,11 @@ Invoke-RestMethod -Uri http://localhost:8080/api/messages/{uuid} -Method GET | C
 
 ---
 
-### Test 2: Ongeldig bericht → NACK (validatiefouten)
-
-**Stuur een bericht met lege XML:**
+### Test 2: Onbekende EAN → NACK met foutcode 765
 
 ```powershell
 $body = @{
-    xmlContent = ""
-    manualEntry = $false
-} | ConvertTo-Json
-
-Invoke-RestMethod -Uri http://localhost:8080/api/messages -Method POST -ContentType "application/json" -Body $body
-```
-
-**Verwacht resultaat:**
-- `status`: `COMPLETED` (pipeline loopt door tot fase 4)
-- `responseType`: `NACK`
-- Stap 1A: `FAILED` met foutmelding "XML content is leeg"
-- Pipeline halted na 1A
-
----
-
-### Test 3: Onbekende EAN → validatiefout in stap 3A
-
-```powershell
-$body = @{
-    xmlContent = '<?xml version="1.0" encoding="UTF-8"?><AllocationSeriesNotification><mRID>550e8400-e29b-41d4-a716-446655440000</mRID><product><identification>8716867000016</identification></product><DateAndOrTime><startDateTime>2026-03-10T23:00:00Z</startDateTime><endDateTime>2026-03-11T23:00:00Z</endDateTime></DateAndOrTime><Detail_Series><resolution>PT15M</resolution><Point><position>1</position><quantity>100</quantity></Point></Detail_Series></AllocationSeriesNotification>'
+    xmlContent = '<?xml version="1.0" encoding="UTF-8"?><AllocationSeries><mRID>550e8400-e29b-41d4-a716-446655440001</mRID><sender_MarketParticipant.mRID codingScheme="A10">999999999999999999</sender_MarketParticipant.mRID><product><identification>023</identification></product><startDateTime>2025-01-01T00:00:00Z</startDateTime><endDateTime>2025-01-02T00:00:00Z</endDateTime><resolution>PT15M</resolution><position>1</position><quantity>100.000</quantity></AllocationSeries>'
     manualEntry = $false
     eanCode = "999999999999999999"
 } | ConvertTo-Json
@@ -632,6 +698,23 @@ Invoke-RestMethod -Uri http://localhost:8080/api/messages -Method POST -ContentT
 
 ---
 
+### Test 3: Test data seeden (dashboard of API)
+
+```powershell
+# Database wissen
+Invoke-RestMethod -Uri http://localhost:8080/api/test/clear -Method POST
+
+# Via API: 20 testberichten laden
+Invoke-RestMethod -Uri http://localhost:8080/api/test/seed -Method POST
+
+# Bekijk alle berichten
+Invoke-RestMethod -Uri http://localhost:8080/api/messages -Method GET | ConvertTo-Json -Depth 3
+```
+
+Of open het dashboard op `http://localhost:8080` en klik op **"Laad Testdata"**.
+
+---
+
 ### Test 4: Bericht opnieuw verwerken
 
 ```powershell
@@ -641,46 +724,28 @@ Invoke-RestMethod -Uri http://localhost:8080/api/messages/{uuid}/reprocess -Meth
 
 ---
 
-### Test 5: Alle berichten bekijken
-
-```powershell
-Invoke-RestMethod -Uri http://localhost:8080/api/messages -Method GET | ConvertTo-Json -Depth 3
-```
-
-### Test 6: Filteren op status
+### Test 5: Filteren op status
 
 ```powershell
 Invoke-RestMethod -Uri http://localhost:8080/api/messages/status/COMPLETED -Method GET | ConvertTo-Json
 ```
 
-### Test 7: Database inspecteren via H2 Console
+---
 
-1. Open http://localhost:8080/h2-console
-2. JDBC URL: `jdbc:h2:file:./data/market_messages`
-3. Username: `sa`, Password: *(leeg)*
-4. Handige queries:
+### Test 6: Database inspecteren (PostgreSQL)
 
-```sql
--- Alle berichten
-SELECT * FROM MARKET_MESSAGES;
+```powershell
+# Alle berichten
+docker exec engie-postgres psql -U engie -d market_messages -c "SELECT message_uuid, message_type, status, ean_code FROM market_messages;"
 
--- Alle stappen van een specifiek bericht
-SELECT * FROM PROCESSING_STEPS WHERE MESSAGE_ID = 1 ORDER BY STEP_ORDER;
+# Stappen van een bericht
+docker exec engie-postgres psql -U engie -d market_messages -c "SELECT step_code, step_name, status FROM processing_steps WHERE message_id = 1 ORDER BY step_order;"
 
--- Validatiefouten
-SELECT * FROM VALIDATION_RESULTS WHERE IS_VALID = FALSE;
+# ACK/NACK responses
+docker exec engie-postgres psql -U engie -d market_messages -c "SELECT response_type, error_codes FROM market_responses;"
 
--- ACK/NACK responses
-SELECT * FROM MARKET_RESPONSES;
-
--- BRP register
-SELECT * FROM BRP_REGISTER;
-
--- Actieve validatieregels
-SELECT * FROM VALIDATION_RULES WHERE IS_ACTIVE = TRUE;
-
--- Delivery status
-SELECT * FROM DELIVERY_RECORDS;
+# BRP register
+docker exec engie-postgres psql -U engie -d market_messages -c "SELECT ean_code, party_name, market_role FROM brp_register;"
 ```
 
 ---
@@ -691,19 +756,19 @@ SELECT * FROM DELIVERY_RECORDS;
 mvn test
 ```
 
-**140 tests** verdeeld over 9 test classes:
+**142 tests** verdeeld over 9 test classes:
 
 | Test class                    | Tests | Dekking                              |
 |-------------------------------|-------|--------------------------------------|
-| Phase1StepTests               | 13    | Stappen 1A-1F                        |
-| Phase2StepTests               | 13    | Stappen 2A-2E                        |
-| Phase3StepTests               | 19    | Stappen 3A-3G (validatie)            |
-| Phase4StepTests               | 14    | Stappen 4A-4E (ACK/NACK)            |
-| Phase5StepTests               | 8     | Stappen 5A-5D (versturen)           |
-| Phase6StepTests               | 7     | Stappen 6A-6B (aflevering)          |
-| PipelineOrchestratorTest      | 11    | Registratie, uitvoering, foutafhandeling |
-| MarketMessageServiceTest      | 12    | Service laag                         |
-| MarketMessageControllerTest   | 10    | REST endpoints (MockMvc)             |
+| Phase1StepTests               | 21    | Stappen 1A-1F                        |
+| Phase2StepTests               | 18    | Stappen 2A-2E                        |
+| Phase3StepTests               | 28    | Stappen 3A-3G (validatie)            |
+| Phase4StepTests               | 17    | Stappen 4A-4E (ACK/NACK)            |
+| Phase5StepTests               | 11    | Stappen 5A-5D (versturen)           |
+| Phase6StepTests               | 8     | Stappen 6A-6B (aflevering)          |
+| PipelineOrchestratorTest      | 13    | Registratie, uitvoering, foutafhandeling |
+| MarketMessageServiceTest      | 14    | Service laag                         |
+| MarketMessageControllerTest   | 12    | REST endpoints (MockMvc) + beveiligingstests |
 
 ---
 
@@ -731,7 +796,10 @@ In `application.yml`:
 | `pipeline.forward-nack-internally`| `false`   | NACK berichten doorsturen naar raw-layer?       |
 | `pipeline.async-enabled`          | `true`    | Asynchrone verwerking aan/uit                   |
 | `spring.jpa.hibernate.ddl-auto`   | `update`  | Schema automatisch aanmaken/updaten             |
-| `spring.h2.console.enabled`       | `true`    | H2 web console aan/uit                          |
+| `spring.h2.console.enabled`       | `false`   | H2 web console (uitgeschakeld voor beveiliging) |
+| `spring.servlet.multipart.max-file-size` | `2MB` | Maximum upload grootte                     |
+| `server.error.include-message`    | `never`   | Verberg interne foutmeldingen                   |
+| `server.error.include-stacktrace` | `never`   | Verberg stack traces                            |
 
 ---
 
@@ -740,29 +808,70 @@ In `application.yml`:
 ```
 src/main/java/nl/engie/allocation/
 ├── config/
-│   └── DataInitializer.java          # Seed data bij eerste start
+│   ├── DataInitializer.java          # Seed data bij eerste start (BRP register + validatieregels)
+│   ├── InputSanitizer.java           # Input validatie utilities (UUID, EAN, size checks)
+│   ├── RateLimitFilter.java          # Rate limiting per IP-adres
+│   └── SecurityConfig.java           # Spring Security configuratie (headers, CORS)
 ├── controller/
-│   └── MarketMessageController.java  # REST endpoints
+│   ├── MarketMessageController.java  # REST API endpoints
+│   └── TestDataController.java       # Test data seeder (alleen niet-productie)
 ├── dto/
-│   ├── MessageSubmitRequest.java     # Input DTO
+│   ├── MessageSubmitRequest.java     # Input DTO met validatie-annotaties
 │   ├── MessageStatusResponse.java    # Output DTO (record)
-│   └── StepStatusDto.java           # Stap detail DTO (record)
+│   ├── StepStatusDto.java           # Stap detail DTO (record)
+│   └── ValidationErrorDto.java       # Validatie fout DTO
+├── exception/
+│   ├── GlobalExceptionHandler.java   # Centrale foutafhandeling (geen interne details lekken)
+│   └── PipelineException.java        # Custom exception voor pipeline fouten
 ├── model/
 │   ├── entity/                       # JPA entities (8 tabellen)
-│   └── enums/                        # MessageType, MessageStatus, StepCode, etc.
+│   │   ├── BrpRegisterEntry.java
+│   │   ├── DeliveryRecord.java
+│   │   ├── MarketMessage.java
+│   │   ├── MarketResponse.java
+│   │   ├── ProcessingLog.java
+│   │   ├── ProcessingStep.java
+│   │   ├── ValidationResult.java
+│   │   └── ValidationRule.java
+│   └── enums/                        # Enumeraties
+│       ├── ErrorCode.java
+│       ├── MessageStatus.java
+│       ├── MessageType.java
+│       ├── ResponseType.java
+│       ├── StepCode.java
+│       └── StepStatus.java
 ├── pipeline/
 │   ├── PipelineContext.java          # Context object door pipeline
 │   ├── PipelineOrchestrator.java     # Voert 29 stappen uit op volgorde
 │   ├── PipelineStep.java            # Interface voor een stap
 │   ├── StepResult.java              # Resultaat van een stap
-│   └── step/                        # 29 individuele stap classes
-│       ├── Step1aOntvangBericht.java
-│       ├── Step1bTechnischeOntvangst.java
-│       ├── ...
-│       └── Step6bAfleverstatus.java
+│   └── step/                        # 28 individuele stap classes
+│       ├── Step1aOntvangBericht.java ... Step6bAfleverstatus.java
 ├── repository/                       # Spring Data JPA repositories (8)
 └── service/
     └── MarketMessageService.java     # Business logic
+
+src/main/resources/
+├── application.yml                   # Configuratie (H2 default + PostgreSQL profiel)
+└── static/                           # Dashboard frontend
+    ├── index.html
+    ├── css/                          # 10 modulaire CSS bestanden
+    └── js/                           # 4 JavaScript bestanden (api, app, render, utils)
+
+src/test/java/nl/engie/allocation/
+├── controller/
+│   └── MarketMessageControllerTest.java  # 12 tests (REST + beveiliging)
+├── service/
+│   └── MarketMessageServiceTest.java     # 14 tests
+├── pipeline/
+│   ├── PipelineOrchestratorTest.java     # 13 tests
+│   └── step/
+│       ├── Phase1StepTests.java          # 21 tests
+│       ├── Phase2StepTests.java          # 18 tests
+│       ├── Phase3StepTests.java          # 28 tests
+│       ├── Phase4StepTests.java          # 17 tests
+│       ├── Phase5StepTests.java          # 11 tests
+│       └── Phase6StepTests.java          # 8 tests
 ```
 
 ---

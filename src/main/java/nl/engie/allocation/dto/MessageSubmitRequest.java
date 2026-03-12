@@ -1,10 +1,20 @@
 package nl.engie.allocation.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 import java.util.Objects;
 
 public class MessageSubmitRequest {
+
+    @NotBlank(message = "XML content mag niet leeg zijn")
+    @Size(max = 2097152, message = "XML content mag niet groter zijn dan 2 MB")
     private String xmlContent;
+
     private boolean manualEntry;
+
+    @Pattern(regexp = "^$|^\\d{13}(\\d{5})?$", message = "EAN-code moet 13 of 18 cijfers bevatten")
     private String eanCode;
 
     public MessageSubmitRequest() {
@@ -41,9 +51,9 @@ public class MessageSubmitRequest {
     @Override
     public String toString() {
         return "MessageSubmitRequest(" +
-                "xmlContent=" + xmlContent +
+                "xmlContent=[" + (xmlContent != null ? xmlContent.length() + " chars" : "null") + "]" +
                 ", manualEntry=" + manualEntry +
-                ", eanCode=" + eanCode +
+                ", eanCode=" + (eanCode != null ? "***" : "null") +
                 ')';
     }
 }

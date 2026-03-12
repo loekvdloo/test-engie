@@ -1,6 +1,7 @@
 package nl.engie.allocation.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.engie.allocation.config.SecurityConfig;
 import nl.engie.allocation.dto.MessageStatusResponse;
 import nl.engie.allocation.dto.MessageSubmitRequest;
 import nl.engie.allocation.model.enums.MessageStatus;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,7 +25,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(MarketMessageController.class)
+@Import(SecurityConfig.class)
 class MarketMessageControllerTest {
+
+    private static final String VALID_UUID = "550e8400-e29b-41d4-a716-446655440000";
+    private static final String VALID_UUID_2 = "550e8400-e29b-41d4-a716-446655440001";
+    private static final String VALID_UUID_3 = "550e8400-e29b-41d4-a716-446655440002";
+    private static final String VALID_EAN = "1234567890123";
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,7 +51,7 @@ class MarketMessageControllerTest {
             when(messageService.submitMessage(any())).thenReturn("gen-uuid-123");
 
             MessageSubmitRequest request = new MessageSubmitRequest(
-                    "<AllocationSeries/>", false, "EAN123"
+                    "<AllocationSeries/>", false, VALID_EAN
             );
 
             mockMvc.perform(post("/api/messages")
@@ -78,25 +86,31 @@ class MarketMessageControllerTest {
         @Test
         void getMessageStatus_shouldReturn200() throws Exception {
             MessageStatusResponse response = new MessageStatusResponse(
-                    "test-uuid", "ALLOCATION_SERIES", "COMPLETED", "STEP_6B",
+                    VALID_UUID, "ALLOCATION_SERIES", "COMPLETED", "STEP_6B",
                     LocalDateTime.now(), LocalDateTime.now(), 1, "ACK", "<ack/>", List.of(), List.of()
             );
-            when(messageService.getMessageStatus("test-uuid")).thenReturn(response);
+            when(messageService.getMessageStatus(VALID_UUID)).thenReturn(response);
 
-            mockMvc.perform(get("/api/messages/test-uuid"))
+            mockMvc.perform(get("/api/messages/" + VALID_UUID))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.messageUuid").value("test-uuid"))
+                    .andExpect(jsonPath("$.messageUuid").value(VALID_UUID))
                     .andExpect(jsonPath("$.status").value("COMPLETED"))
                     .andExpect(jsonPath("$.responseType").value("ACK"));
         }
 
         @Test
-        void getMessageStatus_notFound_shouldReturn400() throws Exception {
-            when(messageService.getMessageStatus("unknown"))
+        void getMessageStatus_invalidUuid_shouldReturn400() throws Exception {
+            mockMvc.perform(get("/api/messages/not-a-valid-uuid"))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void getMessageStatus_notFound_shouldReturn500() throws Exception {
+            when(messageService.getMessageStatus(VALID_UUID_2))
                     .thenThrow(new RuntimeException("Bericht niet gevonden"));
 
-            mockMvc.perform(get("/api/messages/unknown"))
-                    .andExpect(status().isBadRequest());
+            mockMvc.perform(get("/api/messages/" + VALID_UUID_2))
+                    .andExpect(status().isInternalServerError());
         }
     }
 
@@ -165,21 +179,27 @@ class MarketMessageControllerTest {
 
         @Test
         void reprocess_shouldReturn200() throws Exception {
-            when(messageService.reprocessMessage("failed-uuid")).thenReturn("failed-uuid");
+            when(messageService.reprocessMessage(VALID_UUID)).thenReturn(VALID_UUID);
 
-            mockMvc.perform(post("/api/messages/failed-uuid/reprocess"))
+            mockMvc.perform(post("/api/messages/" + VALID_UUID + "/reprocess"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.messageUuid").value("failed-uuid"))
+                    .andExpect(jsonPath("$.messageUuid").value(VALID_UUID))
                     .andExpect(jsonPath("$.status").value("REPROCESSING"));
         }
 
         @Test
-        void reprocess_completedMessage_shouldReturn400() throws Exception {
-            when(messageService.reprocessMessage("completed-uuid"))
+        void reprocess_invalidUuid_shouldReturn400() throws Exception {
+            mockMvc.perform(post("/api/messages/not-a-valid-uuid/reprocess"))
+                    .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void reprocess_completedMessage_shouldReturn500() throws Exception {
+            when(messageService.reprocessMessage(VALID_UUID_3))
                     .thenThrow(new RuntimeException("Kan niet herverwerken"));
 
-            mockMvc.perform(post("/api/messages/completed-uuid/reprocess"))
-                    .andExpect(status().isBadRequest());
+            mockMvc.perform(post("/api/messages/" + VALID_UUID_3 + "/reprocess"))
+                    .andExpect(status().isInternalServerError());
         }
     }
 }

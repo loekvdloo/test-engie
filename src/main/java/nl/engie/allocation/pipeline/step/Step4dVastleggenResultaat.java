@@ -33,6 +33,21 @@ public class Step4dVastleggenResultaat implements PipelineStep {
     public StepResult execute(PipelineContext context) {
         var message = context.getMessage();
 
+        // Save individual validation error entries (specific error codes from steps 3A-3G)
+        if (context.isNack()) {
+            for (var error : context.getValidationErrors()) {
+                ValidationResult errorResult = ValidationResult.builder()
+                        .marketMessage(message)
+                        .ruleCode(error.code())
+                        .isValid(false)
+                        .errorCode(error.code())
+                        .errorMessage(error.message())
+                        .build();
+                validationResultRepository.save(errorResult);
+            }
+        }
+
+        // Save overall validation result
         ValidationResult overallResult = ValidationResult.builder()
                 .marketMessage(message)
                 .ruleCode("OVERALL")

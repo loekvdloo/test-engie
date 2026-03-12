@@ -1,4 +1,7 @@
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\config\DataInitializer.java
+C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\config\InputSanitizer.java
+C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\config\RateLimitFilter.java
+C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\config\SecurityConfig.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\controller\MarketMessageController.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\controller\TestDataController.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\dto\MessageStatusResponse.java
