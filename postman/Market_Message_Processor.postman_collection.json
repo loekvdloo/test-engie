@@ -1,0 +1,497 @@
+{
+  "info": {
+    "name": "Market Message Processor - Pipeline API",
+    "description": "Postman collectie voor de Market Message Processor pipeline API.\n\nVoorbeelden van berichten die alle stappen doorlopen (ACK), en berichten die ergens blijven haken (NACK/FAIL).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "messageUuid",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Valide berichten (ACK pad)",
+      "description": "Berichten die succesvol alle 29 stappen doorlopen en een ACK ontvangen.",
+      "item": [
+        {
+          "name": "1a. Submit - Valid AllocationSeries (ACK)",
+          "description": "Een volledig geldig AllocationSeries bericht met een bekende EAN code.\nDit bericht doorloopt alle 29 stappen succesvol en resulteert in een ACK.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 202 Accepted', function() {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "pm.test('Response bevat messageUuid', function() {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.messageUuid).to.be.a('string');",
+                  "    pm.collectionVariables.set('messageUuid', json.messageUuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"xmlContent\": \"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><AllocationSeries><mRID>a1b2c3d4-e5f6-7890-abcd-ef1234567890</mRID><product><identification>8716867000016</identification></product><startDateTime>2025-01-01T00:00:00Z</startDateTime><endDateTime>2025-01-02T00:00:00Z</endDateTime><resolution>PT15M</resolution><position>1</position><quantity>100.000</quantity><position>2</position><quantity>200.000</quantity></AllocationSeries>\",\n  \"manualEntry\": false,\n  \"eanCode\": \"871686700012345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        },
+        {
+          "name": "1b. Submit - Valid AggregatedAllocation (ACK)",
+          "description": "Een geldig geaggregeerd allocatiebericht met de correcte allocatiegroep (PRF).\nResulteert in ACK.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 202 Accepted', function() {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "pm.test('Response bevat messageUuid', function() {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('messageUuid', json.messageUuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"xmlContent\": \"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><AggregatedAllocation><mRID>b2c3d4e5-f6a7-8901-bcde-f12345678901</mRID><product><identification>023</identification></product><allocatiegroep>PRF</allocatiegroep><startDateTime>2025-01-01T00:00:00Z</startDateTime><endDateTime>2025-01-02T00:00:00Z</endDateTime><resolution>PT15M</resolution><position>1</position><quantity>500.000</quantity></AggregatedAllocation>\",\n  \"manualEntry\": false,\n  \"eanCode\": \"871686700012345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Ongeldige berichten (NACK/FAIL pad)",
+      "description": "Berichten die ergens in de pipeline blijven haken.",
+      "item": [
+        {
+          "name": "2a. FAIL bij Step 1A - Leeg bericht",
+          "description": "Bericht zonder XML content.\nFAALT bij stap 1A (Ontvangen marktbericht) omdat xmlContent leeg is.\nAlle volgende stappen worden overgeslagen.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 202 Accepted', function() {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "pm.test('Response bevat messageUuid', function() {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('messageUuid', json.messageUuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"xmlContent\": \"\",\n  \"manualEntry\": false,\n  \"eanCode\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        },
+        {
+          "name": "2b. FAIL bij Step 1C - Ongeldige XML",
+          "description": "Bericht met kapotte/ongeldige XML.\nHaalt stap 1A en 1B, maar FAALT bij stap 1C (Technische validatie) omdat de XML niet parseerbaar is.\nAlle stappen na 1C worden overgeslagen.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 202 Accepted', function() {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "pm.test('Response bevat messageUuid', function() {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('messageUuid', json.messageUuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"xmlContent\": \"<dit is geen geldige xml><zonder sluittag\",\n  \"manualEntry\": false,\n  \"eanCode\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        },
+        {
+          "name": "2c. FAIL bij Step 1E - Onbekend berichttype",
+          "description": "Bericht met geldige XML maar een onbekend root element.\nHaalt stap 1A t/m 1D, maar FAALT bij stap 1E (Identificatie berichttype).\nAlle stappen na 1E worden overgeslagen.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 202 Accepted', function() {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "pm.test('Response bevat messageUuid', function() {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('messageUuid', json.messageUuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"xmlContent\": \"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><OnbekendBerichttype><mRID>c3d4e5f6-a7b8-9012-cdef-123456789012</mRID><data>test</data></OnbekendBerichttype>\",\n  \"manualEntry\": false,\n  \"eanCode\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        },
+        {
+          "name": "2d. NACK bij Step 3A - Ongeldige EAN",
+          "description": "Bericht met een EAN code die niet in het BRP register staat.\nDoorloopt fase 1 en 2 succesvol, maar krijgt bij stap 3A een BRP001 validatiefout.\nResulteert in NACK bij fase 4.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 202 Accepted', function() {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "pm.test('Response bevat messageUuid', function() {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('messageUuid', json.messageUuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"xmlContent\": \"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><AllocationSeries><mRID>d4e5f6a7-b8c9-0123-def0-123456789abc</mRID><product><identification>8716867000016</identification></product><startDateTime>2025-01-01T00:00:00Z</startDateTime><endDateTime>2025-01-02T00:00:00Z</endDateTime><resolution>PT15M</resolution><position>1</position><quantity>50.000</quantity></AllocationSeries>\",\n  \"manualEntry\": false,\n  \"eanCode\": \"999999999999999999\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        },
+        {
+          "name": "2e. NACK bij Step 3C - Verplichte velden ontbreken",
+          "description": "Bericht waar verplichte velden (product, startDateTime, endDateTime, resolution) ontbreken.\nDoorloopt fase 1 en 2 succesvol, maar krijgt bij stap 3C meerdere VLD001 validatiefouten.\nResulteert in NACK bij fase 4.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 202 Accepted', function() {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "pm.test('Response bevat messageUuid', function() {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('messageUuid', json.messageUuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"xmlContent\": \"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><AllocationSeries><mRID>e5f6a7b8-c9d0-1234-ef01-23456789abcd</mRID><data>minimaal bericht zonder verplichte velden</data></AllocationSeries>\",\n  \"manualEntry\": false,\n  \"eanCode\": \"871686700012345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        },
+        {
+          "name": "2f. NACK bij Step 3G - Ongeldig mRID UUID formaat",
+          "description": "Bericht met een mRID die niet het UUID formaat heeft.\nDoorloopt fase 1 t/m 3F, maar krijgt bij stap 3G een HBR001 validatiefout.\nResulteert in NACK bij fase 4.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 202 Accepted', function() {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "pm.test('Response bevat messageUuid', function() {",
+                  "    var json = pm.response.json();",
+                  "    pm.collectionVariables.set('messageUuid', json.messageUuid);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"xmlContent\": \"<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?><AllocationSeries><mRID>GEEN-GELDIG-UUID-FORMAAT</mRID><product><identification>8716867000016</identification></product><startDateTime>2025-01-01T00:00:00Z</startDateTime><endDateTime>2025-01-02T00:00:00Z</endDateTime><resolution>PT15M</resolution><position>1</position><quantity>100.000</quantity></AllocationSeries>\",\n  \"manualEntry\": false,\n  \"eanCode\": \"871686700012345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Status & Beheer",
+      "description": "Endpoints om de status van berichten te bekijken en te beheren.",
+      "item": [
+        {
+          "name": "3a. GET - Status van laatste bericht",
+          "description": "Haal de volledige status op van het laatst ingediende bericht.\nToont alle 29 stappen met hun status (COMPLETED, SKIPPED, FAILED, PENDING).",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response bevat steps', function() {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.steps).to.be.an('array');",
+                  "    pm.expect(json.steps.length).to.equal(29);",
+                  "});",
+                  "pm.test('Steps zijn in volgorde', function() {",
+                  "    var json = pm.response.json();",
+                  "    for (var i = 0; i < json.steps.length; i++) {",
+                  "        pm.expect(json.steps[i].stepOrder).to.equal(i + 1);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/messages/{{messageUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages", "{{messageUuid}}"]
+            }
+          }
+        },
+        {
+          "name": "3b. GET - Alle berichten (overzicht)",
+          "description": "Haal een overzicht van alle verwerkte berichten op.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response is een array', function() {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        },
+        {
+          "name": "3c. GET - Berichten op status (COMPLETED)",
+          "description": "Haal alle berichten op met status COMPLETED.",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/messages/status/COMPLETED",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages", "status", "COMPLETED"]
+            }
+          }
+        },
+        {
+          "name": "3d. GET - Berichten op status (FAILED)",
+          "description": "Haal alle berichten op met status FAILED.",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/messages/status/FAILED",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages", "status", "FAILED"]
+            }
+          }
+        },
+        {
+          "name": "3e. POST - Herverwerk een gefaald bericht",
+          "description": "Herverwerk een bericht dat eerder is gefaald of geparkeerd.\nGebruik de messageUuid van een FAILED of PARKED bericht.\nDe pipeline wordt opnieuw doorlopen vanaf stap 1A.",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response bevat REPROCESSING status', function() {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.status).to.equal('REPROCESSING');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/messages/{{messageUuid}}/reprocess",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages", "{{messageUuid}}", "reprocess"]
+            }
+          }
+        },
+        {
+          "name": "3f. POST - Submit raw XML",
+          "description": "Dien ruwe XML direct in via het /xml endpoint.\nHandig voor integraties die direct XML sturen.",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/xml"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<AllocationSeries>\n    <mRID>f6a7b8c9-d0e1-2345-f012-3456789abcde</mRID>\n    <product>\n        <identification>8716867000016</identification>\n    </product>\n    <startDateTime>2025-01-01T00:00:00Z</startDateTime>\n    <endDateTime>2025-01-02T00:00:00Z</endDateTime>\n    <resolution>PT15M</resolution>\n    <position>1</position>\n    <quantity>250.000</quantity>\n</AllocationSeries>"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/messages/xml",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "messages", "xml"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
