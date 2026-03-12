@@ -880,7 +880,6 @@ src/test/java/nl/engie/allocation/
 
 Het volledige specificatiedocument met alle foutcodes, berichtdefinities, procesregels en validatievoorschriften is opgenomen in het project:
 
-📄 **[docs/Business-Service-Uitwisselen-allocatiegegevens-elektriciteit-v4.0.pdf](docs/Business-Service-Uitwisselen-allocatiegegevens-elektriciteit-v4.0.pdf)**
 
 Dit document is de bron voor:
 - Alle foutcodes en hun betekenis
