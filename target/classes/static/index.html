@@ -4,790 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ENGIE Market Messages Dashboard</title>
-    <style>
-        :root {
-            --green: #00c853;
-            --red: #ff1744;
-            --orange: #ff9100;
-            --blue: #2979ff;
-            --gray: #90a4ae;
-            --bg: #0f1923;
-            --card: #1a2733;
-            --card-hover: #223344;
-            --text: #e0e0e0;
-            --text-muted: #78909c;
-            --border: #2c3e50;
-            --header-bg: #162029;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-        }
-
-        header {
-            background: var(--header-bg);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        header h1 {
-            font-size: 20px;
-            font-weight: 600;
-            color: #fff;
-        }
-
-        header h1 span { color: var(--blue); }
-
-        .header-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--card);
-            color: var(--text);
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.15s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn:hover { background: var(--card-hover); border-color: var(--blue); }
-        .btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
-        .btn-green { border-color: var(--green); color: var(--green); }
-        .btn-green:hover, .btn-green.active { background: var(--green); color: #fff; }
-        .btn-red { border-color: var(--red); color: var(--red); }
-        .btn-red:hover, .btn-red.active { background: var(--red); color: #fff; }
-        .btn-blue { border-color: var(--blue); color: var(--blue); }
-        .btn-blue:hover { background: var(--blue); color: #fff; }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 24px 32px;
-        }
-
-        .stats-bar {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px 24px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .stat-card .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-card .value { font-size: 28px; font-weight: 700; }
-        .stat-card .value.green { color: var(--green); }
-        .stat-card .value.red { color: var(--red); }
-        .stat-card .value.blue { color: var(--blue); }
-
-        .filter-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .filter-bar .label {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-right: 4px;
-        }
-
-        .message-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .message-item {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px 20px;
-            cursor: pointer;
-            transition: all 0.15s;
-            display: grid;
-            grid-template-columns: 40px 1fr 160px 140px 120px;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .message-item:hover {
-            background: var(--card-hover);
-            border-color: var(--blue);
-            transform: translateX(2px);
-        }
-
-        .message-item.selected {
-            border-color: var(--blue);
-            background: var(--card-hover);
-        }
-
-        .status-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .status-icon.success { background: rgba(0,200,83,0.15); color: var(--green); }
-        .status-icon.failed { background: rgba(255,23,68,0.15); color: var(--red); }
-        .status-icon.processing { background: rgba(41,121,255,0.15); color: var(--blue); }
-        .status-icon.parked { background: rgba(255,145,0,0.15); color: var(--orange); }
-
-        .message-info h3 {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-
-        .message-info .uuid {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-family: 'Cascadia Code', 'Fira Code', monospace;
-        }
-
-        .message-type { font-size: 12px; color: var(--text-muted); }
-        .message-time { font-size: 12px; color: var(--text-muted); }
-
-        .message-status {
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 12px;
-            text-align: center;
-            width: fit-content;
-            justify-self: end;
-        }
-
-        .message-status.COMPLETED { background: rgba(0,200,83,0.15); color: var(--green); }
-        .message-status.FAILED { background: rgba(255,23,68,0.15); color: var(--red); }
-        .message-status.PROCESSING { background: rgba(41,121,255,0.15); color: var(--blue); }
-        .message-status.PARKED { background: rgba(255,145,0,0.15); color: var(--orange); }
-        .message-status.RECEIVED { background: rgba(144,164,174,0.15); color: var(--gray); }
-
-        /* Detail panel */
-        .detail-panel {
-            position: fixed;
-            top: 0;
-            right: -700px;
-            width: 700px;
-            height: 100vh;
-            background: var(--header-bg);
-            border-left: 1px solid var(--border);
-            z-index: 200;
-            transition: right 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .detail-panel.open { right: 0; }
-
-        .detail-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .detail-header h2 { font-size: 16px; font-weight: 600; }
-        .detail-header .uuid-detail {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-family: 'Cascadia Code', 'Fira Code', monospace;
-            margin-top: 4px;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 4px;
-            line-height: 1;
-        }
-        .close-btn:hover { color: #fff; }
-
-        .detail-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px;
-        }
-
-        .detail-meta {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 28px;
-        }
-
-        .meta-item {
-            background: var(--card);
-            border-radius: 6px;
-            padding: 10px 14px;
-        }
-
-        .meta-item .meta-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .meta-item .meta-value { font-size: 14px; font-weight: 500; margin-top: 2px; }
-
-        .pipeline-title {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: #fff;
-        }
-
-        .pipeline {
-            position: relative;
-        }
-
-        .phase-group {
-            margin-bottom: 20px;
-        }
-
-        .phase-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 6px 12px;
-            background: rgba(41,121,255,0.08);
-            border-radius: 4px;
-            margin-bottom: 8px;
-            display: inline-block;
-        }
-
-        .step-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 10px 0;
-            position: relative;
-        }
-
-        .step-item:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            left: 15px;
-            top: 40px;
-            bottom: -10px;
-            width: 2px;
-            background: var(--border);
-        }
-
-        .step-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 700;
-            flex-shrink: 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .step-icon.COMPLETED { background: rgba(0,200,83,0.2); color: var(--green); }
-        .step-icon.FAILED { background: rgba(255,23,68,0.2); color: var(--red); }
-        .step-icon.SKIPPED { background: rgba(144,164,174,0.1); color: var(--gray); }
-        .step-icon.PENDING { background: rgba(144,164,174,0.1); color: var(--gray); }
-        .step-icon.IN_PROGRESS { background: rgba(41,121,255,0.2); color: var(--blue); }
-
-        .step-content { flex: 1; min-width: 0; }
-
-        .step-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2px;
-        }
-
-        .step-name {
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .step-code-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-family: 'Cascadia Code', 'Fira Code', monospace;
-            background: rgba(144,164,174,0.1);
-            padding: 2px 6px;
-            border-radius: 3px;
-        }
-
-        .step-result {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
-
-        .step-error {
-            font-size: 12px;
-            color: var(--red);
-            margin-top: 4px;
-            background: rgba(255,23,68,0.08);
-            padding: 6px 10px;
-            border-radius: 4px;
-            border-left: 3px solid var(--red);
-        }
-
-        .step-time {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
-
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 150;
-            display: none;
-        }
-
-        .overlay.show { display: block; }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
-        }
-
-        .loading .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid var(--border);
-            border-top-color: var(--blue);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-        }
-
-        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
-        .empty-state h3 { font-size: 16px; color: var(--text); margin-bottom: 8px; }
-
-        .response-badge {
-            display: inline-block;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 3px;
-            margin-left: 8px;
-        }
-
-        .response-badge.ACK { background: rgba(0,200,83,0.2); color: var(--green); }
-        .response-badge.NACK { background: rgba(255,23,68,0.2); color: var(--red); }
-
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: var(--card);
-            border: 1px solid var(--green);
-            color: var(--green);
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 13px;
-            z-index: 300;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s;
-        }
-
-        .toast.show { transform: translateY(0); opacity: 1; }
-
-        .sort-btn {
-            font-size: 12px;
-            padding: 6px 12px;
-        }
-
-        @media (max-width: 900px) {
-            .message-item {
-                grid-template-columns: 36px 1fr;
-                gap: 10px;
-            }
-            .message-type, .message-time { display: none; }
-            .detail-panel { width: 100%; right: -100%; }
-        }
-    </style>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/stats.css">
+    <link rel="stylesheet" href="css/filters.css">
+    <link rel="stylesheet" href="css/messages.css">
+    <link rel="stylesheet" href="css/detail-panel.css">
+    <link rel="stylesheet" href="css/pipeline.css">
+    <link rel="stylesheet" href="css/errors.css">
+    <link rel="stylesheet" href="css/components.css">
 </head>
 <body>
 
+<!-- ==================== HEADER ==================== -->
 <header>
-    <h1><span>⚡</span> ENGIE Market Messages</h1>
+    <h1><span class="accent">⚡</span> ENGIE Market Messages</h1>
     <div class="header-actions">
-        <button class="btn btn-blue" onclick="loadTestData()">🧪 Laad Test Data</button>
-        <button class="btn" onclick="loadMessages()">🔄 Vernieuwen</button>
+        <button class="btn btn-blue" id="seedBtn" onclick="App.seedTestData()">🧪 Laad Test Data</button>
+        <button class="btn" onclick="App.refresh()">🔄 Vernieuwen</button>
     </div>
 </header>
 
+<!-- ==================== MAIN CONTENT ==================== -->
 <div class="container">
+
+    <!-- Stats cards -->
     <div class="stats-bar">
         <div class="stat-card">
             <span class="label">Totaal</span>
-            <span class="value blue" id="totalCount">0</span>
+            <span class="value blue" id="statTotal">0</span>
         </div>
         <div class="stat-card">
             <span class="label">Geslaagd (ACK)</span>
-            <span class="value green" id="successCount">0</span>
+            <span class="value green" id="statSuccess">0</span>
         </div>
         <div class="stat-card">
             <span class="label">Gefaald (NACK)</span>
-            <span class="value red" id="failedCount">0</span>
+            <span class="value red" id="statFailed">0</span>
         </div>
         <div class="stat-card">
             <span class="label">Laatste bericht</span>
-            <span class="value" id="lastTime" style="font-size:14px; color: var(--text-muted)">-</span>
+            <span class="value muted" id="statLastTime">-</span>
         </div>
     </div>
 
+    <!-- Filter & sort bar -->
     <div class="filter-bar">
         <span class="label">Filter:</span>
-        <button class="btn sort-btn active" data-filter="all" onclick="setFilter('all')">Alle berichten</button>
-        <button class="btn sort-btn btn-green" data-filter="success" onclick="setFilter('success')">✓ Geslaagd</button>
-        <button class="btn sort-btn btn-red" data-filter="failed" onclick="setFilter('failed')">✗ Gefaald</button>
-        <span class="label" style="margin-left: 16px;">Sorteer:</span>
-        <button class="btn sort-btn active" data-sort="newest" onclick="setSort('newest')">Nieuwste eerst</button>
-        <button class="btn sort-btn" data-sort="oldest" onclick="setSort('oldest')">Oudste eerst</button>
+        <button class="btn filter-btn active" data-filter="all"     onclick="App.setFilter('all')">Alle berichten</button>
+        <button class="btn filter-btn btn-green" data-filter="success" onclick="App.setFilter('success')">✓ Geslaagd</button>
+        <button class="btn filter-btn btn-red"   data-filter="failed"  onclick="App.setFilter('failed')">✗ Gefaald</button>
+
+        <span class="label spacer">Sorteer:</span>
+        <button class="btn filter-btn active" data-sort="newest" onclick="App.setSort('newest')">Nieuwste eerst</button>
+        <button class="btn filter-btn"        data-sort="oldest" onclick="App.setSort('oldest')">Oudste eerst</button>
     </div>
 
+    <!-- Message list -->
     <div class="message-list" id="messageList">
-        <div class="loading">
-            <div class="spinner"></div>
-            Berichten laden...
-        </div>
+        <div class="loading"><div class="spinner"></div>Berichten laden...</div>
     </div>
 </div>
 
-<div class="overlay" id="overlay" onclick="closeDetail()"></div>
+<!-- ==================== DETAIL SLIDE-IN PANEL ==================== -->
+<div class="overlay" id="overlay" onclick="App.closeDetail()"></div>
 
 <div class="detail-panel" id="detailPanel">
     <div class="detail-header">
         <div>
             <h2 id="detailTitle">Bericht Details</h2>
-            <div class="uuid-detail" id="detailUuid"></div>
+            <div class="uuid-label" id="detailUuid"></div>
         </div>
-        <button class="close-btn" onclick="closeDetail()">×</button>
+        <button class="close-btn" onclick="App.closeDetail()">×</button>
     </div>
-    <div class="detail-body" id="detailBody">
-        <!-- Filled by JS -->
-    </div>
+    <div class="detail-body" id="detailBody"></div>
 </div>
 
+<!-- ==================== TOAST ==================== -->
 <div class="toast" id="toast"></div>
 
-<script>
-    const API_BASE = '/api/messages';
-    let allMessages = [];
-    let currentFilter = 'all';
-    let currentSort = 'newest';
-
-    // Startup
-    document.addEventListener('DOMContentLoaded', loadMessages);
-
-    async function loadMessages() {
-        const list = document.getElementById('messageList');
-        list.innerHTML = '<div class="loading"><div class="spinner"></div>Berichten laden...</div>';
-
-        try {
-            const res = await fetch(API_BASE);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            allMessages = await res.json();
-            updateStats();
-            renderMessages();
-        } catch (e) {
-            list.innerHTML = `<div class="empty-state">
-                <div class="icon">⚠️</div>
-                <h3>Kan berichten niet laden</h3>
-                <p>${e.message}</p>
-            </div>`;
-        }
-    }
-
-    function updateStats() {
-        const total = allMessages.length;
-        const success = allMessages.filter(m => m.responseType === 'ACK').length;
-        const failed = allMessages.filter(m => m.responseType === 'NACK' || m.status === 'FAILED').length;
-
-        document.getElementById('totalCount').textContent = total;
-        document.getElementById('successCount').textContent = success;
-        document.getElementById('failedCount').textContent = failed;
-
-        if (total > 0) {
-            const sorted = [...allMessages].sort((a, b) =>
-                new Date(b.receivedAt) - new Date(a.receivedAt));
-            document.getElementById('lastTime').textContent = formatTime(sorted[0].receivedAt);
-        }
-    }
-
-    function renderMessages() {
-        const list = document.getElementById('messageList');
-        let filtered = [...allMessages];
-
-        // Apply filter
-        if (currentFilter === 'success') {
-            filtered = filtered.filter(m => m.responseType === 'ACK');
-        } else if (currentFilter === 'failed') {
-            filtered = filtered.filter(m => m.responseType === 'NACK' || m.status === 'FAILED');
-        }
-
-        // Apply sort
-        filtered.sort((a, b) => {
-            const da = new Date(a.receivedAt);
-            const db = new Date(b.receivedAt);
-            return currentSort === 'newest' ? db - da : da - db;
-        });
-
-        if (filtered.length === 0) {
-            list.innerHTML = `<div class="empty-state">
-                <div class="icon">📭</div>
-                <h3>Geen berichten gevonden</h3>
-                <p>${currentFilter !== 'all' ? 'Probeer een ander filter' : 'Klik op "Laad Test Data" om te beginnen'}</p>
-            </div>`;
-            return;
-        }
-
-        list.innerHTML = filtered.map(m => {
-            const isSuccess = m.responseType === 'ACK';
-            const isFailed = m.responseType === 'NACK' || m.status === 'FAILED';
-            const isParked = m.status === 'PARKED';
-            const statusClass = isSuccess ? 'success' : isFailed ? 'failed' : isParked ? 'parked' : 'processing';
-            const icon = isSuccess ? '✓' : isFailed ? '✗' : isParked ? '⏸' : '⟳';
-
-            const failedSteps = (m.steps || []).filter(s => s.status === 'FAILED').length;
-            const totalSteps = (m.steps || []).length;
-            const passedSteps = (m.steps || []).filter(s => s.status === 'COMPLETED').length;
-
-            return `<div class="message-item" onclick="openDetail('${m.messageUuid}')">
-                <div class="status-icon ${statusClass}">${icon}</div>
-                <div class="message-info">
-                    <h3>${m.messageType || 'Onbekend type'}
-                        ${m.responseType ? `<span class="response-badge ${m.responseType}">${m.responseType}</span>` : ''}
-                    </h3>
-                    <div class="uuid">${m.messageUuid}</div>
-                </div>
-                <div class="message-type">
-                    <div style="font-size:12px">Stappen: ${passedSteps}/${totalSteps} ✓</div>
-                    ${failedSteps > 0 ? `<div style="font-size:12px; color:var(--red)">${failedSteps} gefaald</div>` : ''}
-                </div>
-                <div class="message-time">${formatTime(m.receivedAt)}</div>
-                <div class="message-status ${m.status}">${m.status}</div>
-            </div>`;
-        }).join('');
-    }
-
-    async function openDetail(uuid) {
-        const panel = document.getElementById('detailPanel');
-        const overlay = document.getElementById('overlay');
-        const body = document.getElementById('detailBody');
-
-        panel.classList.add('open');
-        overlay.classList.add('show');
-        body.innerHTML = '<div class="loading"><div class="spinner"></div>Details laden...</div>';
-
-        try {
-            const res = await fetch(`${API_BASE}/${uuid}`);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const msg = await res.json();
-
-            document.getElementById('detailTitle').innerHTML =
-                `${msg.messageType || 'Bericht'} ${msg.responseType ? `<span class="response-badge ${msg.responseType}">${msg.responseType}</span>` : ''}`;
-            document.getElementById('detailUuid').textContent = msg.messageUuid;
-
-            const metaHtml = `
-                <div class="detail-meta">
-                    <div class="meta-item">
-                        <div class="meta-label">Status</div>
-                        <div class="meta-value">${msg.status}</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">Prioriteit</div>
-                        <div class="meta-value">${msg.priority || '-'}</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">Ontvangen</div>
-                        <div class="meta-value">${formatTime(msg.receivedAt)}</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">Afgerond</div>
-                        <div class="meta-value">${msg.completedAt ? formatTime(msg.completedAt) : '-'}</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">Huidige stap</div>
-                        <div class="meta-value">${msg.currentStep || '-'}</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">Response Type</div>
-                        <div class="meta-value">${msg.responseType || '-'}</div>
-                    </div>
-                </div>`;
-
-            // Group steps by phase
-            const steps = msg.steps || [];
-            const phases = {};
-            steps.forEach(s => {
-                if (!phases[s.phaseName]) phases[s.phaseName] = [];
-                phases[s.phaseName].push(s);
-            });
-
-            let pipelineHtml = '<div class="pipeline-title">Pipeline Stappen</div><div class="pipeline">';
-
-            for (const [phase, phaseSteps] of Object.entries(phases)) {
-                pipelineHtml += `<div class="phase-group">
-                    <div class="phase-label">${phase}</div>`;
-
-                phaseSteps.forEach(s => {
-                    const icon = getStepIcon(s.status);
-                    const duration = s.startedAt && s.completedAt ?
-                        `${(new Date(s.completedAt) - new Date(s.startedAt))}ms` : '';
-
-                    pipelineHtml += `<div class="step-item">
-                        <div class="step-icon ${s.status}">${icon}</div>
-                        <div class="step-content">
-                            <div class="step-header">
-                                <span class="step-name">${s.stepName}</span>
-                                <span class="step-code-label">${s.stepCode}</span>
-                            </div>
-                            ${s.resultMessage ? `<div class="step-result">${escapeHtml(s.resultMessage)}</div>` : ''}
-                            ${s.errorMessage ? `<div class="step-error">⚠ ${escapeHtml(s.errorMessage)}</div>` : ''}
-                            ${duration ? `<div class="step-time">⏱ ${duration}</div>` : ''}
-                        </div>
-                    </div>`;
-                });
-
-                pipelineHtml += '</div>';
-            }
-
-            pipelineHtml += '</div>';
-            body.innerHTML = metaHtml + pipelineHtml;
-        } catch (e) {
-            body.innerHTML = `<div class="empty-state"><h3>Fout bij laden</h3><p>${e.message}</p></div>`;
-        }
-    }
-
-    function closeDetail() {
-        document.getElementById('detailPanel').classList.remove('open');
-        document.getElementById('overlay').classList.remove('show');
-    }
-
-    function setFilter(filter) {
-        currentFilter = filter;
-        document.querySelectorAll('[data-filter]').forEach(b => {
-            b.classList.toggle('active', b.dataset.filter === filter);
-        });
-        renderMessages();
-    }
-
-    function setSort(sort) {
-        currentSort = sort;
-        document.querySelectorAll('[data-sort]').forEach(b => {
-            b.classList.toggle('active', b.dataset.sort === sort);
-        });
-        renderMessages();
-    }
-
-    async function loadTestData() {
-        const btn = event.target;
-        btn.disabled = true;
-        btn.textContent = '⏳ Laden...';
-
-        try {
-            const res = await fetch('/api/test/seed', { method: 'POST' });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            showToast(`✓ ${data.message}`);
-            await loadMessages();
-        } catch (e) {
-            showToast(`✗ Fout: ${e.message}`);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = '🧪 Laad Test Data';
-        }
-    }
-
-    function getStepIcon(status) {
-        switch(status) {
-            case 'COMPLETED': return '✓';
-            case 'FAILED': return '✗';
-            case 'SKIPPED': return '–';
-            case 'IN_PROGRESS': return '⟳';
-            default: return '○';
-        }
-    }
-
-    function formatTime(dateStr) {
-        if (!dateStr) return '-';
-        const d = new Date(dateStr);
-        return d.toLocaleString('nl-NL', {
-            day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit', second: '2-digit'
-        });
-    }
-
-    function escapeHtml(str) {
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
-    }
-
-    function showToast(msg) {
-        const toast = document.getElementById('toast');
-        toast.textContent = msg;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
-    // Keyboard shortcut
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeDetail();
-    });
-</script>
+<!-- ==================== JAVASCRIPT ==================== -->
+<script src="js/api.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/render.js"></script>
+<script src="js/app.js"></script>
 
 </body>
 </html>

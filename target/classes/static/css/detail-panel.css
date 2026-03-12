@@ -1,0 +1,108 @@
+/* ===================================================
+   Detail slide-in panel (right side)
+   =================================================== */
+.detail-panel {
+    position: fixed;
+    top: 0;
+    right: calc(-1 * var(--detail-width));
+    width: var(--detail-width);
+    height: 100vh;
+    background: var(--bg-header);
+    border-left: 1px solid var(--border-color);
+    z-index: 200;
+    transition: right var(--transition-slide);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.detail-panel.open {
+    right: 0;
+}
+
+.detail-header {
+    padding: 20px var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.detail-header h2 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.uuid-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    margin-top: var(--spacing-xs);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 24px;
+    cursor: pointer;
+    padding: var(--spacing-xs);
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: var(--text-white);
+}
+
+.detail-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-lg);
+}
+
+/* Meta info grid */
+.detail-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.meta-item {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+}
+
+.meta-item .meta-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.meta-item .meta-value {
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+/* Overlay (behind panel) */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 150;
+    display: none;
+}
+
+.overlay.show {
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .detail-panel {
+        width: 100%;
+        right: -100%;
+    }
+}

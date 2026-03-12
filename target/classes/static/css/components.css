@@ -1,0 +1,102 @@
+/* ===================================================
+   Shared / reusable components
+   =================================================== */
+
+/* Button base */
+.btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--color-info);
+}
+
+.btn.active {
+    background: var(--color-info);
+    color: var(--text-white);
+    border-color: var(--color-info);
+}
+
+/* Button variants */
+.btn-green       { border-color: var(--color-success); color: var(--color-success); }
+.btn-green:hover,
+.btn-green.active { background: var(--color-success); color: var(--text-white); }
+
+.btn-red         { border-color: var(--color-error); color: var(--color-error); }
+.btn-red:hover,
+.btn-red.active  { background: var(--color-error); color: var(--text-white); }
+
+.btn-blue        { border-color: var(--color-info); color: var(--color-info); }
+.btn-blue:hover  { background: var(--color-info); color: var(--text-white); }
+
+/* Loading spinner */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+}
+
+.loading .spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--color-info);
+    border-radius: var(--radius-circle);
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+
+.empty-state .icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.empty-state h3 {
+    font-size: 16px;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Toast notification */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--color-success);
+    color: var(--color-success);
+    padding: 12px 20px;
+    border-radius: var(--radius-lg);
+    font-size: 13px;
+    z-index: 300;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all var(--transition-slide);
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}

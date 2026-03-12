@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: nl.engie.allocation.controller.MarketMessageControllerTest$ReprocessTests
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.399 s -- in nl.engie.allocation.controller.MarketMessageControllerTest$ReprocessTests
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.336 s -- in nl.engie.allocation.controller.MarketMessageControllerTest$ReprocessTests

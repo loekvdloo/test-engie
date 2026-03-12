@@ -13,5 +13,6 @@ public record MessageStatusResponse(
         Integer priority,
         String responseType,
         String responseXml,
-        List<StepStatusDto> steps
+        List<StepStatusDto> steps,
+        List<ValidationErrorDto> errorCodes
 ) {}

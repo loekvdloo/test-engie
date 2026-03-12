@@ -11,6 +11,7 @@ import nl.engie.allocation.pipeline.PipelineOrchestrator;
 import nl.engie.allocation.repository.MarketMessageRepository;
 import nl.engie.allocation.repository.MarketResponseRepository;
 import nl.engie.allocation.repository.ProcessingStepRepository;
+import nl.engie.allocation.repository.ValidationResultRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,6 +35,7 @@ class MarketMessageServiceTest {
     @Mock private MarketMessageRepository messageRepository;
     @Mock private ProcessingStepRepository stepRepository;
     @Mock private MarketResponseRepository responseRepository;
+    @Mock private ValidationResultRepository validationResultRepository;
     @Mock private PipelineOrchestrator pipelineOrchestrator;
 
     private MarketMessageService service;
@@ -41,7 +43,8 @@ class MarketMessageServiceTest {
     @BeforeEach
     void setUp() {
         service = new MarketMessageService(
-                messageRepository, stepRepository, responseRepository, pipelineOrchestrator
+                messageRepository, stepRepository, responseRepository,
+                validationResultRepository, pipelineOrchestrator
         );
     }
 
@@ -158,6 +161,8 @@ class MarketMessageServiceTest {
             resp.setResponseType(ResponseType.ACK);
             resp.setXmlResponse("<ack/>");
             when(responseRepository.findByMarketMessageId(1L)).thenReturn(Optional.of(resp));
+            when(validationResultRepository.findByMarketMessageIdAndIsValidFalse(1L))
+                    .thenReturn(List.of());
 
             MessageStatusResponse result = service.getMessageStatus("my-uuid");
 
@@ -178,6 +183,8 @@ class MarketMessageServiceTest {
             when(stepRepository.findByMarketMessageIdOrderByStepOrderAsc(1L))
                     .thenReturn(List.of());
             when(responseRepository.findByMarketMessageId(1L)).thenReturn(Optional.empty());
+            when(validationResultRepository.findByMarketMessageIdAndIsValidFalse(1L))
+                    .thenReturn(List.of());
 
             MessageStatusResponse result = service.getMessageStatus("no-resp-uuid");
 
@@ -205,12 +212,15 @@ class MarketMessageServiceTest {
             MarketMessage m2 = createMessage("uuid-2");
             m2.setId(2L);
             when(messageRepository.findAll()).thenReturn(List.of(m1, m2));
+            when(messageRepository.findByMessageUuid("uuid-1")).thenReturn(Optional.of(m1));
+            when(messageRepository.findByMessageUuid("uuid-2")).thenReturn(Optional.of(m2));
+            when(stepRepository.findByMarketMessageIdOrderByStepOrderAsc(anyLong())).thenReturn(List.of());
+            when(responseRepository.findByMarketMessageId(anyLong())).thenReturn(Optional.empty());
+            when(validationResultRepository.findByMarketMessageIdAndIsValidFalse(anyLong())).thenReturn(List.of());
 
             List<MessageStatusResponse> result = service.getAllMessages();
 
             assertEquals(2, result.size());
-            // Overview should have null steps (no detailed step info)
-            assertNull(result.get(0).steps());
         }
 
         @Test
@@ -239,6 +249,8 @@ class MarketMessageServiceTest {
                     .thenReturn(List.of());
             when(responseRepository.findByMarketMessageId(1L))
                     .thenReturn(Optional.empty());
+            when(validationResultRepository.findByMarketMessageIdAndIsValidFalse(1L))
+                    .thenReturn(List.of());
 
             List<MessageStatusResponse> result =
                     service.getMessagesByStatus(MessageStatus.COMPLETED);

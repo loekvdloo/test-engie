@@ -1,6 +1,7 @@
 nl\engie\allocation\pipeline\step\Step2dUitzonderingParkeren.class
 nl\engie\allocation\pipeline\step\Step5bGeconfigureerdVersturen.class
 nl\engie\allocation\exception\GlobalExceptionHandler.class
+nl\engie\allocation\dto\ValidationErrorDto.class
 nl\engie\allocation\pipeline\step\Step2aClassificeer.class
 nl\engie\allocation\exception\PipelineException.class
 nl\engie\allocation\dto\MessageSubmitRequest.class

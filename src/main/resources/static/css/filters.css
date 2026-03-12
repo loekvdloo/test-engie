@@ -1,0 +1,25 @@
+/* ===================================================
+   Filter & sort bar
+   =================================================== */
+.filter-bar {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-bar .label {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-right: var(--spacing-xs);
+}
+
+.filter-bar .label.spacer {
+    margin-left: var(--spacing-md);
+}
+
+.filter-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+}

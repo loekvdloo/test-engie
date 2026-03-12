@@ -3,14 +3,17 @@ package nl.engie.allocation.service;
 import nl.engie.allocation.dto.MessageStatusResponse;
 import nl.engie.allocation.dto.MessageSubmitRequest;
 import nl.engie.allocation.dto.StepStatusDto;
+import nl.engie.allocation.dto.ValidationErrorDto;
 import nl.engie.allocation.model.entity.MarketMessage;
 import nl.engie.allocation.model.entity.ProcessingStep;
+import nl.engie.allocation.model.entity.ValidationResult;
 import nl.engie.allocation.model.enums.MessageStatus;
 import nl.engie.allocation.pipeline.PipelineContext;
 import nl.engie.allocation.pipeline.PipelineOrchestrator;
 import nl.engie.allocation.repository.MarketMessageRepository;
 import nl.engie.allocation.repository.MarketResponseRepository;
 import nl.engie.allocation.repository.ProcessingStepRepository;
+import nl.engie.allocation.repository.ValidationResultRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -29,12 +32,18 @@ public class MarketMessageService {
     private final MarketMessageRepository messageRepository;
     private final ProcessingStepRepository stepRepository;
     private final MarketResponseRepository responseRepository;
+    private final ValidationResultRepository validationResultRepository;
     private final PipelineOrchestrator pipelineOrchestrator;
 
-    public MarketMessageService(MarketMessageRepository messageRepository, ProcessingStepRepository stepRepository, MarketResponseRepository responseRepository, PipelineOrchestrator pipelineOrchestrator) {
+    public MarketMessageService(MarketMessageRepository messageRepository,
+                                ProcessingStepRepository stepRepository,
+                                MarketResponseRepository responseRepository,
+                                ValidationResultRepository validationResultRepository,
+                                PipelineOrchestrator pipelineOrchestrator) {
         this.messageRepository = messageRepository;
         this.stepRepository = stepRepository;
         this.responseRepository = responseRepository;
+        this.validationResultRepository = validationResultRepository;
         this.pipelineOrchestrator = pipelineOrchestrator;
     }
 
@@ -110,6 +119,16 @@ public class MarketMessageService {
             responseType = responseOpt.get().getResponseType().name();
         }
 
+        // Collect validation error codes for NACK responses
+        List<ValidationErrorDto> errorDtos = validationResultRepository
+                .findByMarketMessageIdAndIsValidFalse(message.getId())
+                .stream()
+                .map(v -> new ValidationErrorDto(
+                        v.getErrorCode(),
+                        v.getErrorMessage(),
+                        v.getRuleCode()))
+                .toList();
+
         return new MessageStatusResponse(
                 message.getMessageUuid(),
                 message.getMessageType() != null ? message.getMessageType().name() : null,
@@ -120,7 +139,8 @@ public class MarketMessageService {
                 message.getPriority(),
                 responseType,
                 responseXml,
-                stepDtos);
+                stepDtos,
+                errorDtos);
     }
 
     /**

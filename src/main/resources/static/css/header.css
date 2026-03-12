@@ -1,0 +1,30 @@
+/* ===================================================
+   Header
+   =================================================== */
+header {
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--spacing-md) var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-white);
+}
+
+header h1 .accent {
+    color: var(--color-info);
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}

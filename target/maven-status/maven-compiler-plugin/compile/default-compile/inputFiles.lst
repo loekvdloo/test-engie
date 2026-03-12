@@ -4,6 +4,7 @@ C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\controller\TestDataCo
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\dto\MessageStatusResponse.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\dto\MessageSubmitRequest.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\dto\StepStatusDto.java
+C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\dto\ValidationErrorDto.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\exception\GlobalExceptionHandler.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\exception\PipelineException.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\MarketMessageProcessorApplication.java

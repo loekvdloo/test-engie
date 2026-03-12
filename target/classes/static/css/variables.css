@@ -1,0 +1,52 @@
+/* ===================================================
+   Design tokens / CSS custom properties
+   Pas deze variabelen aan om het hele thema te wijzigen.
+   =================================================== */
+:root {
+    /* Status kleuren */
+    --color-success:    #00c853;
+    --color-error:      #ff1744;
+    --color-warning:    #ff9100;
+    --color-info:       #2979ff;
+    --color-neutral:    #90a4ae;
+
+    /* Achtergronden */
+    --bg-page:          #0f1923;
+    --bg-card:          #1a2733;
+    --bg-card-hover:    #223344;
+    --bg-header:        #162029;
+
+    /* Tekst */
+    --text-primary:     #e0e0e0;
+    --text-muted:       #78909c;
+    --text-white:       #ffffff;
+
+    /* Borders */
+    --border-color:     #2c3e50;
+
+    /* Spacing */
+    --spacing-xs:       4px;
+    --spacing-sm:       8px;
+    --spacing-md:       16px;
+    --spacing-lg:       24px;
+    --spacing-xl:       32px;
+
+    /* Border radius */
+    --radius-sm:        4px;
+    --radius-md:        6px;
+    --radius-lg:        8px;
+    --radius-pill:      12px;
+    --radius-circle:    50%;
+
+    /* Fonts */
+    --font-sans:        'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-mono:        'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+
+    /* Transitions */
+    --transition-fast:  0.15s ease;
+    --transition-slide: 0.3s ease;
+
+    /* Layout */
+    --max-width:        1400px;
+    --detail-width:     700px;
+}
