@@ -11,5 +11,7 @@ public record StepStatusDto(
         LocalDateTime startedAt,
         LocalDateTime completedAt,
         String resultMessage,
-        String errorMessage
+        String errorMessage,
+        String inputSnapshot,
+        String outputSnapshot
 ) {}

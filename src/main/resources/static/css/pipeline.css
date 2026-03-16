@@ -172,3 +172,44 @@
     border-radius: var(--radius-sm);
     border-left: 3px solid var(--color-error);
 }
+
+.audit-trail {
+    margin-top: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.02);
+    padding: 6px 8px;
+}
+
+.audit-trail summary {
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 12px;
+    user-select: none;
+}
+
+.audit-block {
+    margin-top: 8px;
+}
+
+.audit-label {
+    font-size: 11px;
+    color: var(--color-info);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.audit-block pre {
+    margin: 0;
+    padding: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--text-primary);
+}

@@ -108,7 +108,9 @@ public class MarketMessageService {
                         s.getStartedAt(),
                         s.getCompletedAt(),
                         s.getResultMessage(),
-                        s.getErrorMessage()))
+                        s.getErrorMessage(),
+                        s.getInputSnapshot(),
+                        s.getOutputSnapshot()))
                 .toList();
 
         String responseXml = null;

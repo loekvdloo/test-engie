@@ -96,7 +96,7 @@ public class PipelineOrchestrator {
             if (step == null) {
                 log.warn("No handler registered for step: {}. Skipping.", stepCode);
                 updateStepStatus(message.getId(), stepCode, StepStatus.SKIPPED,
-                        "No handler registered", null);
+                        "No handler registered", null, null, null);
                 continue;
             }
 
@@ -105,23 +105,28 @@ public class PipelineOrchestrator {
             saveMessage(message);
 
             // Mark step as in-progress
-            updateStepStatus(message.getId(), stepCode, StepStatus.IN_PROGRESS, null, null);
+                String inputSnapshot = buildInputSnapshot(context, stepCode);
+                updateStepStatus(message.getId(), stepCode, StepStatus.IN_PROGRESS, null, null,
+                    inputSnapshot, null);
             logStep(message, stepCode, "INFO", "Starting step: " + stepCode.getStepName());
 
             try {
                 StepResult result = step.execute(context);
 
                 if (result.isSkipped()) {
+                    String outputSnapshot = buildOutputSnapshot(context, stepCode, result);
                     updateStepStatus(message.getId(), stepCode, StepStatus.SKIPPED,
-                            result.getMessage(), null);
+                        result.getMessage(), null, null, outputSnapshot);
                     logStep(message, stepCode, "INFO", "Step skipped: " + result.getMessage());
                 } else if (result.isSuccess()) {
+                    String outputSnapshot = buildOutputSnapshot(context, stepCode, result);
                     updateStepStatus(message.getId(), stepCode, StepStatus.COMPLETED,
-                            result.getMessage(), null);
+                        result.getMessage(), null, null, outputSnapshot);
                     logStep(message, stepCode, "INFO", "Step completed: " + result.getMessage());
                 } else {
+                    String outputSnapshot = buildOutputSnapshot(context, stepCode, result);
                     updateStepStatus(message.getId(), stepCode, StepStatus.FAILED,
-                            null, result.getMessage());
+                        null, result.getMessage(), null, outputSnapshot);
                     logStep(message, stepCode, "ERROR", "Step failed: " + result.getMessage());
 
                     // Don't halt on failure in outcome/response phases - they handle errors
@@ -133,8 +138,9 @@ public class PipelineOrchestrator {
             } catch (Exception e) {
                 log.error("Exception in step {}: {}", stepCode, e.getMessage(), e);
                 try {
+                    String outputSnapshot = buildExceptionOutputSnapshot(context, stepCode, e);
                     updateStepStatus(message.getId(), stepCode, StepStatus.FAILED,
-                            null, e.getMessage());
+                            null, e.getMessage(), null, outputSnapshot);
                     logStep(message, stepCode, "ERROR", "Exception: " + e.getMessage());
                 } catch (Exception logEx) {
                     log.error("Failed to log step failure: {}", logEx.getMessage());
@@ -165,7 +171,8 @@ public class PipelineOrchestrator {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateStepStatus(Long messageId, StepCode stepCode, StepStatus status,
-                                   String resultMessage, String errorMessage) {
+                                   String resultMessage, String errorMessage,
+                                   String inputSnapshot, String outputSnapshot) {
         stepRepository.findByMarketMessageIdAndStepCode(messageId, stepCode)
                 .ifPresent(step -> {
                     step.setStatus(status);
@@ -178,6 +185,12 @@ public class PipelineOrchestrator {
                     }
                     step.setResultMessage(resultMessage);
                     step.setErrorMessage(errorMessage);
+                    if (inputSnapshot != null) {
+                        step.setInputSnapshot(truncateSnapshot(inputSnapshot));
+                    }
+                    if (outputSnapshot != null) {
+                        step.setOutputSnapshot(truncateSnapshot(outputSnapshot));
+                    }
                     stepRepository.save(step);
                 });
     }
@@ -186,9 +199,50 @@ public class PipelineOrchestrator {
         for (StepCode code : StepCode.values()) {
             if (code.getOrder() >= fromStep.getOrder()) {
                 updateStepStatus(messageId, code, StepStatus.SKIPPED,
-                        "Pipeline halted before this step", null);
+                        "Pipeline halted before this step", null, null, null);
             }
         }
+    }
+
+    private String buildInputSnapshot(PipelineContext context, StepCode stepCode) {
+        MarketMessage message = context.getMessage();
+        int xmlLen = message.getXmlContent() != null ? message.getXmlContent().length() : 0;
+        int validationCount = context.getValidationErrors() != null ? context.getValidationErrors().size() : 0;
+        return "step=" + stepCode.name()
+                + " | messageStatus=" + (message.getStatus() != null ? message.getStatus().name() : "-")
+                + " | currentStep=" + (message.getCurrentStep() != null ? message.getCurrentStep().name() : "-")
+                + " | validationErrors=" + validationCount
+                + " | xmlLength=" + xmlLen;
+    }
+
+    private String buildOutputSnapshot(PipelineContext context, StepCode stepCode, StepResult result) {
+        MarketMessage message = context.getMessage();
+        int validationCount = context.getValidationErrors() != null ? context.getValidationErrors().size() : 0;
+        int errorCount = context.getErrors() != null ? context.getErrors().size() : 0;
+        String responseType = context.getResponseXml() == null ? "-" : (context.isNack() ? "NACK" : "ACK");
+        return "step=" + stepCode.name()
+                + " | result=" + (result.isSuccess() ? "SUCCESS" : (result.isSkipped() ? "SKIPPED" : "FAILED"))
+                + " | message=" + (result.getMessage() != null ? result.getMessage() : "-")
+                + " | isNack=" + context.isNack()
+            + " | responseType=" + responseType
+                + " | validationErrors=" + validationCount
+                + " | pipelineErrors=" + errorCount
+                + " | responseXmlLength=" + (context.getResponseXml() != null ? context.getResponseXml().length() : 0)
+                + " | messageStatus=" + (message.getStatus() != null ? message.getStatus().name() : "-");
+    }
+
+    private String buildExceptionOutputSnapshot(PipelineContext context, StepCode stepCode, Exception exception) {
+        return "step=" + stepCode.name()
+                + " | result=EXCEPTION"
+                + " | exceptionType=" + exception.getClass().getSimpleName()
+                + " | exceptionMessage=" + (exception.getMessage() != null ? exception.getMessage() : "-")
+                + " | isNack=" + context.isNack();
+    }
+
+    private String truncateSnapshot(String snapshot) {
+        if (snapshot == null) return null;
+        int max = 8000;
+        return snapshot.length() <= max ? snapshot : snapshot.substring(0, max) + "...(truncated)";
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

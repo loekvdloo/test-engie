@@ -203,7 +203,7 @@ class PipelineOrchestratorTest {
             when(stepRepository.findByMarketMessageIdAndStepCode(1L, StepCode.STEP_1A))
                     .thenReturn(Optional.of(step));
 
-            orchestrator.updateStepStatus(1L, StepCode.STEP_1A, StepStatus.IN_PROGRESS, null, null);
+            orchestrator.updateStepStatus(1L, StepCode.STEP_1A, StepStatus.IN_PROGRESS, null, null, null, null);
 
             assertNotNull(step.getStartedAt());
             assertEquals(StepStatus.IN_PROGRESS, step.getStatus());
@@ -216,7 +216,7 @@ class PipelineOrchestratorTest {
             when(stepRepository.findByMarketMessageIdAndStepCode(1L, StepCode.STEP_1A))
                     .thenReturn(Optional.of(step));
 
-            orchestrator.updateStepStatus(1L, StepCode.STEP_1A, StepStatus.COMPLETED, "Done", null);
+            orchestrator.updateStepStatus(1L, StepCode.STEP_1A, StepStatus.COMPLETED, "Done", null, null, null);
 
             assertNotNull(step.getCompletedAt());
             assertEquals("Done", step.getResultMessage());
@@ -228,7 +228,7 @@ class PipelineOrchestratorTest {
             when(stepRepository.findByMarketMessageIdAndStepCode(1L, StepCode.STEP_1A))
                     .thenReturn(Optional.of(step));
 
-            orchestrator.updateStepStatus(1L, StepCode.STEP_1A, StepStatus.FAILED, null, "Fout!");
+            orchestrator.updateStepStatus(1L, StepCode.STEP_1A, StepStatus.FAILED, null, "Fout!", null, null);
 
             assertEquals("Fout!", step.getErrorMessage());
             assertEquals(StepStatus.FAILED, step.getStatus());
@@ -240,7 +240,7 @@ class PipelineOrchestratorTest {
                     .thenReturn(Optional.empty());
 
             // Should not throw
-            orchestrator.updateStepStatus(1L, StepCode.STEP_1A, StepStatus.COMPLETED, null, null);
+            orchestrator.updateStepStatus(1L, StepCode.STEP_1A, StepStatus.COMPLETED, null, null, null, null);
             verify(stepRepository, never()).save(any());
         }
     }

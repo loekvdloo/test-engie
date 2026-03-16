@@ -47,6 +47,12 @@ public class ProcessingStep {
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
+    @Column(name = "input_snapshot", columnDefinition = "TEXT")
+    private String inputSnapshot;
+
+    @Column(name = "output_snapshot", columnDefinition = "TEXT")
+    private String outputSnapshot;
+
     public ProcessingStep() {
     }
 
@@ -89,6 +95,10 @@ public class ProcessingStep {
     public void setResultMessage(String resultMessage) { this.resultMessage = resultMessage; }
     public String getErrorMessage() { return errorMessage; }
     public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
+    public String getInputSnapshot() { return inputSnapshot; }
+    public void setInputSnapshot(String inputSnapshot) { this.inputSnapshot = inputSnapshot; }
+    public String getOutputSnapshot() { return outputSnapshot; }
+    public void setOutputSnapshot(String outputSnapshot) { this.outputSnapshot = outputSnapshot; }
 
     public static ProcessingStepBuilder builder() {
         return new ProcessingStepBuilder();
@@ -106,6 +116,8 @@ public class ProcessingStep {
         private LocalDateTime completedAt;
         private String resultMessage;
         private String errorMessage;
+        private String inputSnapshot;
+        private String outputSnapshot;
 
         ProcessingStepBuilder() {}
 
@@ -120,10 +132,15 @@ public class ProcessingStep {
         public ProcessingStepBuilder completedAt(LocalDateTime completedAt) { this.completedAt = completedAt; return this; }
         public ProcessingStepBuilder resultMessage(String resultMessage) { this.resultMessage = resultMessage; return this; }
         public ProcessingStepBuilder errorMessage(String errorMessage) { this.errorMessage = errorMessage; return this; }
+        public ProcessingStepBuilder inputSnapshot(String inputSnapshot) { this.inputSnapshot = inputSnapshot; return this; }
+        public ProcessingStepBuilder outputSnapshot(String outputSnapshot) { this.outputSnapshot = outputSnapshot; return this; }
 
         public ProcessingStep build() {
-            return new ProcessingStep(id, marketMessage, stepCode, stepName, phaseName, stepOrder,
+            ProcessingStep step = new ProcessingStep(id, marketMessage, stepCode, stepName, phaseName, stepOrder,
                     status, startedAt, completedAt, resultMessage, errorMessage);
+            step.setInputSnapshot(inputSnapshot);
+            step.setOutputSnapshot(outputSnapshot);
+            return step;
         }
     }
 }

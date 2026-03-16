@@ -93,6 +93,62 @@ const Render = {
         } else {
             document.getElementById('statLastTime').textContent = '-';
         }
+
+        const total = messages.length || 1;
+        const ackCount = messages.filter(m => m.responseType === 'ACK').length;
+        const nackCount = messages.filter(m => m.responseType === 'NACK').length;
+        document.getElementById('kpiAckPct').textContent = `${Math.round((ackCount / total) * 100)}%`;
+        document.getElementById('kpiNackPct').textContent = `${Math.round((nackCount / total) * 100)}%`;
+
+        const codeFreq = new Map();
+        for (const message of messages) {
+            for (const error of (message.errorCodes || [])) {
+                if (!error || !error.code || error.code === 'VALIDATION_FAILED') continue;
+                codeFreq.set(error.code, (codeFreq.get(error.code) || 0) + 1);
+            }
+        }
+        const topCodes = [...codeFreq.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([code, count]) => `${Utils.escapeHtml(code)} (${count}x)`);
+        document.getElementById('kpiTopCodes').innerHTML = topCodes.length
+            ? topCodes.map(t => `<div>${t}</div>`).join('')
+            : '<div>-</div>';
+
+        const phaseDurations = new Map();
+        for (const message of messages) {
+            for (const step of (message.steps || [])) {
+                if (!step.phaseName || !step.startedAt || !step.completedAt) continue;
+                const start = new Date(step.startedAt).getTime();
+                const end = new Date(step.completedAt).getTime();
+                if (Number.isNaN(start) || Number.isNaN(end) || end < start) continue;
+                const duration = end - start;
+                const agg = phaseDurations.get(step.phaseName) || { total: 0, count: 0 };
+                agg.total += duration;
+                agg.count += 1;
+                phaseDurations.set(step.phaseName, agg);
+            }
+        }
+        const phaseLines = [...phaseDurations.entries()]
+            .map(([phase, agg]) => ({
+                phase,
+                avgMs: agg.total / Math.max(agg.count, 1)
+            }))
+            .sort((a, b) => a.phase.localeCompare(b.phase))
+            .map(x => `${Utils.escapeHtml(x.phase)}: ${this.formatDuration(x.avgMs)}`);
+
+        document.getElementById('kpiAvgPhase').innerHTML = phaseLines.length
+            ? phaseLines.map(t => `<div>${t}</div>`).join('')
+            : '<div>-</div>';
+    },
+
+    formatDuration(ms) {
+        if (!ms || ms < 0) return '-';
+        if (ms < 1000) return `${Math.round(ms)} ms`;
+        const sec = ms / 1000;
+        if (sec < 60) return `${sec.toFixed(1)} s`;
+        const min = sec / 60;
+        return `${min.toFixed(1)} min`;
     },
 
     /* --------------------------------------------------
@@ -304,6 +360,22 @@ const Render = {
                     ? `<div class="step-result ${isWarning ? 'step-result-warning' : ''}">${Utils.escapeHtml(s.resultMessage)}</div>`
                     : '';
                 const time = s.completedAt ? Utils.formatTime(s.completedAt) : '';
+                const auditTrail = (s.inputSnapshot || s.outputSnapshot)
+                    ? `
+                        <details class="audit-trail">
+                            <summary>Audit trail</summary>
+                            ${s.inputSnapshot ? `
+                                <div class="audit-block">
+                                    <div class="audit-label">Input snapshot</div>
+                                    <pre>${Utils.escapeHtml(s.inputSnapshot)}</pre>
+                                </div>` : ''}
+                            ${s.outputSnapshot ? `
+                                <div class="audit-block">
+                                    <div class="audit-label">Output snapshot</div>
+                                    <pre>${Utils.escapeHtml(s.outputSnapshot)}</pre>
+                                </div>` : ''}
+                        </details>`
+                    : '';
 
                 return `
                 <div class="step-item ${statusClass}">
@@ -316,6 +388,7 @@ const Render = {
                         </div>
                         ${resultLine}
                         ${errorLine}
+                        ${auditTrail}
                     </div>
                 </div>`;
             }).join('');
