@@ -17,6 +17,7 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
 }
 
 .message-main {
@@ -51,8 +52,8 @@
 
 .message-item:hover {
     background: var(--bg-card-hover);
-    border-color: var(--color-info);
-    transform: translateX(2px);
+    border-color: #3f6eb7;
+    transform: translateY(-1px);
 }
 
 /* Status icon (circle with check/cross) */
@@ -74,8 +75,8 @@
 
 /* Message info (title + UUID) */
 .message-info h3 {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
     margin-bottom: 3px;
 }
 
@@ -91,13 +92,15 @@
 
 /* Status badge */
 .message-status {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
-    padding: 4px 10px;
+    padding: 5px 10px;
     border-radius: var(--radius-pill);
     text-align: center;
     width: fit-content;
     justify-self: end;
+    text-transform: uppercase;
+    letter-spacing: 0.35px;
 }
 
 .message-status.COMPLETED  { background: rgba(0, 200, 83, 0.15);   color: var(--color-success); }

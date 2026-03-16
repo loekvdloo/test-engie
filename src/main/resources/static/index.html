@@ -21,10 +21,15 @@
 <header>
     <h1><span class="accent">⚡</span> ENGIE Market Messages</h1>
     <div class="header-actions">
-        <button class="btn" id="exportJsonBtn">⬇️ Export JSON</button>
-        <button class="btn" id="exportCsvBtn">⬇️ Export CSV</button>
-        <button class="btn btn-blue" id="seedBtn">🧪 Laad Test Data</button>
-        <button class="btn" id="refreshBtn">🔄 Vernieuwen</button>
+        <div class="dropdown" id="exportDropdown">
+            <button class="btn" id="exportMenuBtn" aria-expanded="false" aria-haspopup="true">Export ▾</button>
+            <div class="dropdown-menu" id="exportMenu" role="menu" aria-label="Export opties">
+                <button class="dropdown-item" id="exportJsonBtn" role="menuitem">Export JSON</button>
+                <button class="dropdown-item" id="exportCsvBtn" role="menuitem">Export CSV</button>
+            </div>
+        </div>
+        <button class="btn btn-blue" id="seedBtn">Laad testdata</button>
+        <button class="btn" id="refreshBtn">Vernieuwen</button>
     </div>
 </header>
 

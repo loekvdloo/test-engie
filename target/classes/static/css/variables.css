@@ -4,25 +4,29 @@
    =================================================== */
 :root {
     /* Status kleuren */
-    --color-success:    #00c853;
-    --color-error:      #ff1744;
-    --color-warning:    #ff9100;
-    --color-info:       #2979ff;
-    --color-neutral:    #90a4ae;
+    --color-success:    #22c55e;
+    --color-error:      #ef4444;
+    --color-warning:    #f59e0b;
+    --color-info:       #3b82f6;
+    --color-neutral:    #94a3b8;
 
     /* Achtergronden */
-    --bg-page:          #0f1923;
-    --bg-card:          #1a2733;
-    --bg-card-hover:    #223344;
-    --bg-header:        #162029;
+    --bg-page:          #0b1220;
+    --bg-card:          #111a2a;
+    --bg-card-hover:    #162236;
+    --bg-header:        #0f1728;
 
     /* Tekst */
-    --text-primary:     #e0e0e0;
-    --text-muted:       #78909c;
+    --text-primary:     #e2e8f0;
+    --text-muted:       #94a3b8;
     --text-white:       #ffffff;
 
     /* Borders */
-    --border-color:     #2c3e50;
+    --border-color:     #243247;
+
+    /* Schaduw */
+    --shadow-sm:        0 4px 12px rgba(2, 8, 23, 0.22);
+    --shadow-md:        0 10px 24px rgba(2, 8, 23, 0.28);
 
     /* Spacing */
     --spacing-xs:       4px;
@@ -32,9 +36,9 @@
     --spacing-xl:       32px;
 
     /* Border radius */
-    --radius-sm:        4px;
-    --radius-md:        6px;
-    --radius-lg:        8px;
+    --radius-sm:        6px;
+    --radius-md:        10px;
+    --radius-lg:        14px;
     --radius-pill:      12px;
     --radius-circle:    50%;
 

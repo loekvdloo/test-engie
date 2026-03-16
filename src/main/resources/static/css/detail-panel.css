@@ -7,13 +7,14 @@
     right: calc(-1 * var(--detail-width));
     width: var(--detail-width);
     height: 100vh;
-    background: var(--bg-header);
+    background: linear-gradient(180deg, #101a2c 0%, var(--bg-header) 100%);
     border-left: 1px solid var(--border-color);
     z-index: 200;
     transition: right var(--transition-slide);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: -14px 0 30px rgba(2, 8, 23, 0.45);
 }
 
 .detail-panel.open {
@@ -21,7 +22,7 @@
 }
 
 .detail-header {
-    padding: 20px var(--spacing-lg);
+    padding: 18px var(--spacing-lg);
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
@@ -29,8 +30,8 @@
 }
 
 .detail-header h2 {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 17px;
+    font-weight: 700;
 }
 
 .uuid-label {
@@ -41,17 +42,19 @@
 }
 
 .close-btn {
-    background: none;
-    border: none;
+    background: rgba(148, 163, 184, 0.1);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
     color: var(--text-muted);
-    font-size: 24px;
+    font-size: 22px;
     cursor: pointer;
-    padding: var(--spacing-xs);
+    padding: 2px 8px;
     line-height: 1;
 }
 
 .close-btn:hover {
     color: var(--text-white);
+    border-color: #3f6eb7;
 }
 
 .detail-body {
@@ -79,7 +82,7 @@
     background: var(--bg-card);
     color: var(--text-primary);
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.5;
     white-space: pre-wrap;
     word-break: break-word;
@@ -102,6 +105,7 @@
 
 .meta-item {
     background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: 10px 14px;
 }

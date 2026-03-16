@@ -4,22 +4,31 @@
 
 /* Button base */
 .btn {
-    padding: 8px 16px;
+    padding: 9px 14px;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    background: var(--bg-card);
+    background: #132139;
     color: var(--text-primary);
     cursor: pointer;
-    font-size: 13px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
     transition: all var(--transition-fast);
     display: flex;
     align-items: center;
     gap: 6px;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn:hover {
     background: var(--bg-card-hover);
-    border-color: var(--color-info);
+    border-color: #3f6eb7;
+    transform: translateY(-1px);
+}
+
+.btn:focus-visible {
+    outline: 2px solid rgba(59, 130, 246, 0.6);
+    outline-offset: 2px;
 }
 
 .btn.active {
@@ -39,6 +48,51 @@
 
 .btn-blue        { border-color: var(--color-info); color: var(--color-info); }
 .btn-blue:hover  { background: var(--color-info); color: var(--text-white); }
+
+/* Header dropdown menu */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 170px;
+    padding: 6px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-md);
+    display: none;
+    z-index: 220;
+}
+
+.dropdown.open .dropdown-menu {
+    display: block;
+}
+
+.dropdown-item {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    color: var(--text-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background: var(--bg-card-hover);
+}
+
+.dropdown-item:focus-visible {
+    outline: 2px solid rgba(59, 130, 246, 0.6);
+    outline-offset: 1px;
+}
 
 /* Loading spinner */
 .loading {
@@ -94,6 +148,7 @@
     transform: translateY(100px);
     opacity: 0;
     transition: all var(--transition-slide);
+    box-shadow: var(--shadow-md);
 }
 
 .toast.show {

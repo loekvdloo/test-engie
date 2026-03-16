@@ -27,6 +27,32 @@ const App = {
         document.getElementById('exportJsonBtn').addEventListener('click', () => this.exportErrorOverview('json'));
         document.getElementById('exportCsvBtn').addEventListener('click', () => this.exportErrorOverview('csv'));
 
+        const exportDropdown = document.getElementById('exportDropdown');
+        const exportMenuBtn = document.getElementById('exportMenuBtn');
+        const closeExportMenu = () => {
+            exportDropdown.classList.remove('open');
+            exportMenuBtn.setAttribute('aria-expanded', 'false');
+        };
+
+        exportMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const open = exportDropdown.classList.toggle('open');
+            exportMenuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+
+        document.getElementById('exportJsonBtn').addEventListener('click', closeExportMenu);
+        document.getElementById('exportCsvBtn').addEventListener('click', closeExportMenu);
+        document.addEventListener('click', (e) => {
+            if (!exportDropdown.contains(e.target)) {
+                closeExportMenu();
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeExportMenu();
+            }
+        });
+
         // Filter buttons
         document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
             btn.addEventListener('click', () => this.setFilter(btn.dataset.filter));

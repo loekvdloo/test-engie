@@ -11,7 +11,7 @@
 
 body {
     font-family: var(--font-sans);
-    background: var(--bg-page);
+    background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 40%), var(--bg-page);
     color: var(--text-primary);
     min-height: 100vh;
     line-height: 1.5;
@@ -20,11 +20,11 @@ body {
 .container {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: var(--spacing-xl) var(--spacing-xl);
 }
 
 /* Scrollbar styling */
-::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #2e3f59; border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }

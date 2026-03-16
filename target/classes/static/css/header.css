@@ -2,21 +2,23 @@
    Header
    =================================================== */
 header {
-    background: var(--bg-header);
+    background: linear-gradient(180deg, #101b2f 0%, var(--bg-header) 100%);
     border-bottom: 1px solid var(--border-color);
-    padding: var(--spacing-md) var(--spacing-xl);
+    padding: 14px var(--spacing-xl);
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: sticky;
     top: 0;
     z-index: 100;
+    backdrop-filter: blur(6px);
 }
 
 header h1 {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 22px;
+    font-weight: 700;
     color: var(--text-white);
+    letter-spacing: 0.2px;
 }
 
 header h1 .accent {
@@ -25,6 +27,6 @@ header h1 .accent {
 
 .header-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
 }
