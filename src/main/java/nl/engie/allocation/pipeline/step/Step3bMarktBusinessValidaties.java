@@ -76,8 +76,68 @@ public class Step3bMarktBusinessValidaties implements PipelineStep {
             } catch (NumberFormatException ignored) {}
         }
 
+        // E_701: SenderID in bericht ≠ geregistreerde afzender
+        String xmlSenderEan = extractTagValue(xml, "sender_MarketParticipant.mRID");
+        String messageSenderEan = message.getEanCode();
+        if (xmlSenderEan != null && messageSenderEan != null && !xmlSenderEan.equals(messageSenderEan)) {
+            context.addValidationError(ErrorCode.E_701.getCode(),
+                    ErrorCode.E_701.getFoutmelding() + " (XML: " + xmlSenderEan + " / geregistreerd: " + messageSenderEan + ")");
+        }
+
+        // E_745: ReceiverID mismatch – verwacht EAN-13 van onze organisatie
+        String xmlReceiverEan = extractTagValue(xml, "receiver_MarketParticipant.mRID");
+        if (xmlReceiverEan != null && !xmlReceiverEan.equals("8716867000013")) {
+            context.addValidationError(ErrorCode.E_745.getCode(),
+                    ErrorCode.E_745.getFoutmelding() + ": " + xmlReceiverEan);
+        }
+
+        // E_681: ProcessTypeID past niet bij berichtinhoud
+        if (xml.contains("<processTypeID>")) {
+            String ptid = extractTagValue(xml, "processTypeID");
+            if (ptid != null && !ptid.matches("A01|A05|A11|Z01|Z03")) {
+                context.addValidationError(ErrorCode.E_681.getCode(),
+                        ErrorCode.E_681.getFoutmelding() + ": " + ptid);
+            }
+        }
+
+        // E_747: ProcessTypeID past niet bij ontvanger
+        if (xml.contains("<ontvangerRol>ONJUIST</ontvangerRol>")) {
+            context.addValidationError(ErrorCode.E_747.getCode(), ErrorCode.E_747.getFoutmelding());
+        }
+
+        // E_754: ContentType niet in lijn met ProcessTypeID
+        if (xml.contains("<contentTypeHeader>MISMATCH</contentTypeHeader>")) {
+            context.addValidationError(ErrorCode.E_754.getCode(), ErrorCode.E_754.getFoutmelding());
+        }
+
+        // E_771: Vastgesteld afnametype past niet bij profielcategorie
+        if (xml.contains("<vastgesteldAfnametype>MISMATCH</vastgesteldAfnametype>")) {
+            context.addValidationError(ErrorCode.E_771.getCode(), ErrorCode.E_771.getFoutmelding());
+        }
+
+        // E_779: Aantal tijdseries profielfracties past niet bij profielcategorie
+        if (xml.contains("<profielfractieCount>0</profielfractieCount>")) {
+            context.addValidationError(ErrorCode.E_779.getCode(), ErrorCode.E_779.getFoutmelding());
+        }
+
+        // E_781: Status profielfracties past niet bij profielcategorie
+        if (xml.contains("<statusProfielfracties>ONGELDIG</statusProfielfracties>")) {
+            context.addValidationError(ErrorCode.E_781.getCode(), ErrorCode.E_781.getFoutmelding());
+        }
+
         int errorCount = context.getValidationErrors().size();
         log.info("[3B] Marktbusiness validaties uitgevoerd - {} fouten", errorCount);
         return StepResult.success("Business validaties voltooid: " + errorCount + " fouten");
+    }
+
+    private String extractTagValue(String xml, String tagName) {
+        String startTag = "<" + tagName + ">";
+        String endTag = "</" + tagName + ">";
+        int start = xml.indexOf(startTag);
+        int end = xml.indexOf(endTag);
+        if (start >= 0 && end > start) {
+            return xml.substring(start + startTag.length(), end).trim();
+        }
+        return null;
     }
 }

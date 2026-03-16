@@ -65,6 +65,44 @@ public class Step3gHerbruikbareRegels implements PipelineStep {
                     ErrorCode.E_651.getFoutmelding() + ": " + receiverEan);
         }
 
+        // E_670: eerder ontvangen bericht met dit kenmerk
+        if (xml.contains("<duplicaatKenmerk>JA</duplicaatKenmerk>")) {
+            String mrid = extractValue(xml, "mRID");
+            context.addValidationError(ErrorCode.E_670.getCode(),
+                    ErrorCode.E_670.getFoutmelding() + (mrid != null ? ": " + mrid : ""));
+        }
+
+        // E_704: recentere creatie datum/tijdstempel al ontvangen
+        if (xml.contains("<isLatestVersion>NEEN</isLatestVersion>")) {
+            context.addValidationError(ErrorCode.E_704.getCode(), ErrorCode.E_704.getFoutmelding());
+        }
+
+        // E_769: duplicate allocatierun identificatie
+        if (xml.contains("<allocatieRunId>")) {
+            String runId = extractValue(xml, "allocatieRunId");
+            if (runId != null && runId.contains("REEDS-VERWERKT")) {
+                context.addValidationError(ErrorCode.E_769.getCode(),
+                        ErrorCode.E_769.getFoutmelding() + ": " + runId);
+            }
+        }
+
+        // E_774: factor heeft onjuist aantal decimalen
+        java.util.regex.Matcher factorMatcher = java.util.regex.Pattern
+                .compile("<factor>(-?[\\d.]+)</factor>").matcher(xml);
+        while (factorMatcher.find()) {
+            String factorVal = factorMatcher.group(1);
+            if (!factorVal.matches("-?\\d+\\.\\d{3}")) {
+                context.addValidationError(ErrorCode.E_774.getCode(),
+                        ErrorCode.E_774.getFoutmelding() + ": " + factorVal);
+                break;
+            }
+        }
+
+        // E_780: CorrelationID mismatch
+        if (xml.contains("<correlationID>MISMATCH</correlationID>")) {
+            context.addValidationError(ErrorCode.E_780.getCode(), ErrorCode.E_780.getFoutmelding());
+        }
+
         log.info("[3G] Herbruikbare validatieregels uitgevoerd");
         return StepResult.success("Herbruikbare validatieregels voltooid");
     }

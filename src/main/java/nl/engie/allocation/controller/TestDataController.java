@@ -169,6 +169,115 @@ public class TestDataController {
                 VALID_ALLOCATION_XML_DDM, false, "871686700000000004"));
         count++;
 
+        // =====================================================
+        // FOUTCODES 651 t/m 782 — elk een eigen testgeval
+        // =====================================================
+
+        // === 21. Ongeldige EAN-18 zendercode (NACK - foutcode 651) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_EAN18_SENDER_XML, false, null));
+        count++;
+
+        // === 22. Eerder ontvangen bericht met zelfde kenmerk (NACK - foutcode 670) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_DUPLICATE_KENMERK_XML, false, "871686700000000001"));
+        count++;
+
+        // === 23. Onjuist aantal posities t.o.v. verwacht (NACK - foutcode 671) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_POSITION_COUNT_XML, false, "871686700000000001"));
+        count++;
+
+        // === 24. ProcessTypeID past niet bij berichtinhoud (NACK - foutcode 681) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_PROCESS_TYPE_XML, false, "871686700000000001"));
+        count++;
+
+        // === 25. SenderID in bericht ≠ geregistreerde afzender (NACK - foutcode 701) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_SENDER_MISMATCH_XML, false, "871686700000000002"));
+        count++;
+
+        // === 26. Recentere creatiedatum al ontvangen (NACK - foutcode 704) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_NOT_LATEST_VERSION_XML, false, "871686700000000001"));
+        count++;
+
+        // === 27. ReceiverID past niet bij ontvanger (NACK - foutcode 745) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_RECEIVER_MISMATCH_XML, false, "871686700000000001"));
+        count++;
+
+        // === 28. ProcessTypeID past niet bij ontvanger rol (NACK - foutcode 747) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_RECEIVER_ROL_XML, false, "871686700000000001"));
+        count++;
+
+        // === 29. ContentType niet in lijn met ProcessTypeID (NACK - foutcode 754) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_CONTENT_TYPE_XML, false, "871686700000000001"));
+        count++;
+
+        // === 30. Ontbrekende EAN-13 / mRID in bericht (NACK - foutcode 758) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_NO_MRID_XML, false, "871686700000000001"));
+        count++;
+
+        // === 31. BRP niet actief als BRP-er in het netgebied (NACK - foutcode 761) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_BRP_NOT_ACTIVE_XML, false, "871686700000000001"));
+        count++;
+
+        // === 32. Aantal tijdseries past niet bij allocatiegroep (NACK - foutcode 764) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_AGGREGATED_NO_GROUP_XML, false, "871686700000000001"));
+        count++;
+
+        // === 33. Duplicate allocatierun identificatie (NACK - foutcode 769) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_DUPLICATE_ALLOCATIERUN_XML, false, "871686700000000001"));
+        count++;
+
+        // === 34. Vastgesteld afnametype past niet bij profielcategorie (NACK - foutcode 771) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_AFNAMETYPE_XML, false, "871686700000000001"));
+        count++;
+
+        // === 35. Factor heeft onjuist aantal decimalen (NACK - foutcode 774) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_FACTOR_DECIMALS_XML, false, "871686700000000001"));
+        count++;
+
+        // === 36. Volume heeft onjuist aantal decimalen (NACK - foutcode 776) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_VOLUME_DECIMALS_XML, false, "871686700000000001"));
+        count++;
+
+        // === 37. Netgebied niet in LNB administratie (NACK - foutcode 777) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_NETGEBIED_UNKNOWN_XML, false, "871686700000000001"));
+        count++;
+
+        // === 38. Aantal profielfractie tijdseries onjuist (NACK - foutcode 779) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_PROFIELFRACTIE_COUNT_XML, false, "871686700000000001"));
+        count++;
+
+        // === 39. CorrelationID mismatch in header (NACK - foutcode 780) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_CORRELATION_ID_XML, false, "871686700000000001"));
+        count++;
+
+        // === 40. Status profielfracties past niet bij profielcategorie (NACK - foutcode 781) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_STATUS_PROFIELFRACTIES_XML, false, "871686700000000001"));
+        count++;
+
+        // === 41. Gat in positienummering (NACK - foutcode 782) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_POSITION_GAP_XML, false, "871686700000000001"));
+        count++;
+
         log.info("Test data seeded: {} messages created", count);
 
         return ResponseEntity.ok(Map.of(
@@ -376,10 +485,10 @@ public class TestDataController {
             <broken><tag>
             """;
 
-    /** Foutieve resolutie PT1H i.p.v. PT15M (triggers foutcode 773) */
+    /** Foutieve resolutie PT1H i.p.v. PT15M bij AllocationFactorSeries (triggers foutcode 773) */
     private static final String INVALID_RESOLUTION_XML = """
             <?xml version="1.0" encoding="UTF-8"?>
-            <AllocationSeries>
+            <AllocationFactorSeriesNotification>
                 <mRID>e5f6a7b8-c9d0-1234-efab-345678901234</mRID>
                 <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
                 <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
@@ -388,7 +497,7 @@ public class TestDataController {
                 <endDateTime>2025-01-02T00:00:00Z</endDateTime>
                 <resolution>PT1H</resolution>
                 <position>1</position><quantity>500.000</quantity>
-            </AllocationSeries>
+            </AllocationFactorSeriesNotification>
             """;
 
     /** Periode fout: einddatum vóór startdatum (triggers foutcode 663) */
@@ -469,6 +578,361 @@ public class TestDataController {
                 <resolution>PT15M</resolution>
                 <position>1</position><quantity>100.000</quantity>
                 <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    // ============================================================
+    // Test XML Templates — één per foutcode (651 t/m 782)
+    // ============================================================
+
+    /** Foutcode 651: EAN-18 zendercode heeft niet precies 18 cijfers */
+    private static final String INVALID_EAN18_SENDER_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>65100000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID>12345678</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <startDateTime>2025-07-01T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-02T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 670: eerder ontvangen bericht met zelfde kenmerk (duplicaat-indicator in XML) */
+    private static final String INVALID_DUPLICATE_KENMERK_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>67000000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <startDateTime>2025-07-03T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-04T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <duplicaatKenmerk>JA</duplicaatKenmerk>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 671: opgegeven aantal posities klopt niet met werkelijke inhoud */
+    private static final String INVALID_POSITION_COUNT_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>67100000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <startDateTime>2025-07-05T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-06T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <positionCount>96</positionCount>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+                <position>3</position><quantity>150.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 681: ProcessTypeID past niet bij berichtinhoud */
+    private static final String INVALID_PROCESS_TYPE_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>68100000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <processTypeID>Z99</processTypeID>
+                <startDateTime>2025-07-07T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-08T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 701: SenderID in XML ≠ geregistreerde EAN van afzender */
+    private static final String INVALID_SENDER_MISMATCH_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>70100000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID>871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <startDateTime>2025-07-09T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-10T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 704: recentere creatiedatum al eerder ontvangen */
+    private static final String INVALID_NOT_LATEST_VERSION_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>70400000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <isLatestVersion>NEEN</isLatestVersion>
+                <startDateTime>2025-07-11T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-12T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 745: ReceiverID in XML past niet bij verwachte ontvanger */
+    private static final String INVALID_RECEIVER_MISMATCH_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>74500000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID>999999999999999999</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <startDateTime>2025-07-13T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-14T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 747: ProcessTypeID past niet bij ontvanger rol */
+    private static final String INVALID_RECEIVER_ROL_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>74700000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <ontvangerRol>ONJUIST</ontvangerRol>
+                <startDateTime>2025-07-15T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-16T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 754: ContentType in SOAP Header niet in lijn met ProcessTypeID */
+    private static final String INVALID_CONTENT_TYPE_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>75400000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <contentTypeHeader>MISMATCH</contentTypeHeader>
+                <startDateTime>2025-07-17T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-18T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 758: ontbrekende EAN-13 / mRID identificatie in bericht */
+    private static final String INVALID_NO_MRID_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <startDateTime>2025-07-19T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-20T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 761: BRP niet actief als BRP-er in het netgebied */
+    private static final String INVALID_BRP_NOT_ACTIVE_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>76100000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <brpActief>NEE</brpActief>
+                <startDateTime>2025-07-21T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-22T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 764: aantal tijdseries in bericht past niet bij allocatiegroep */
+    private static final String INVALID_AGGREGATED_NO_GROUP_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AggregatedAllocationSeriesNotification>
+                <mRID>76400000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <startDateTime>2025-07-23T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-24T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AggregatedAllocationSeriesNotification>
+            """;
+
+    /** Foutcode 769: allocatierun identificatie reeds eerder ontvangen */
+    private static final String INVALID_DUPLICATE_ALLOCATIERUN_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>76900000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <allocatieRunId>REEDS-VERWERKT-20250601-001</allocatieRunId>
+                <startDateTime>2025-07-25T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-26T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 771: vastgesteld afnametype past niet bij profielcategorie */
+    private static final String INVALID_AFNAMETYPE_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>77100000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <vastgesteldAfnametype>MISMATCH</vastgesteldAfnametype>
+                <startDateTime>2025-07-27T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-28T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 774: factor heeft onjuist aantal decimalen (verwacht 3, gevonden 2) */
+    private static final String INVALID_FACTOR_DECIMALS_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationFactorSeriesNotification>
+                <mRID>77400000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <startDateTime>2025-07-29T00:00:00Z</startDateTime>
+                <endDateTime>2025-07-30T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <factor>0.45</factor>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationFactorSeriesNotification>
+            """;
+
+    /** Foutcode 776: volume heeft onjuist aantal decimalen (2 i.p.v. 3) */
+    private static final String INVALID_VOLUME_DECIMALS_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>77600000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <startDateTime>2025-08-01T00:00:00Z</startDateTime>
+                <endDateTime>2025-08-02T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>150.50</quantity>
+                <position>2</position><quantity>200.75</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 777: netgebied of allocatiepunt niet in LNB administratie */
+    private static final String INVALID_NETGEBIED_UNKNOWN_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>77700000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <netgebiedEAN>500000000000000001</netgebiedEAN>
+                <startDateTime>2025-08-03T00:00:00Z</startDateTime>
+                <endDateTime>2025-08-04T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 779: aantal tijdseries met profielfracties past niet bij profielcategorie */
+    private static final String INVALID_PROFIELFRACTIE_COUNT_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationFactorSeriesNotification>
+                <mRID>77900000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <profielfractieCount>0</profielfractieCount>
+                <startDateTime>2025-08-05T00:00:00Z</startDateTime>
+                <endDateTime>2025-08-06T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationFactorSeriesNotification>
+            """;
+
+    /** Foutcode 780: CorrelationID in Business Document Header ≠ CorrelationID in SOAP Header */
+    private static final String INVALID_CORRELATION_ID_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>78000000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <correlationID>MISMATCH</correlationID>
+                <startDateTime>2025-08-07T00:00:00Z</startDateTime>
+                <endDateTime>2025-08-08T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationSeries>
+            """;
+
+    /** Foutcode 781: status profielfracties past niet bij profielcategorie */
+    private static final String INVALID_STATUS_PROFIELFRACTIES_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationFactorSeriesNotification>
+                <mRID>78100000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <statusProfielfracties>ONGELDIG</statusProfielfracties>
+                <startDateTime>2025-08-09T00:00:00Z</startDateTime>
+                <endDateTime>2025-08-10T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+            </AllocationFactorSeriesNotification>
+            """;
+
+    /** Foutcode 782: gat in positienummering (1, 2, 5 — positie 3 en 4 ontbreken) */
+    private static final String INVALID_POSITION_GAP_XML = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <AllocationSeries>
+                <mRID>78200000-0000-0000-0000-000000000001</mRID>
+                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                <product><identification>023</identification></product>
+                <startDateTime>2025-08-11T00:00:00Z</startDateTime>
+                <endDateTime>2025-08-12T00:00:00Z</endDateTime>
+                <resolution>PT15M</resolution>
+                <position>1</position><quantity>100.000</quantity>
+                <position>2</position><quantity>200.000</quantity>
+                <position>5</position><quantity>150.000</quantity>
             </AllocationSeries>
             """;
 }

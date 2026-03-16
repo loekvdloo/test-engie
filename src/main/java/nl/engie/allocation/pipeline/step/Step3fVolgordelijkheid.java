@@ -69,6 +69,28 @@ public class Step3fVolgordelijkheid implements PipelineStep {
             log.warn("[3F] Fout bij controle volgordelijkheid: {}", e.getMessage());
         }
 
+        // E_671: verwacht aantal posities klopt niet met werkelijk gevonden posities
+        if (xml.contains("<positionCount>")) {
+            try {
+                String xml2 = xml;
+                int s = xml2.indexOf("<positionCount>") + "<positionCount>".length();
+                int e2 = xml2.indexOf("</positionCount>");
+                if (s > 0 && e2 > s) {
+                    int expected = Integer.parseInt(xml2.substring(s, e2).trim());
+                    DocumentBuilderFactory f2 = DocumentBuilderFactory.newInstance();
+                    f2.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+                    Document d2 = f2.newDocumentBuilder().parse(new InputSource(new java.io.StringReader(xml2)));
+                    int actual = d2.getElementsByTagName("position").getLength();
+                    if (actual != expected) {
+                        context.addValidationError(ErrorCode.E_671.getCode(),
+                                ErrorCode.E_671.getFoutmelding() + ": verwacht=" + expected + " gevonden=" + actual);
+                    }
+                }
+            } catch (Exception ex) {
+                log.warn("[3F] Fout bij controle positionCount: {}", ex.getMessage());
+            }
+        }
+
         log.info("[3F] Controle op volgordelijkheid uitgevoerd");
         return StepResult.success("Volgordelijkheid gecontroleerd");
     }

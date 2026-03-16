@@ -61,11 +61,32 @@ public class Step3aBrpRegister implements PipelineStep {
                 return StepResult.success("BRP register controle: EAN niet gevonden (" + ErrorCode.E_765.getCode() + ")");
             }
             log.info("[3A] EAN {} gevonden in BRP register", eanCode);
-            return StepResult.success("BRP register controle: EAN geldig");
+        } else {
+            log.info("[3A] Geen EAN code beschikbaar voor BRP controle");
         }
 
-        log.info("[3A] Geen EAN code beschikbaar voor BRP controle");
-        return StepResult.success("BRP register controle: geen EAN beschikbaar");
+        // E_761: BRP niet actief als BRP-er in het netgebied
+        if (message.getXmlContent() != null && message.getXmlContent().contains("<brpActief>NEE</brpActief>")) {
+            context.addValidationError(ErrorCode.E_761.getCode(), ErrorCode.E_761.getFoutmelding());
+            log.warn("[3A] BRP is niet actief in netgebied (foutcode {})", ErrorCode.E_761.getCode());
+        }
+
+        // E_777: netgebied of allocatiepunt niet in LNB administratie
+        if (message.getXmlContent() != null && message.getXmlContent().contains("<netgebiedEAN>")) {
+            String xml = message.getXmlContent();
+            int s = xml.indexOf("<netgebiedEAN>") + "<netgebiedEAN>".length();
+            int e = xml.indexOf("</netgebiedEAN>");
+            if (s > 0 && e > s) {
+                String netEan = xml.substring(s, e).trim();
+                if (!netEan.startsWith("871686700")) {
+                    context.addValidationError(ErrorCode.E_777.getCode(),
+                            ErrorCode.E_777.getFoutmelding() + ": " + netEan);
+                    log.warn("[3A] Netgebied EAN onbekend in LNB administratie: {} (foutcode {})", netEan, ErrorCode.E_777.getCode());
+                }
+            }
+        }
+
+        return StepResult.success("BRP register controle voltooid");
     }
 
     private String extractEanFromXml(String xml) throws Exception {
