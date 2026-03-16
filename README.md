@@ -35,7 +35,7 @@ Bevat een **live dashboard** op `http://localhost:8080` met statusoverzicht, pip
 | Tool         | Versie    | Opmerkingen                          |
 |--------------|-----------|--------------------------------------|
 | Java (JDK)   | 21+       | Getest met OpenJDK Temurin 25        |
-| Maven        | 3.9+      | Wrapper aanwezig in project          |
+| Maven        | 3.9+      | Lokale Maven installatie vereist     |
 | Docker       | 20+       | Alleen nodig voor PostgreSQL-profiel |
 
 ---
@@ -119,6 +119,7 @@ De applicatie bevat een **volledig interactief dashboard** op `http://localhost:
 - **Filters:** Filter op status (COMPLETED, FAILED, PARKED, etc.)
 - **Pipeline-visualisatie:** Klik op een bericht om alle 29 stappen te zien per fase
 - **Test Data Seeder:** "Laad Testdata" knop om snel testberichten aan te maken (mix van ACK en NACK)
+- **Export dropdown:** Één export-menu in de header met `Export JSON` en `Export CSV`
 - **NACK-indicatie:** Stappen met warnings worden oranje gemarkeerd in de pipeline
 
 ### Techniek
@@ -438,37 +439,18 @@ POST /api/messages/{uuid}/reprocess
 ### 7. Test Data Seeder (`/api/test`)
 
 ```
-POST /api/test/seed    — 20 testberichten laden
+POST /api/test/seed    — 49 testberichten laden (mix ACK/NACK/FAILED)
 POST /api/test/clear   — alle data wissen (TRUNCATE CASCADE)
 ```
 
 > Alleen beschikbaar in niet-productie profielen (`default`, `dev`, `test`, `postgres`).
 > Rate limited: max 5 requests per minuut per IP.
 
-Maakt de volgende testberichten aan:
-
-| # | Scenario                                    | EAN-code             | Verwacht resultaat        |
-|---|---------------------------------------------|----------------------|---------------------------|
-| 1 | Geldig allocatiebericht (Engie)             | `871686700000000001` | ACK                       |
-| 2 | Geldig allocatiebericht (Vattenfall)        | `871686700000000002` | ACK                       |
-| 3 | Geldig bericht, handmatige opvoer (Essent)  | `871686700000000003` | ACK                       |
-| 4 | Geaggregeerd allocatiebericht met PRF       | `871686700000000001` | ACK                       |
-| 5 | RCF / Profielfracties bericht               | `871686700000000002` | ACK                       |
-| 6 | Negatief volume (PRF groep, toegestaan)     | `871686700000000001` | ACK                       |
-| 7 | Groot bericht met 96 posities (volledig dag)| `871686700000000001` | ACK                       |
-| 8 | Meerdere tijdseries in één bericht          | `871686700000000003` | ACK                       |
-| 9 | Ongeldig productcode                        | `871686700000000001` | NACK (validatiefout)      |
-| 10| Geen EAN-code meegegeven                    | *(geen)*             | NACK (BRP onbekend)       |
-| 11| Ongeldige XML (niet parseerbaar)            | `871686700000000001` | NACK (technisch)          |
-| 12| Onbekende BRP EAN                           | `999999999999999999` | NACK (765: BRP niet gevonden) |
-| 13| Foutieve resolutie (PT1H i.p.v. PT15M)     | `871686700000000001` | NACK (773: resolutie)     |
-| 14| Periode fout (eind voor start)              | `871686700000000001` | NACK (663: periode onjuist) |
-| 15| Ongeldige UUID in mRID                      | `871686700000000001` | NACK (669: ongeldig mRID) |
-| 16| Negatief volume (niet-PRF, niet toegestaan) | `871686700000000001` | NACK (686: negatief volume) |
-| 17| Volgorde posities fout (begint bij 2)       | `871686700000000001` | NACK (676/782: volgorde)  |
-| 18| Lege XML content                            | `871686700000000001` | FAILED (stap 1A)          |
-| 19| Toekomstdata (ver in toekomst)              | `871686700000000001` | NACK (772: toekomst)      |
-| 20| Dubbele EAN-codes in bericht                | `871686700000000004` | ACK (Liander, DDM rol)    |
+De seed-set bevat:
+- Meerdere **geldige ACK-berichten** (inclusief AllocationSeries, Aggregated en Factor-series)
+- Meerdere **NACK-berichten met combinatiefouten**
+- **FAILED-gevallen** op technische input
+- Dekking waarbij elke ondersteunde foutcode minimaal één keer voorkomt in de testdata
 
 ---
 
@@ -507,7 +489,7 @@ Het bericht doorloopt **strikt in volgorde** alle 29 stappen. Als een stap faalt
 | 15   | STEP_3D | Configureerbare validatieregels   | Voert actieve regels uit DB uit (CONTAINS/REGEX)   |
 | 16   | STEP_3E | Tijdvenster-validaties            | Controleert start < eind, niet te ver in toekomst  |
 | 17   | STEP_3F | Controle op volgordelijkheid      | Valideert dat posities sequentieel zijn (1,2,3...) |
-| 18   | STEP_3G | Herbruikbare validatieregels      | Valideert UUID-formaat en ISO 8601 datumformaat     |
+| 18   | STEP_3G | Herbruikbare validatieregels      | Controle op MessageID-uniqueness, decimalen, correlatie en herbruikbare markeringen |
 
 ### Fase 4: Bepaal uitkomst
 
@@ -541,35 +523,56 @@ Het bericht doorloopt **strikt in volgorde** alle 29 stappen. Als een stap faalt
 
 Alle foutcodes komen uit de officiële specificatie: **Business-Service-Uitwisselen-allocatiegegevens-elektriciteit-v4.0.pdf** (pagina's 17-19).
 
-### Officiële foutcodes – Tijdserie-niveau
+### Officiële foutcodes – volledig overzicht
 
-| Code | Foutmelding                                        | Controle                                               |
-|------|----------------------------------------------------|--------------------------------------------------------|
-| 651  | Ongeldige EAN-codelijst                            | Controle of EAN-18 code geldig is                      |
-| 663  | Periode niet juist                                 | Controle of einddatum na startdatum ligt               |
-| 669  | MessageID niet uniek / ongeldig formaat            | Controle of mRID een geldig UUID is                    |
-| 676  | Eerste positie is niet '1'                         | Controle of eerste tijdserie-positie = 1               |
-| 686  | Volume negatief (niet toegestaan)                  | Controle op negatieve volumes (excl. PRF)              |
-| 758  | Ontbrekende/ongeldige EAN-13 code meetpunt         | Controle of EAN-13 meetpunt geldig is                  |
-| 763  | Oplevering te laat (dagrapport)                    | Controle of bericht binnen geldige leverdatum valt     |
-| 764  | Tijdserie past niet bij allocatiegroep             | Controle of allocatiegroep overeenkomt                 |
-| 765  | BRP/leverancier niet bekend/erkend                 | Controle of BRP in register staat                      |
-| 772  | Data heeft betrekking op de toekomst               | Controle of data niet in de toekomst ligt              |
-| 773  | Resolutie past niet bij productsoort               | Controle of resolutie klopt (PT15M bij elektriciteit)  |
-| 776  | Volume onjuist aantal decimalen                    | Controle of volumes exact 3 decimalen hebben           |
-| 782  | Increment is niet '1'                              | Controle of position-increment altijd 1 is             |
-| 999  | Overige fout / generieke validatiefout             | Diverse controles die niet onder specifiek code vallen |
+| Code | Korte betekenis |
+|------|------------------|
+| 650 | EAN-18 aansluiting niet valide |
+| 651 | EAN-18 netgebied/allocatiepunt niet valide |
+| 663 | Periode onjuist |
+| 667 | Product past niet bij productsoort |
+| 668 | Energie-eenheid past niet bij product |
+| 669 | MessageID niet uniek |
+| 670 | Kenmerk bericht niet uniek |
+| 671 | Aantal posities onjuist |
+| 676 | Eerste positie begint niet met 1 |
+| 681 | ProcessTypeID past niet bij berichtinhoud |
+| 683 | Herkomst/validatie/reparatie combinatie ongeldig |
+| 686 | Negatief volume (behalve PRF-uitzondering) |
+| 701 | SenderID SOAP ≠ SenderID BDH |
+| 704 | Recentere versie al ontvangen |
+| 745 | ReceiverID SOAP ≠ ReceiverID BDH |
+| 747 | ProcessTypeID past niet bij ontvanger |
+| 754 | ContentType niet in lijn met ProcessTypeID |
+| 758 | Ontbrekende of onjuiste EAN-13 |
+| 759 | Ontbrekende EAN-13 van BRP |
+| 761 | BRP niet actief in netgebied |
+| 763 | Dagbericht te laat opgeleverd |
+| 764 | Aantal tijdseries past niet bij allocatiegroep |
+| 765 | BRP niet bekend/erkend |
+| 769 | Allocatierun identificatie niet uniek |
+| 771 | Vastgesteld afnametype past niet bij profielcategorie |
+| 772 | Gegevens (deels) in de toekomst |
+| 773 | Resolutie past niet bij afspraken |
+| 774 | Factor heeft onjuist aantal decimalen |
+| 776 | Volume heeft onjuist aantal decimalen |
+| 777 | Netgebied/allocatiepunt niet in landelijke administratie |
+| 779 | Aantal profielfractie-tijdseries onjuist |
+| 780 | CorrelationID BDH ≠ SOAP |
+| 781 | Status profielfracties past niet bij profielcategorie |
+| 782 | Increment van tijdserie is geen 1 |
+| 999 | Generieke fout / vrij tekstveld |
 
 ### Waar worden foutcodes gegenereerd?
 
 | Stap | Bestand                            | Foutcodes die gegenereerd worden                                       |
 |------|------------------------------------|------------------------------------------------------------------------|
-| 3A   | Step3aBrpRegister.java             | 765 (BRP niet bekend)                                                  |
-| 3B   | Step3bMarktBusinessValidaties.java | 999 (productsoort), 764 (allocatiegroep), 773 (resolutie), 758 (EAN-13), 686 (negatief volume) |
+| 3A   | Step3aBrpRegister.java             | 761, 765, 777                                                          |
+| 3B   | Step3bMarktBusinessValidaties.java | 650, 651, 667, 668, 683, 686, 701, 745, 681, 747, 754, 758, 759, 764, 771, 773, 779, 781, 999 |
 | 3C   | Step3cControleVerplicht.java       | 999 (verplicht veld ontbreekt)                                         |
 | 3E   | Step3eTijdvenster.java             | 663 (periode onjuist), 772 (toekomst), 763 (te laat)                   |
-| 3F   | Step3fVolgordelijkheid.java        | 676 (eerste positie ≠ 1), 782 (increment ≠ 1)                         |
-| 3G   | Step3gHerbruikbareRegels.java      | 669 (MessageID), 999 (datetime formaat), 776 (decimalen), 651 (EAN-18) |
+| 3F   | Step3fVolgordelijkheid.java        | 671, 676, 782                                                          |
+| 3G   | Step3gHerbruikbareRegels.java      | 651, 669, 670, 704, 769, 774, 776, 780, 999                           |
 
 ---
 
@@ -704,7 +707,7 @@ Invoke-RestMethod -Uri http://localhost:8080/api/messages -Method POST -ContentT
 # Database wissen
 Invoke-RestMethod -Uri http://localhost:8080/api/test/clear -Method POST
 
-# Via API: 20 testberichten laden
+# Via API: 49 testberichten laden
 Invoke-RestMethod -Uri http://localhost:8080/api/test/seed -Method POST
 
 # Bekijk alle berichten
@@ -795,6 +798,7 @@ In `application.yml`:
 | `server.port`                     | `8080`    | Poort van de applicatie                         |
 | `pipeline.forward-nack-internally`| `false`   | NACK berichten doorsturen naar raw-layer?       |
 | `pipeline.async-enabled`          | `true`    | Asynchrone verwerking aan/uit                   |
+| `pipeline.max-delivery-delay-hours` | `48`    | Max uren na periode-einde voor tijdige oplevering (E_763) |
 | `spring.jpa.hibernate.ddl-auto`   | `update`  | Schema automatisch aanmaken/updaten             |
 | `spring.h2.console.enabled`       | `false`   | H2 web console (uitgeschakeld voor beveiliging) |
 | `spring.servlet.multipart.max-file-size` | `2MB` | Maximum upload grootte                     |
