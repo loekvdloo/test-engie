@@ -24,6 +24,8 @@ const App = {
         // Header buttons
         document.getElementById('seedBtn').addEventListener('click', () => this.seedTestData());
         document.getElementById('refreshBtn').addEventListener('click', () => this.refresh());
+        document.getElementById('exportJsonBtn').addEventListener('click', () => this.exportErrorOverview('json'));
+        document.getElementById('exportCsvBtn').addEventListener('click', () => this.exportErrorOverview('csv'));
 
         // Filter buttons
         document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
@@ -146,6 +148,65 @@ const App = {
             btn.disabled = false;
             btn.textContent = '🧪 Laad Test Data';
         }
+    },
+
+    exportErrorOverview(format) {
+        const rows = [];
+        for (const message of this.state.messages) {
+            const errors = message.errorCodes || [];
+            for (const error of errors) {
+                if (!error || !error.code || error.code === 'VALIDATION_FAILED') continue;
+                rows.push({
+                    messageUuid: message.messageUuid,
+                    messageType: message.messageType,
+                    status: message.status,
+                    responseType: message.responseType,
+                    receivedAt: message.receivedAt,
+                    errorCode: error.code,
+                    ruleCode: error.ruleCode,
+                    errorMessage: error.message
+                });
+            }
+        }
+
+        if (!rows.length) {
+            Utils.showToast('Geen foutcodes gevonden om te exporteren');
+            return;
+        }
+
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+        if (format === 'json') {
+            const json = JSON.stringify(rows, null, 2);
+            this.downloadFile(`foutoverzicht-${timestamp}.json`, 'application/json;charset=utf-8', json);
+            Utils.showToast(`✅ JSON export klaar (${rows.length} regels)`);
+            return;
+        }
+
+        const header = ['messageUuid', 'messageType', 'status', 'responseType', 'receivedAt', 'errorCode', 'ruleCode', 'errorMessage'];
+        const csvLines = [header.join(',')];
+        for (const row of rows) {
+            const values = header.map(key => {
+                const value = row[key] == null ? '' : String(row[key]);
+                return `"${value.replace(/"/g, '""')}"`;
+            });
+            csvLines.push(values.join(','));
+        }
+        const csv = csvLines.join('\n');
+        this.downloadFile(`foutoverzicht-${timestamp}.csv`, 'text/csv;charset=utf-8', csv);
+        Utils.showToast(`✅ CSV export klaar (${rows.length} regels)`);
+    },
+
+    downloadFile(filename, mimeType, content) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
     }
 };
 

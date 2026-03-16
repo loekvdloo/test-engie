@@ -110,6 +110,7 @@ const Render = {
         let html = '';
         html += this.metaSection(msg);
         html += this.errorSection(msg.errorCodes);
+        html += this.xmlSection(msg.inputXml, msg.errorCodes);
         html += this.pipelineSection(msg.steps, msg.responseType, msg.errorCodes);
 
         document.getElementById('detailBody').innerHTML = html;
@@ -185,6 +186,79 @@ const Render = {
             </div>
             ${cards}
         </div>`;
+    },
+
+    /**
+     * Render original input XML with highlighted fields based on error codes.
+     * @param {string|null} inputXml
+     * @param {Array|null} errorCodes
+     * @returns {string}
+     */
+    xmlSection(inputXml, errorCodes) {
+        if (!inputXml) return '';
+
+        const tagMap = {
+            '651': ['sender_MarketParticipant.mRID', 'receiver_MarketParticipant.mRID'],
+            '663': ['startDateTime', 'endDateTime'],
+            '669': ['mRID'],
+            '670': ['duplicaatKenmerk', 'mRID'],
+            '671': ['positionCount', 'position'],
+            '676': ['position'],
+            '681': ['processTypeID'],
+            '686': ['quantity'],
+            '701': ['sender_MarketParticipant.mRID'],
+            '704': ['isLatestVersion'],
+            '745': ['receiver_MarketParticipant.mRID'],
+            '747': ['ontvangerRol', 'processTypeID'],
+            '754': ['contentTypeHeader'],
+            '758': ['mRID', 'ean', 'EAN'],
+            '761': ['brpActief'],
+            '764': ['group_businessType'],
+            '765': ['sender_MarketParticipant.mRID', 'mRID'],
+            '769': ['allocatieRunId'],
+            '771': ['vastgesteldAfnametype'],
+            '772': ['startDateTime'],
+            '773': ['resolution'],
+            '774': ['factor'],
+            '776': ['quantity'],
+            '777': ['netgebiedEAN'],
+            '779': ['profielfractieCount'],
+            '780': ['correlationID'],
+            '781': ['statusProfielfracties'],
+            '782': ['position'],
+            '999': ['product', 'startDateTime', 'endDateTime', 'resolution']
+        };
+
+        const codes = (errorCodes || []).map(e => e.code);
+        const tags = new Set();
+        for (const code of codes) {
+            const mapped = tagMap[code] || [];
+            mapped.forEach(t => tags.add(t));
+        }
+
+        const highlighted = this.highlightXml(inputXml, tags);
+
+        return `
+        <div class="xml-section">
+            <div class="xml-section-title">🧾 Input XML</div>
+            <pre class="xml-viewer">${highlighted}</pre>
+        </div>`;
+    },
+
+    highlightXml(xml, tagsToHighlight) {
+        let html = Utils.escapeHtml(xml);
+
+        if (!tagsToHighlight || tagsToHighlight.size === 0) {
+            return html;
+        }
+
+        for (const tag of tagsToHighlight) {
+            const escapedTag = tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const tagRegex = new RegExp(`(&lt;\\/?)(\\s*${escapedTag})(\\b[^&]*?&gt;)`, 'g');
+            html = html.replace(tagRegex, '$1<span class="xml-highlight-tag">$2</span>$3');
+        }
+
+        return html;
     },
 
     /* --------------------------------------------------

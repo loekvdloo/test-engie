@@ -138,6 +138,7 @@ public class MarketMessageService {
                 message.getCompletedAt(),
                 message.getPriority(),
                 responseType,
+                message.getXmlContent(),
                 responseXml,
                 stepDtos,
                 errorDtos);

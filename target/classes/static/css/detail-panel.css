@@ -60,6 +60,38 @@
     padding: var(--spacing-lg);
 }
 
+.xml-section {
+    margin-bottom: 28px;
+}
+
+.xml-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.xml-viewer {
+    margin: 0;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.xml-highlight-tag {
+    color: var(--color-info);
+    background: rgba(33, 150, 243, 0.14);
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
 /* Meta info grid */
 .detail-meta {
     display: grid;

@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: nl.engie.allocation.pipeline.step.Phase3StepTests$Step3bTests
 -------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in nl.engie.allocation.pipeline.step.Phase3StepTests$Step3bTests
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in nl.engie.allocation.pipeline.step.Phase3StepTests$Step3bTests

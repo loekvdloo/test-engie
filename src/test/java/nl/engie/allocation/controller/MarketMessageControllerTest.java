@@ -87,7 +87,7 @@ class MarketMessageControllerTest {
         void getMessageStatus_shouldReturn200() throws Exception {
             MessageStatusResponse response = new MessageStatusResponse(
                     VALID_UUID, "ALLOCATION_SERIES", "COMPLETED", "STEP_6B",
-                    LocalDateTime.now(), LocalDateTime.now(), 1, "ACK", "<ack/>", List.of(), List.of()
+                    LocalDateTime.now(), LocalDateTime.now(), 1, "ACK", "<AllocationSeries/>", "<ack/>", List.of(), List.of()
             );
             when(messageService.getMessageStatus(VALID_UUID)).thenReturn(response);
 
@@ -122,11 +122,11 @@ class MarketMessageControllerTest {
         void getAllMessages_shouldReturnList() throws Exception {
             MessageStatusResponse r1 = new MessageStatusResponse(
                     "uuid-1", "ALLOCATION_SERIES", "COMPLETED", null,
-                    LocalDateTime.now(), LocalDateTime.now(), 1, null, null, null, null
+                    LocalDateTime.now(), LocalDateTime.now(), 1, null, null, null, null, null
             );
             MessageStatusResponse r2 = new MessageStatusResponse(
                     "uuid-2", null, "FAILED", null,
-                    LocalDateTime.now(), null, null, null, null, null, null
+                    LocalDateTime.now(), null, null, null, null, null, null, null
             );
             when(messageService.getAllMessages()).thenReturn(List.of(r1, r2));
 
@@ -155,7 +155,7 @@ class MarketMessageControllerTest {
         void getByStatus_shouldReturnFilteredMessages() throws Exception {
             MessageStatusResponse r = new MessageStatusResponse(
                     "failed-uuid", null, "FAILED", null,
-                    LocalDateTime.now(), null, null, null, null, null, null
+                    LocalDateTime.now(), null, null, null, null, null, null, null
             );
             when(messageService.getMessagesByStatus(MessageStatus.FAILED))
                     .thenReturn(List.of(r));

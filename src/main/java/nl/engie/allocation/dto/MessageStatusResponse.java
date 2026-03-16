@@ -12,6 +12,7 @@ public record MessageStatusResponse(
         LocalDateTime completedAt,
         Integer priority,
         String responseType,
+        String inputXml,
         String responseXml,
         List<StepStatusDto> steps,
         List<ValidationErrorDto> errorCodes
