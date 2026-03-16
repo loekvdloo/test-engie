@@ -9,11 +9,20 @@ package nl.engie.allocation.model.enums;
 public enum ErrorCode {
 
     // ── Tijdserie-controles ──────────────────────────────────────────────────
+    E_650("650", "EAN-code-18 is niet valide.",
+            "De EAN-code-18 van de aansluiting is een valide EAN-code.", "BRP/LNB"),
+
     E_651("651", "EAN-code-18 is niet valide.",
             "De EAN-code-18 van het netgebied is een valide EAN-code.", "BRP/LNB"),
 
     E_663("663", "De periode waarop het bericht betrekking heeft is niet juist.",
             "Bij een dagbericht elektriciteit is de periode precies 1 kalenderdag.", "BRP/LNB"),
+
+    E_667("667", "Een of meerdere producten passen niet bij de productsoort.",
+            "Alle producten passen bij de productsoort.", "BRP/LNB"),
+
+    E_668("668", "Een of meerdere energie-eenheden passen niet bij het/de product/producten.",
+            "Alle energie-eenheden passen bij de producten.", "BRP/LNB"),
 
     E_670("670", "Er is al eerder een bericht met dit kenmerk ontvangen.",
             "Het kenmerk van het bericht is uniek.", "BRP/LNB"),
@@ -23,6 +32,9 @@ public enum ErrorCode {
 
     E_676("676", "Eerste positie begint niet met '1'.",
             "De eerste positie in een tijdserie is '1'.", "BRP/LNB"),
+
+    E_683("683", "De combinatie van herkomstindicatie, validatiestatus en reparatiemethodiek is geen geldige combinatie.",
+            "De combinatie van herkomstindicatie, validatiestatus en reparatiemethodiek is een geldige combinatie.", "BRP/LNB"),
 
     E_686("686", "Volume met negatieve waarde.",
             "Alle volumes in het bericht zijn positieve getallen (of nul).", "BRP/LNB"),
@@ -35,6 +47,9 @@ public enum ErrorCode {
 
     E_758("758", "Ontbrekende of onjuiste EAN-13.",
             "Het bericht bevat exact één keer de EAN-13 van een marktpartij met de verwachte marktrol.", "BRP/LNB"),
+
+    E_759("759", "Ontbrekende EAN 13 van de BRP.",
+            "Het bericht bevat de EAN 13 van de marktpartij met de marktrol BRP.", "LNB"),
 
     E_761("761", "De BRP-er is niet actief als BRP-er in het netgebied voor deze allocatiegroep.",
             "De BRP is in de gehele berichtperiode volgens het aansluitingenregister voor tenminste één allocatiepunt binnen deze allocatiegroep in het betreffende netgebied geregistreerd.", "BRP"),

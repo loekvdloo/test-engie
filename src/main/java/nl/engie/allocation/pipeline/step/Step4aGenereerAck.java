@@ -43,7 +43,12 @@ public class Step4aGenereerAck implements PipelineStep {
         var message = context.getMessage();
         String responseUuid = UUID.randomUUID().toString();
 
-        String ackXml = generateAckXml(responseUuid, message.getMessageUuid());
+        String receivedMessageId = message.getExternalMessageId() != null
+                ? message.getExternalMessageId()
+                : message.getMessageUuid();
+        String correlationId = preferredCorrelationId(context);
+
+        String ackXml = generateAckXml(responseUuid, receivedMessageId, correlationId, message.getMessageType());
 
         MarketResponse response = MarketResponse.builder()
                 .marketMessage(message)
@@ -61,21 +66,53 @@ public class Step4aGenereerAck implements PipelineStep {
         return StepResult.success("ACK gegenereerd: " + responseUuid);
     }
 
-    private String generateAckXml(String responseUuid, String originalUuid) {
+    private String generateAckXml(String responseUuid, String receivedMessageId,
+                                  String correlationId,
+                                  nl.engie.allocation.model.enums.MessageType messageType) {
+        String root = acknowledgementRoot(messageType);
+        String correlationXml = (correlationId == null || correlationId.isBlank())
+                ? ""
+                : "    <correlationID>" + correlationId + "</correlationID>\n";
         return """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <Acknowledgement_MarketDocument>
+                <%s>
                     <mRID>%s</mRID>
                     <createdDateTime>%s</createdDateTime>
-                    <Reason>
+                %s    <Reason>
                         <code>000</code>
                     </Reason>
                     <Received_MarketDocument>
                         <mRID>%s</mRID>
                     </Received_MarketDocument>
-                </Acknowledgement_MarketDocument>
-                """.formatted(responseUuid,
+                </%s>
+                """.formatted(root,
+                responseUuid,
                 LocalDateTime.now().toString() + "Z",
-                originalUuid);
+                correlationXml,
+                receivedMessageId,
+                root);
+    }
+
+    private String preferredCorrelationId(PipelineContext context) {
+        if (context.getMessageHeaders() == null) {
+            return null;
+        }
+        if (context.getMessageHeaders().correlationIdSoap() != null
+                && !context.getMessageHeaders().correlationIdSoap().isBlank()) {
+            return context.getMessageHeaders().correlationIdSoap();
+        }
+        return context.getMessageHeaders().correlationIdBusiness();
+    }
+
+    private String acknowledgementRoot(nl.engie.allocation.model.enums.MessageType type) {
+        if (type == null) {
+            return "Acknowledgement_MarketDocument";
+        }
+        return switch (type) {
+            case ALLOCATION_SERIES -> "AllocationSeriesAcknowledgement";
+            case AGGREGATED_ALLOCATION_SERIES -> "AggregatedAllocationSeriesAcknowledgement";
+            case ALLOCATION_FACTOR_SERIES -> "AllocationFactorSeriesAcknowledgement";
+            default -> "Acknowledgement_MarketDocument";
+        };
     }
 }

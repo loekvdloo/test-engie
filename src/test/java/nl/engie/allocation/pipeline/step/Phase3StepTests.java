@@ -9,6 +9,7 @@ import nl.engie.allocation.model.enums.StepCode;
 import nl.engie.allocation.pipeline.PipelineContext;
 import nl.engie.allocation.pipeline.StepResult;
 import nl.engie.allocation.repository.BrpRegisterRepository;
+import nl.engie.allocation.repository.MarketMessageRepository;
 import nl.engie.allocation.repository.ValidationResultRepository;
 import nl.engie.allocation.repository.ValidationRuleRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +37,7 @@ class Phase3StepTests {
             <?xml version="1.0" encoding="UTF-8"?>
             <AllocationSeries>
                 <mRID>a1b2c3d4-e5f6-7890-abcd-ef1234567890</mRID>
-                <product><identification>8716867000016</identification></product>
+                <product><identification>8716867000030</identification></product>
                 <startDateTime>2025-01-01T00:00:00Z</startDateTime>
                 <endDateTime>2025-01-02T00:00:00Z</endDateTime>
                 <resolution>PT15M</resolution>
@@ -137,7 +138,7 @@ class Phase3StepTests {
             StepResult result = step.execute(ctx);
 
             assertTrue(result.isSuccess());
-            // Valid XML contains 8716867000016 which is valid
+            // Valid XML contains 8716867000030 (actieve energie, ebIX code list) which is valid
         }
 
         @Test
@@ -152,8 +153,9 @@ class Phase3StepTests {
             PipelineContext ctx = new PipelineContext(msg);
             step.execute(ctx);
 
+            // E_667: product past niet bij de productsoort (spec §3.4)
             boolean hasBiz001 = ctx.getValidationErrors().stream()
-                    .anyMatch(e -> e.code().equals("999"));
+                    .anyMatch(e -> e.code().equals("667"));
             assertTrue(hasBiz001);
         }
 
@@ -357,8 +359,11 @@ class Phase3StepTests {
 
         @Test
         void execute_withOldMessage_shouldAddError() {
+            // E_763: bericht ontvangen meer dan maxDeliveryDelayHours na periode-einde
             MarketMessage msg = createMessage(VALID_XML);
-            msg.setReceivedAt(LocalDateTime.now().minusDays(60));
+            // Set endDateTime 10 days ago, message received now (well after SLA window)
+            msg.setEndDateTime(LocalDateTime.now().minusDays(10));
+            msg.setReceivedAt(LocalDateTime.now());
 
             PipelineContext ctx = new PipelineContext(msg);
             step.execute(ctx);
@@ -418,11 +423,13 @@ class Phase3StepTests {
     @DisplayName("Step 3G: Herbruikbare regels")
     class Step3gTests {
 
+        @Mock
+        private MarketMessageRepository marketMessageRepository;
         private Step3gHerbruikbareRegels step;
 
         @BeforeEach
         void setUp() {
-            step = new Step3gHerbruikbareRegels();
+            step = new Step3gHerbruikbareRegels(marketMessageRepository);
         }
 
         @Test
@@ -431,29 +438,35 @@ class Phase3StepTests {
         }
 
         @Test
-        void execute_withValidUuid_shouldNotAddError() {
-            PipelineContext ctx = new PipelineContext(createMessage(VALID_XML));
+        void execute_withUniqueExternalMessageId_shouldNotAddE669() {
+            // E_669 is now a DB uniqueness check, not UUID format
+            MarketMessage msg = createMessage(VALID_XML);
+            msg.setExternalMessageId("unique-ext-id-001");
+            when(marketMessageRepository.existsByExternalMessageIdAndIdNot("unique-ext-id-001", 1L))
+                    .thenReturn(false);
+
+            PipelineContext ctx = new PipelineContext(msg);
             step.execute(ctx);
 
-            boolean hasHbr001 = ctx.getValidationErrors().stream()
+            boolean hasE669 = ctx.getValidationErrors().stream()
                     .anyMatch(e -> e.code().equals("669"));
-            assertFalse(hasHbr001);
+            assertFalse(hasE669);
         }
 
         @Test
-        void execute_withInvalidUuid_shouldAddError() {
-            String xml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <AllocationSeries>
-                        <mRID>NOT-A-VALID-UUID</mRID>
-                    </AllocationSeries>
-                    """;
-            PipelineContext ctx = new PipelineContext(createMessage(xml));
+        void execute_withDuplicateExternalMessageId_shouldAddE669() {
+            // E_669: bericht met dit kenmerk al ontvangen (duplicate in DB)
+            MarketMessage msg = createMessage(VALID_XML);
+            msg.setExternalMessageId("duplicate-ext-id-001");
+            when(marketMessageRepository.existsByExternalMessageIdAndIdNot("duplicate-ext-id-001", 1L))
+                    .thenReturn(true);
+
+            PipelineContext ctx = new PipelineContext(msg);
             step.execute(ctx);
 
-            boolean hasHbr001 = ctx.getValidationErrors().stream()
+            boolean hasE669 = ctx.getValidationErrors().stream()
                     .anyMatch(e -> e.code().equals("669"));
-            assertTrue(hasHbr001);
+            assertTrue(hasE669);
         }
 
         @Test

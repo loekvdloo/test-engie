@@ -49,6 +49,7 @@ server:
 pipeline:
   forward-nack-internally: false
   async-enabled: true
+  max-delivery-delay-hours: 48   # E_763: max uren na periode-einde voor ontvangst bericht
 
 logging:
   level:

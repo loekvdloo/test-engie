@@ -1,0 +1,2603 @@
+ 
+Pagina 1 / 52 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Business Service 
+ 
+ 
+ 
+Uitwisselen allocatiegegevens elektriciteit 
+ 
+ 
+ 
+ 
+Deze versie van de servicebeschrijving wordt van kracht, na 
+vaststelling, bij livegang van Allocatie 2.0 tranche 4. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Naam SD030 - Uitwisselen allocatiegegevens 
+elektriciteit 
+Versie 4.0 
+Code BSCMF0074 - Uitwisselen allocatiegegevens 
+individueel allocatiepunt 
+BSCMF0075 - Uitwisselen geaggregeerde 
+allocatiegegevens allocatiepunten 
+BSCMF0076 - Uitwisselen 
+RestantvolumeCorrectieFactor/Profielfractie 
+Status Vastgesteld 
+Datum 13-09-2024 Auteur EDSN Business Integratie 
+  
+ 
+Pagina 2 / 52 
+Inhoudsopgave 
+Documentbeheer ................................................................................................................................................. 4 
+Verspreidingsgeschiedenis ................................................................................................................................... 5 
+Gerefereerde documenten ................................................................................................................................... 6 
+1 Inleiding ................................ ................................ ................................ ................................ ..... 7 
+1.1 Servicebeschrijving ................................................................................................................................ 7 
+1.2 Leeswijzer .............................................................................................................................................. 7 
+1.3 Uitgangspunten .................................................................................................................................... 8 
+1.4 Gebruik van de service Uitwisselen allocatiegegevens ......................................................................... 9 
+1.5 Lijst met afkortingen ........................................................................................................................... 10 
+2 Rollen en verantwoordelijkheden ................................ ................................ .............................  12 
+2.1 Consumer ............................................................................................................................................ 12 
+2.2 Provider ............................................................................................................................................... 12 
+2.3 RACI ..................................................................................................................................................... 12 
+3 BPMN Uitwisselen allocatiegegevens ................................ ................................ ........................  13 
+3.1 Uitwisselen allocatiegegevens ............................................................................................................ 13 
+3.2 Validaties MMC-hub ........................................................................................................................... 14 
+3.3 Validaties ontvanger ........................................................................................................................... 14 
+3.4 Controles ontvanger voor bericht “Notificatie allocatiegegevens individueel allocatiepunt” ............ 14 
+3.5 Controles ontvanger voor bericht “Notificatie geaggregeerde allocatiegegevens allocatiepunten” . 16 
+3.6 Controles ontvanger voor bericht “Notificatie RestantvolumeCorrectieFactor en Profielfracties” .... 18 
+3.7 Toepassing ProcessTypeID voor uitwisselen allocatiegegevens ......................................................... 20 
+4 Functionele parameters ................................ ................................ ................................ ............ 21 
+4.1 Notificatie Uitwisselen allocatiegegevens individueel allocatiepunt .................................................. 21 
+4.2 Notificatie Uitwisselen geaggregeerde allocatiegegevens allocatiepunten ....................................... 23 
+4.3 Notificatie Uitwisselen RestantvolumeCorrectieFactor en Profielfracties .......................................... 26 
+4.4 Antwoord Uitwisselen allocatiegegevens ........................................................................................... 28 
+4.4.1 Toelichting op het correleren van het antwoord aan de notificatie ................................................... 28 
+5 Sequence Diagram ................................ ................................ ................................ .................... 29 
+5.1 Toelichting........................................................................................................................................... 29 
+5.2 Uitwisselen allocatiegegevens individueel allocatiepunt ................................................................... 30 
+5.3 Uitwisselen geaggregeerde allocatiegegevens allocatiepunten ........................................................ 31 
+5.4 Uitwisselen RestantvolumeCorrectieFactor (RCF) en Profielfracties .................................................. 32 
+6 Eigenschappen service Uitwisselen allocatiegegevens ................................ ...............................  33 
+6.1 Eigenschappen service Uitwisselen allocatiegegevens individueel allocatiepunt .............................. 33 
+6.2 Eigenschappen service Uitwisselen geaggregeerde allocatiegegevens allocatiepunten ................... 35 
+ 
+Pagina 3 / 52 
+6.3 Eigenschappen service Uitwisselen RestantvolumeCorrectieFactor (RCF) en Profielfracties ............. 37 
+7 Informatie model ................................ ................................ ................................ ..................... 39 
+7.1 Toelichting........................................................................................................................................... 39 
+7.2 Notificatie Uitwisselen allocatiegegevens individueel allocatiepunt (AllocationSeriesNotification) .. 40 
+7.3 Bevestiging/afwijzing notificatie allocatiegegevens individueel allocatiepunt 
+(AllocationSeriesAcknowledgement) .................................................................................................. 42 
+7.4 Notificatie Uitwisselen geaggregeerde allocatiegegevens (AggregatedAllocationSeriesNotification)
+ ............................................................................................................................................................ 44 
+7.5 Bevestiging/afwijzing notificatie geaggregeerde allocatiegegevens 
+(AggregatedAllocationSeriesAcknowledgement) ............................................................................... 47 
+7.6 Notificatie Uitwisselen RCF/Profielfracties (AllocationFactorSeriesNotification) ............................... 49 
+7.7 Bevestiging/afwijzing notificatie RCF/Profielfracties (AllocationFactorSeriesAcknowledgement) .... 51 
+ 
+ 
+Pagina 4 / 52 
+Documentbeheer 
+Versie Versiedatum Wijzigingen Auteur 
+0.1 03-06-2021 Initiële versie 
+Opgesteld op basis van BRS Allocatiegegevens en 
+berichtdefinitie AllocationSeries en 
+AggregatedAllocationSeries 
+EDSN 
+0.3 17-06-2021 Service voor RCF toegevoegd aan deze servicebeschrijving 
+Review WG C1 verwerkt 
+EDSN 
+0.6 05-07-2021 Review WG C1 en simulatie verwerkt 
+Controles ontvanger toegevoegd 
+EDSN 
+0.7 31-08-2021 Review sector verwerkt 
+Tijdseries voor profielfracties en tijdseries voor RCF 
+samengevoegd in AllocationFactorSeries 
+EDSN 
+0.8 28-10-2021 Review sector en WG C1 verwerkt 
+Term “adjusted” vervangen door “determined” 
+EDSN 
+0.81 09-11-2021 Review business integratie team verwerkt EDSN 
+0.82 11-11-2021 Terugkoppeling WG C1 verwerkt EDSN 
+0.83 15-11-2021 Controle 779 toegevoegd EDSN 
+0.9 18-11-2021 Controle 758 aangescherpt en 759 verwijderd 
+Versie voor het NEDU goedkeuringstraject 
+EDSN 
+1.0 16-12-2021 Vastgesteld in ALV NEDU EDSN 
+1.1 17-05-2022 Gewijzigde versie obv de volgende RFC’s: 
+• RFC Allocatie 2.0-1 Gebruik CorrelationID: controle 780 
+toegevoegd voor correct gebruik van het CorrelationID 
+voor de Allocatie 2.0 berichten die via de MMC HUB 
+worden uitgewisseld; 
+• RFC Allocatie 2.0-Tranche-2.1 Bericht RCF/Profielfracties: 
+wijziging in de uitgangspunten inzake het sturen van het 
+RCF/Profielfractie bericht; 
+• RFC Allocatie 2.0-Tranche-2.2 Optimalisatie controles 
+allocatieberichten. 
+EDSN 
+1.3 25-05-2022 Versie na controle verwerking RFC’s EDSN 
+2.0 14-06-2022 Vastgesteld in SSG EDSN 
+2.1 17-07-2023 Gewijzigde versie obv RFC Tranche 2-8 Aanpassing 
+uitgangspunten m.b.t. RCF naar LNB. 
+ 
+Huisstijl gewijzigd in MFF BAS. 
+ 
+Voetnoot toegevoegd dat de allocatierun identificatie over 
+een kalenderdag en netgebied voor alle ontvangers van de 
+berichten van die allocatierun identiek is. 
+Voetnoot als toelichting opgenomen bij controle 769. 
+EDSN 
+2.6 03-08-2023 Versie ter controle door achterban van de leden van 
+Berichtenteam MFFBAS 
+EDSN 
+2.9 18-08-2023 Versie na controle door Berichtenteam MFFBAS EDSN 
+3.0 08-09-2023 Vastgesteld in SSG A2.0 EDSN 
+3.1 01-05-2023 Gewijzigde versie o.b.v. TS040 Slimme-meter-allocatie (SMA), 
+waarbij de allocatieresultaten SMA onderscheiden naar de 
+herkomstindicatie (gemeten en berekend) uitgewisseld 
+moeten worden. 
+EDSN 
+3.3 21-05-2024 Versie na verwerking review van Berichtenteam MFFBAS EDSN 
+3.6 30-05-2024 Versie voor peer review EDSN 
+3.9 27-06-2024 Versie na peer review en controle Berichtenteam MFFBAS 
+Toelichting (als voetnoot) opgenomen bij controle 780 
+EDSN 
+4.0 13-09-2024 Vastgesteld in PF SG EDSN 
+ 
+Pagina 5 / 52 
+Verspreidingsgeschiedenis 
+Versie Verspreidingsdatum Ontvangers 
+0.1 03-06-2021 Werkgroep C1 
+0.3 17-06-2021 Werkgroep C1 
+0.6 05-07-2021 Marktpartijen (via NEDU) 
+IT-specialisten 
+NEDU TC 
+Werkgroep C1 
+0.7 31-08-2021 Marktpartijen (via NEDU) 
+IT-specialisten 
+NEDU TC 
+Werkgroep C1 
+0.8 28-10-2021 Marktpartijen (via NEDU) 
+IT-specialisten 
+NEDU TC 
+Werkgroep C1 
+0.81 09-11-2021 Werkgroep C1 
+0.82 11-11-2021 Werkgroep C1 
+0.83 15-11-2021 Werkgroep C1 
+0.9 18-11-2021 NEDU Design Authority 
+Werkgroep C1 
+1.0 16-12-2021 NEDU 
+1.1 17-05-2022 BS A2.0 Advisory Board 
+1.3 25-05-2022 BS A2.0 AD, WG C1, SI MFF BAS, SSG 
+2.0 14-06-2022 BS A2.0 AD, WG C1, SI MFF BAS, SSG 
+2.1 17-07-2023 Berichtenteam MFFBAS 
+2.6 03-08-2023 Achterban leden Berichtenteam MFFBAS 
+2.9 18-08-2023 Integraal implementatie Sturingsoverleg (IISO) 
+3.0 08-09-2023 IISO 
+Berichtenteam MFFBAS 
+3.1 02-05-2024 Berichtenteam MFFBAS 
+3.3 23-05-2024 Berichtenteam MFFBAS 
+3.6 30-05-2024 Peer reviewers van BRP’s, RNB’s, LNB-E 
+Berichtenteam MFFBAS 
+3.9 27-06-2024 MFFBAS 
+Berichtenteam MFFBAS 
+4.0 13-09-2024 MFFBAS 
+Berichtenteam MFFBAS 
+ 
+  
+ 
+Pagina 6 / 52 
+Gerefereerde documenten 
+Requirementsmodel 
+Nr. Omschrijving Versie Datum Auteur 
+1. BRS Allocatiegegevens elektriciteit 3.0 13-09-2024 Berichtenteam 
+MFFBAS 
+11. BRS Meetgegevens en reclamaties meetgegevens GV  9.9  08-08-2024 Berichtenteam 
+MFFBAS 
+ 
+Ontwerpkaders- en richtlijnen 
+Nr. Omschrijving Versie Datum Auteur 
+2. NEDU EDSN Ontwerpkeuzes 3.9 15-04-2021 NEDU/EDSN 
+3. TenneT Web Services guide 3.91 02-09-2024 TenneT 
+8. Technical Guide - Measurements & Allocations 
+Documents 
+1.94 21-05-2024 TenneT 
+ 
+Servicebeschrijvingen en gegevensmodel 
+Nr. Omschrijving Versie Datum Auteur 
+4. EDSN Complex Data Type Specificatie 2.4 07-06-2023 EDSN 
+5. EDSN Logisch Data Type Specificatie 3.0 07-06-2023 EDSN 
+6. ebIX® Code list 1.4A November 2023 ebIX TC 
+7. ISO 8601 voor datum- en tijdnotatie 1:2019 2019 ISO 
+9. Attributenlijst Centraal Aansluitingenregister 13.0 12-06-2023 EDSN 
+10. Business Service Uitwisselen herzieningsverzoeken 6.0 08-12-2023 EDSN 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+Dit document is een publicatie van EDSN voor MFF BAS. In het streven naar volledigheid en juistheid van gegevens verzoeken wij u 
+vriendelijk om commentaar, aanvullingen en verbeteringen ten aanzien van dit document door te geven aan EDSN.  
+U kunt EDSN op de onderstaande wijze contacteren, tevens voor meer informatie over dit document. 
+ EDSN B.V. Telefoon 033 - 422 46 20 
+ Van Asch van Wijckstraat 55 E-mail servicedesk@edsn.nl 
+ 3811 LP Amersfoort Internet www.edsn.nl 
+ 
+Pagina 7 / 52 
+1 Inleiding 
+1.1 Servicebeschrijving 
+De servicebeschrijving beschrijft de afspraken over de uitwisseling door de NB van tijdseries1 van 
+allocatiegegevens elektriciteit per individueel allocatiepunt van: 
+a. Allocatiepunten met allocatiemethode telemetrie (TMT) naar BRP; 
+b. Netverlies allocatiepunten met allocatiemethode telemetrie (TMT) naar BRP; 
+c. Gedimensioneerde allocatiepunten met allocatiemethode telemetrie (TMT) naar BRP;  
+d. Allocatiepunten met allocatiemethode telemetrie (TMT) naar LNB. 
+ 
+Tevens beschrijft deze servicebeschrijving de afspraken over de uitwisseling door de NB van tijdseries van 
+geaggregeerde allocatiegegevens elektriciteit van: 
+a. Allocatiepunten met allocatiemethode telemetrie (TMT) naar BRP; 
+b. Allocatiepunten met allocatiemethode slimme meter allocatie (SMA) naar BRP; 
+c. Allocatiepunten met allocatiemethode profiel (PRF) naar BRP; 
+d. Netverlies allocatiepunten met allocatiemethode telemetrie (TMT) naar BRP; 
+e. Gedimensioneerde allocatiepunten met allocatiemethode telemetrie (TMT) naar BRP; 
+f. Allocatiepunten met allocatiemethode telemetrie (TMT) naar LNB; 
+g. Allocatiepunten met allocatiemethode slimme meter allocatie (SMA) naar LNB; 
+h. Allocatiepunten met allocatiemethode profiel (PRF) naar LNB; 
+i. Netverlies allocatiepunten met allocatiemethode telemetrie (TMT) naar LNB; 
+j. Gedimensioneerde allocatiepunten met allocatiemethode telemetrie (TMT) naar LNB. 
+De tijdseries van geaggregeerde allocatiegegevens voor gedimensioneerde allocatiepunten (e. en j.) en 
+netverlies allocatiepunten (d. en i.) worden separaat uitgewisseld en zijn derhalve niet verwerkt in de 
+geaggregeerde allocatiegegevens van allocatiepunten met allocatiemethode telemetrie (a. en f.). 
+ 
+En de afspraken over de uitwisseling door de NB van tijdseries van de: 
+a. RestantvolumeCorrectieFactor (RCF) en Profielfracties elektriciteit die voor betreffende allocatierun zijn 
+gebruikt, per netgebied naar BRP; 
+b. RestantvolumeCorrectieFactor (RCF) en Profielfracties elektriciteit die voor betreffende allocatierun zijn 
+gebruikt, per netgebied naar LNB. 
+ 
+Om de lezer een goed beeld te geven van de uitwisseling, is een gedetailleerde procesbeschrijving 
+opgenomen en een benoeming van de daarbij te gebruiken berichten. Voor een functionele beschrijving van 
+het proces die deze uitwisseling ondersteunt wordt verwezen naar de Business Requirement Specificatie 
+Allocatiegegevens[1]. 
+ 
+1.2 Leeswijzer 
+Onderhavig document beschrijft o.a. de volgende aspecten: 
+• Proces Uitwisselen allocatiegegevens; 
+• De uitwisseling van deze allocatiegegevens via de MMC-hub van TenneT; 
+• De syntactische validaties door de MMC-hub, de bevestiging/afwijzing door de MMC-hub; 
+• De controles op de allocatiegegevens door de consumers (BRP en LNB); 
+• De bevestiging/afwijzing van de allocatiegegevens door de consumers (BRP en LNB); 
+• XML berichtdefinities. 
+ 
+Voor de functionaliteit van de MMC-hub wordt verwezen naar TenneT Web Services guide[3]. 
+  
+ 
+1 Het gaat hier om interval waarden met een tijdsinterval van bijvoorbeeld 15 minuten. 
+ 
+Pagina 8 / 52 
+1.3 Uitgangspunten 
+De volgende uitgangspunten zijn gehanteerd bij het ontwerpen van de service Uitwisselen 
+allocatiegegevens: 
+• Datum/tijd notatie in XML berichten conform NEDU EDSN Ontwerpkeuzes[2]; 
+• De start- en einddatum is in UTC en conform de notatie: YYYY-MM-DDThh:mm:ssZ; 
+o Voorbeeld start- en einddatum kalenderdag elektriciteit (9 februari 2020, wintertijd):  
+2020-02-08T23:00:00Z / 2020-02-09T23:00:00Z; 
+o Voorbeeld start- en einddatum kalenderdag elektriciteit (29 maart 2020, overgang wintertijd naar 
+zomertijd): 2020-03-28T23:00:00Z / 2020-03-29T22:00:00Z; 
+o Voorbeeld start- en einddatum kalenderdag elektriciteit (9 juni 2020, zomertijd):  
+2020-06-08T22:00:00Z / 2020-06-09T22:00:00Z; 
+o Voorbeeld start- en einddatum kalenderdag elektriciteit (25 oktober 2020, overgang zomertijd naar 
+wintertijd): 2020-10-24T22:00:00Z / 2020-10-25T23:00:00Z; 
+• Daar waar in deze servicebeschrijving wordt gesproken over “regionale netbeheerder”, “netbeheerder”, 
+“RNB” of “NB”, kan ook gelezen worden als “GDS-eigenaar” voor zover het elektriciteit grootverbruik 
+aansluitingen betreft; 
+• Aan een set van allocatiegegevens over een bepaalde kalenderdag en voor een bepaald netgebied 
+behorende bij dezelfde allocatierun wordt een allocatierun identificatie toegekend zodat de consumer 
+op basis van deze identificatie de set van allocatiegegevens bij elkaar kan passen2. De volgorde van de 
+allocatieruns kan onder andere worden afgeleid uit de creatie datumtijd van de RCF/Profielfractie 
+berichten in combinatie met de allocatierun identificatie in de RCF/Profielfractie berichten. Deze 
+RCF/Profielfractie berichten worden beschikbaar gesteld aan de BRP en LNB (geldend voor tenminste 
+alle BRP’s die één of meerdere allocatiepunten hebben als onderdeel van de betreffende allocatierun of 
+een voorgaande allocatierun m.b.t. dezelfde kalenderdag); 
+• Een set van allocatiegegevens bestaat uit: 
+1. Allocatiegegevens van individuele allocatiepunten; 
+2. Geaggregeerde allocatiegegevens; 
+3. RestantvolumeCorrectieFactor en Profielfracties elektriciteit die voor betreffende 
+allocatierun zijn gebruikt; 
+• De RestantvolumeCorrectieFactor kan negatieve waardes bevatten; 
+• Alle volumes in de allocatiegegevens berichten zijn positieve getallen (of nul) met uitzondering van 
+volumes in de allocatiegegevens voor Allocatiegroep PRF. Alleen voor deze Allocatiegroep zijn negatieve 
+getallen toegestaan in de set van allocatiegegevens; 
+• Een bericht met geaggregeerde allocatiegegevens per BRP/LV-combinatie wordt alleen aan de BRP 
+aangeboden indien de betreffende BRP/LV-combinatie actief is op één of meer allocatiepunten in het 
+betreffende netgebied; 
+• Een bericht met geaggregeerde allocatiegegevens per BRP wordt alleen aan de LNB aangeboden indien 
+de betreffende BRP actief is op één of meer allocatiepunten in het betreffende netgebied; 
+• Een bericht voor de BRP met geaggregeerde allocatiegegevens per BRP/LV-combinatie voor 
+Allocatiegroep PRF bevat alleen die profielcategorieën (en vastgesteld afnametype) waarvoor de 
+betreffende BRP/LV-combinatie actief is in het betreffende netgebied; 
+• Een bericht voor de LNB met geaggregeerde allocatiegegevens per BRP voor Allocatiegroep PRF bevat 
+alleen die profielcategorieën (en vastgesteld afnametype) waarvoor de betreffende BRP actief is in het 
+betreffende netgebied; 
+• Een RCF/Profielfractie bericht voor een netgebied bevat altijd alle tijdseries voor alle profielfracties 
+indien er één of meer geprofileerde allocatiepunten actief zijn in het betreffende netgebied; 
+• Indien er geen alloceerbare geprofileerde allocatiepunten actief zijn in het betreffende netgebied, dan 
+wordt het RCF/Profielfractie bericht gestuurd zonder profielfracties en met voor de RCF de waarden 
+1.00000. De verplichting tot het verzenden van deze berichten geldt enkel voor het verzenden naar de 
+BRP, maar niet voor het verzenden naar de LNB; 
+ 
+2 De allocatierun identificatie over een kalenderdag en netgebied is voor alle ontvangers van de berichten van die allocatierun 
+identiek. 
+ 
+Pagina 9 / 52 
+• Een bericht met allocatiegegevens van een individueel allocatiepunt of een bericht met geaggregeerde 
+allocatiegegevens bevat altijd twee volledige tijdseries (afname en invoeding). Indien er voor een 
+tijdserie geen gegevens zijn, dan wordt voor volume de waarde 0.000 aangeleverd in het 
+allocatiegegevens bericht; 
+• Indien een partij namens een andere partij gegevens gaat aanleveren (via de MMC-hub), dan dient daar 
+de CarrierID in de SOAP header voor worden gebruikt. Voor gebruik CarrierID zie TenneT Web Services 
+guide[3]; 
+• Profielcategorie vanaf livegang Allocatie 2.0 tranche 2: een classificering van aansluitingen op grond van 
+objectief vast te stellen kenmerken, zoals aansluitwaarde, schakeltijden, gecontracteerd 
+transportvermogen, vastgesteld afnametype en bedrijfstijd. 
+1.4 Gebruik van de service Uitwisselen allocatiegegevens 
+De onderstaande tabel geeft aan voor welk type allocatiepunt de netbeheerder (NB) een bericht met 
+allocatiegegevens naar de balansverantwoordelijke partij (BRP) of landelijke netbeheerder (LNB) moet 
+sturen. Daarnaast bevat de tabel een verwijzing naar de relevante use cases uit de BRS[1]. 
+ 
+Uitwisseling Provider van 
+allocatie-
+gegevens 
+Consumer 
+van allocatie-
+gegevens 
+Type aansluiting BRS Use Case Code3 
+Allocatiepunt met allocatiemethode telemetrie (TMT) 
+Dagbericht “allocatiegegevens per 
+individueel allocatiepunt 
+(allocatiemethode TMT)” 
+NB BRP Allocatiepunt ELK 
+TMT 
+A20.201 N101 
+Dagbericht “geaggregeerde 
+allocatiegegevens allocatiepunten 
+(allocatiemethode TMT)”, aggregatie per 
+netgebied per LV 
+NB BRP Allocatiepunt ELK 
+TMT 
+A20.201 N102 
+Dagbericht “allocatiegegevens per 
+individueel allocatiepunt 
+(allocatiemethode TMT)”4 
+NB LNB Allocatiepunt ELK 
+TMT 
+A20.211 N101 
+Dagbericht “geaggregeerde 
+allocatiegegevens van allocatiepunten 
+(allocatiemethode TMT), aggregatie per 
+netgebied per BRP 
+NB LNB Allocatiepunt ELK 
+TMT 
+A20.211 N102 
+Allocatiepunt met allocatiemethode slimme meter allocatie (SMA) 
+Dagbericht “geaggregeerde 
+allocatiegegevens allocatiepunten 
+(allocatiemethode SMA)”, aggregatie per 
+netgebied per LV 
+NB BRP Allocatiepunt ELK 
+SMA 
+A20.202 N111 
+Dagbericht “geaggregeerde 
+allocatiegegevens allocatiepunten 
+(allocatiemethode SMA)”, aggregatie per 
+netgebied per BRP 
+NB LNB Allocatiepunt ELK 
+SMA 
+A20.212 N111 
+Allocatiepunt met allocatiemethode profiel (PRF) 
+Dagbericht “geaggregeerde 
+allocatiegegevens allocatiepunten 
+(allocatiemethode PRF)”, aggregatie per 
+netgebied per LV 
+NB BRP Allocatiepunt ELK 
+PRF 
+A20.203 N121 
+Dagbericht “geaggregeerde 
+allocatiegegevens allocatiepunten 
+(allocatiemethode PRF)”, aggregatie per 
+netgebied per BRP 
+NB LNB Allocatiepunt ELK 
+PRF 
+A20.213 N121 
+Netverlies allocatiepunt met allocatiemethode telemetrie (TMT) 
+Dagbericht “allocatiegegevens per 
+individueel netverlies allocatiepunt” 
+(allocatiemethode TMT) 
+NB BRP Netverlies 
+allocatiepunt ELK 
+TMT 
+A20.204 N131 
+ 
+3 Zie paragraaf 3.7 Toepassing ProcessTypeID. 
+4 Betreft allocatiegegevens die op basis van wet- en regelgeving worden opgeleverd aan de LNB. 
+ 
+Pagina 10 / 52 
+Uitwisseling Provider van 
+allocatie-
+gegevens 
+Consumer 
+van allocatie-
+gegevens 
+Type aansluiting BRS Use Case Code3 
+Dagbericht “geaggregeerde 
+allocatiegegevens netverlies 
+allocatiepunten” (allocatiemethode 
+TMT), aggregatie per netgebied per LV 
+NB BRP Netverlies 
+allocatiepunt ELK 
+TMT 
+A20.204 N132 
+Dagbericht “geaggregeerde 
+allocatiegegevens netverlies 
+allocatiepunten” (allocatiemethode 
+TMT), aggregatie per netgebied per BRP 
+NB LNB Netverlies 
+allocatiepunt ELK 
+TMT 
+A20.214 N132 
+Gedimensioneerd allocatiepunt met allocatiemethode telemetrie (TMT) 
+Dagbericht “allocatiegegevens per 
+individueel gedimensioneerd 
+allocatiepunt” (allocatiemethode TMT) 
+NB BRP Gedimensioneerd 
+allocatiepunt ELK 
+TMT 
+A20.205 N141 
+Dagbericht “geaggregeerde 
+allocatiegegevens gedimensioneerd 
+allocatiepunten” (allocatiemethode 
+TMT), aggregatie per netgebied per LV 
+NB BRP Gedimensioneerd 
+allocatiepunt ELK 
+TMT 
+A20.205 N142 
+Dagbericht “geaggregeerde 
+allocatiegegevens gedimensioneerd 
+allocatiepunten” (allocatiemethode 
+TMT), aggregatie per netgebied per BRP 
+NB LNB Gedimensioneerd 
+allocatiepunt ELK 
+TMT 
+A20.215 N142 
+RestantvolumeCorrectieFactor (RCF)/Profielfracties elektriciteit 
+Dagbericht “Restantvolume 
+CorrectieFactor en de in de 
+allocatieberekening gebruikte 
+Profielfracties per netgebied” 
+(gecombineerd in één bericht) 
+NB BRP N.v.t. A20.206 en A20.207 N151 
+Dagbericht “Restantvolume 
+CorrectieFactor en de in de 
+allocatieberekening gebruikte 
+Profielfracties per netgebied” 
+(gecombineerd in één bericht) 
+NB LNB N.v.t. A20.216 en A20.217 N151 
+ 
+1.5 Lijst met afkortingen 
+Afkorting Omschrijving 
+Allocatiepunt Virtueel punt ter plaatse van het overdrachtspunt van een aansluiting, waar de energie-uitwisseling tussen 
+een installatie en het net administratief aan een marktpartij wordt toegewezen alsof de meting op het 
+overdrachtspunt van de aansluiting heeft plaatsgevonden (Begrippencode Elektriciteit 1.1). 
+AMI Afname met invoeding 
+AZI Afname zonder invoeding 
+BRP Balance Responsible Party (Balansverantwoordelijke partij, voorheen PV (programma verantwoordelijke)) 
+BRS Business Requirements Specification 
+cSMA Collectieve Slimme Meter Allocatie 
+DIM Onbemeten aansluitingen waarvoor conform Bijlage 16 van de Netcode gedimensioneerde (DIM) profielen 
+worden opgesteld. 
+EDSN Energie Data Services Nederland B.V. 
+GDS Gesloten Distributiesysteem 
+GV Grootverbruik 
+KV Kleinverbruik 
+LNB Landelijke netbeheerder 
+LV Leverancier 
+MMC-hub Market-Market-Communication hub 
+NB 
+Netbeheerder 
+Daar waar NB staat kan ook regionale netbeheerder, landelijke netbeheerder of GDS-beheerder gelezen 
+worden. 
+NVL Netverlies 
+PRF 
+Profiel 
+Aanduiding voor KV of GV allocatiepunten die niet middels gemeten kwartierwaarden, maar middels 
+profielfracties en een SJI/SJA gealloceerd worden. 
+ 
+Pagina 11 / 52 
+Afkorting Omschrijving 
+RCF Restantvolumecorrectiefactor (factor die er voor zorgt dat het restantvolume verdeeld wordt). 
+RNB Regionale netbeheerder 
+SJA Standaardjaarafname 
+SJI Standaardjaarinvoeding 
+SMA Slimme meter allocatie 
+Aanduiding voor KV allocatiepunten die gealloceerd worden met kwartierwaarden die verkregen zijn uit de 
+slimme meter. 
+TMT Telemetrie 
+Aanduiding voor GV allocatiepunten die gealloceerd worden met kwartierwaarden die door de MV 
+aangeleverd zijn of door de NB berekend zijn. 
+ 
+ 
+Pagina 12 / 52 
+2 Rollen en verantwoordelijkheden 
+2.1 Consumer 
+Deze servicebeschrijving beschrijft hoe de consumers (BRP, LNB, LV) de volumes voor settlement en 
+reconciliatie ontvangen. 
+ 
+Deze servicebeschrijving beschrijft hoe de consumers (BRP, LNB) de allocatiegegevens ontvangen.  
+ 
+2.2 Provider 
+Deze servicebeschrijving beschrijft hoe de provider (NB) de allocatiegegevens aanbiedt. 
+ 
+2.3 RACI 
+In de onderstaande RACI wordt voor servicebeschrijving Uitwisselen allocatiegegevens elektriciteit de rollen 
+en verantwoordelijkheden weergegeven: 
+R (Responsible, NL: Verantwoordelijk) EDSN Business Integratie 
+A (Accountable, NL: Eindverantwoordelijk) Nog nader te bepalen! 
+C (Consulted, NL: Raadplegen) NEDU-ICWE, ebIX Technische Commissie, TenneT 
+I (Informed, NL: Informeren) ALV NEDU, EDSN 
+ 
+ 
+Pagina 13 / 52 
+3 BPMN Uitwisselen allocatiegegevens 
+ 
+Figuur 1 Voor de gedetailleerde informatie omtrent dit proces zie BRS Allocatiegegevens[1] 
+3.1 Uitwisselen allocatiegegevens 
+Het proces voor het uitwisselen van allocatiegegevens volgt het volgende scenario: 
+ 
+1. De netbeheerder verstuurt het bericht “Notificatie allocatiegegevens”5 naar de MMC-hub; 
+2. De MMC-hub verwerkt6 het ontvangen “Notificatie allocatiegegevens” bericht en routeert het bericht 
+naar de ontvanger7; 
+3. De ontvanger controleert het bericht “Notificatie allocatiegegevens”; 
+4. De ontvanger verstuurt het antwoord “Bevestiging/afwijzing notificatie allocatiegegevens” naar de 
+MMC-hub: 
+• een antwoord ter bevestiging, of; 
+• een antwoord met één of meerdere afwijzingen: 
+o indien de BRP allocatiegegevens van een individueel allocatiepunt met allocatiemethode 
+telemetrie (TMT, NVL of DIM) heeft ontvangen en deze niet verwacht, dan dient de BRP een 
+herzieningsverzoek in te sturen naar de betreffende netbeheerder. Het bericht met 
+allocatiegegevens van een individueel allocatiepunt met allocatiemethode telemetrie mag 
+hierop niet worden afgewezen door de BRP. Mocht een nieuwe allocatierun vereist zijn, dan 
+ontvangen alle BRP’s en LNB een nieuwe set met allocatiegegevens (met een nieuwe unieke 
+allocatierun identificatie); 
+o alleen indien een allocatiegegevens bericht semantisch niet correct is (na uitvoeren van de 
+controles in paragraaf 3.4, 3.5 of 3.6) mag een BRP of LNB een afwijzing sturen. De BRP of LNB 
+wordt verzocht om direct daarna rechtstreeks contact op te nemen met betreffende NB zodat zij 
+gezamenlijk hiernaar kunnen kijken en eventueel corrigerende maatregelen kunnen nemen; 
+5. De MMC-hub verwerkt het antwoord en routeert het bericht naar de netbeheerder. 
+ 
+5 Een notificatie met allocatiegegevens van een individueel allocatiepunt, een notificatie met geaggregeerde allocatiegegevens van 
+allocatiepunten van een allocatiegroep of een notificatie RestantvolumeCorrectieFactor en Profielfracties. 
+6 Een niet-valide bericht wordt door de MMC-hub afgewezen, zie paragraaf 3.2. 
+7 Is de consumer (BRP, LNB) van de allocatiegegevens. 
+
+ 
+Pagina 14 / 52 
+3.2 Validaties MMC-hub 
+Naar aanleiding van het ontvangen bericht “Notificatie allocatiegegevens” en ontvangen bericht 
+“Bevestiging/afwijzing notificatie allocatiegegevens” voert de MMC-hub de volgende validaties uit:  
+Validatie Foutmelding 
+XSD Validation: The message shall comply to the XSD rules TEN-500001: [Error detail] 
+Unreadable message: The message shall be a valid XML 
+layout 
+TEN-500001: [Error detail] 
+Others: All other faults TEN-999999: Unhandled exception 
+ 
+Indien een bericht door de MMC-hub wordt afgewezen, stuurt de MMC-hub de foutcode en -tekst naar de 
+indiener van het betreffende bericht. Voor de functionaliteit van de MMC-hub wordt verwezen naar TenneT 
+Web Services guide[3]. 
+ 
+3.3 Validaties ontvanger 
+Naar aanleiding van het ontvangen bericht “Notificatie allocatiegegevens” en ontvangen bericht 
+“Bevestiging/afwijzing notificatie allocatiegegevens” kan de ontvanger de volgende validaties uitvoeren8: 
+Validatie Foutmelding in de SOAP response 
+Het ontvangen XML bericht is conform de W3C XML ‘well-
+formedness’ specificatie. 
+TEN-500001: [Error detail] 
+Het ontvangen XML bericht is valide tegen de XML 
+berichtdefinitie (XSD) die de ontvanger hanteert. 
+TEN-500001: [Error detail] 
+ 
+Naar aanleiding van het ontvangen bericht “Notificatie allocatiegegevens” voert de ontvanger de volgende 
+validaties uit: 
+Validatie Foutmelding in de Acknowledgement 
+De integriteit en/of vertrouwelijkheid van het XML bericht is 
+gegarandeerd (signing check). 
+Foutcode: 999 
+Foutmelding: TEN-500021 – Incorrect message signing 
+De technicalMessageId in de SOAP header is uniek. Foutcode: 999 
+Foutmelding: TEN-500023 – Unique identifier not unique or 
+already processed 
+ 
+3.4 Controles ontvanger voor bericht “Notificatie allocatiegegevens individueel allocatiepunt” 
+Naar aanleiding van het bericht “Notificatie allocatiegegevens individueel allocatiepunt” heeft de ontvanger 
+de volgende controles en foutmeldingen tot zijn beschikking en voert deze controles uit voor zo ver deze 
+verplicht zijn dan wel relevant zijn voor de verwerking door de ontvanger: 
+Controle Foutmelding Rol Code 
+Tijdserie allocatiegegevens    
+De EAN-code-18 van de aansluiting is een valide EAN-code.  EAN-code-18 is niet valide. BRP/LNB 650 
+Bij een dagbericht elektriciteit is de periode precies 1 
+kalenderdag. 
+De periode waarop het bericht 
+betrekking heeft is niet juist. 
+BRP/LNB 663 
+Alle producten passen bij de productsoort. Een of meerdere producten passen 
+niet bij de productsoort. 
+BRP/LNB 667 
+Alle energie-eenheden passen bij de producten. Een of meerdere energie-eenheden 
+passen niet bij het/de 
+product/producten. 
+BRP/LNB 668 
+Het aantal posities van alle tijdseries past bij de periode en 
+de resolutie. 
+Het aantal posities is onjuist. BRP/LNB 671 
+De eerste positie in een tijdserie is ‘1’. Eerste positie begint niet met ‘1’. BRP/LNB 676 
+De posities binnen een tijdserie lopen op met een increment 
+van ‘1’. 
+Het increment van een tijdserie is 
+geen ‘1’. 
+BRP/LNB 782 
+Het volume heeft een correct aantal decimalen. Volume heeft een onjuist aantal 
+decimalen. 
+BRP/LNB 776 
+ 
+8 Deze validaties worden altijd door de MMC-hub uitgevoerd. Geadviseerd wordt dat een ontvanger deze validaties ook nog zelf 
+uitvoert. 
+ 
+Pagina 15 / 52 
+Controle Foutmelding Rol Code 
+De combinatie van herkomstindicatie, validatiestatus en 
+reparatiemethodiek is een geldige combinatie9. 
+De combinatie van 
+herkomstindicatie, validatiestatus 
+en reparatiemethodiek is geen 
+geldige combinatie. 
+BRP/LNB 683 
+Alle volumes in het bericht zijn positieve getallen (of nul). Volume met negatieve waarde. BRP/LNB 686 
+De EAN-code-18 van het netgebied of het allocatiepunt 
+i.c.m. de netbeheerder, is actief en geadministreerd bij de 
+landelijke netbeheerder. 
+Het netgebied of het allocatiepunt 
+i.c.m. de netbeheerder, komt niet 
+voor in de administratie van de 
+landelijke netbeheerder. 
+LNB 777 
+Het bericht bevat de EAN 13 van de marktpartij met de 
+marktrol BRP. 
+Ontbrekende EAN 13 van de BRP. LNB 759 
+Het dagbericht met allocatiegegevens is tijdig opgeleverd.10 Het dagbericht met 
+allocatiegegevens is te laat 
+opgeleverd. 
+BRP/LNB 763 
+Het aantal tijdseries in het bericht past bij de allocatiegroep. Het aantal tijdseries in het bericht 
+past niet bij de allocatiegroep. 
+BRP/LNB 764 
+De BRP is volgens het BRP-erkenningenregister bekend en 
+erkend. 
+De BRP is volgens het BRP-
+erkenningenregister niet bekend en 
+erkend. 
+LNB 765 
+De allocatierun identificatie is uniek. Er is al eerder een 
+allocatiegegevens bericht met deze 
+allocatierun identificatie 
+ontvangen11. 
+BRP/LNB 769 
+De periode waarop het bericht betrekking heeft ligt 
+tenminste 1 dag in het verleden. 
+De gegevens hebben (deels) 
+betrekking op de toekomst. 
+BRP/LNB 772 
+De resolutie past bij de afspraken voor deze gegevens. Resolutie past niet bij deze 
+gegevens. 
+BRP/LNB 773 
+Het kenmerk van het bericht is uniek. Er is al eerder een bericht met dit 
+kenmerk ontvangen. 
+BRP/LNB 670 
+ 
+  
+ 
+9 Zie BRS Meetgegevens GV Bijlage A voor geldige combinaties van herkomstindicatie, validatiestatus en reparatiemethodiek[11]. 
+10 Periode in validatie kan wijzigen door uitstel distributie definitieve allocatie (markt window). 
+11 Deze controle is bedoeld om een bericht af te kunnen wijzen indien een allocatierun identificatie is gebruikt uit een voorgaande 
+allocatierun. 
+ 
+Pagina 16 / 52 
+Header van het bericht    
+Het MessageID in de header van het bericht is uniek. Er is al eerder een bericht met dit 
+MessageID ontvangen van deze NB. 
+BRP/LNB 669 
+Het ProcessTypeID in de header van het bericht past bij de 
+inhoud van het bericht. 
+ProcessTypeID past niet bij de 
+inhoud van het bericht. 
+BRP/LNB 681 
+Het ProcessTypeID in de header van het bericht past bij de 
+ontvanger van het bericht. 
+ProcessTypeID past niet bij de 
+ontvanger van het bericht. 
+BRP/LNB 747 
+Er is geen bericht ontvangen met een recentere creatie 
+datum/tijdstempel (“latest and greatest”). 
+Er is al een bericht ontvangen met 
+een recentere creatie 
+datum/tijdstempel. 
+BRP/LNB 704 
+Het senderID in de SOAP Header is gelijk aan het SenderID in 
+de Business Document Header. 
+senderID in de SOAP Header is niet 
+gelijk aan SenderID in de Business 
+Document Header. 
+BRP/LNB 701 
+Het receiverID in de SOAP Header is gelijk aan het 
+ReceiverID in de Business Document Header. 
+receiverID in de SOAP Header is 
+niet gelijk aan ReceiverID in de 
+Business Document Header. 
+BRP/LNB 745 
+Het contentType12 in de SOAP Header is in lijn met het 
+ProcessTypeID in de Business Document Header. 
+contentType in de SOAP Header is 
+niet in lijn met ProcessTypeID in de 
+Business Document Header. 
+BRP/LNB 754 
+Het CorrelationID in de Business Document Header is, indien 
+gevuld, gelijk aan het correlationID in de SOAP Header13. 
+Het CorrelationID in de Business 
+Document Header is niet gelijk aan 
+het correlationID in de SOAP 
+Header. 
+BRP/LNB 780 
+Gehele bericht    
+Bericht is volledig, correct en gericht aan de juiste 
+ontvanger14. 
+[vrij tekstveld]15 BRP/LNB 999 
+ 
+Indien de BRP allocatiegegevens van een individueel allocatiepunt heeft ontvangen en deze niet verwacht of 
+allocatiegegevens van een individueel allocatiepunt verwacht maar niet heeft ontvangen, dan dient de BRP 
+een herzieningsverzoek in te sturen naar de betreffende netbeheerder (zie servicebeschrijving Uitwisselen 
+herzieningsverzoeken[10]). Het bericht met allocatiegegevens van een individueel allocatiepunt mag hierop 
+niet worden afgewezen door de BRP. Mocht een nieuwe allocatierun vereist zijn, dan ontvangen alle BRP’s 
+en LNB een nieuwe set met allocatiegegevens (met een nieuwe unieke allocatierun identificatie). 
+ 
+3.5 Controles ontvanger voor bericht “Notificatie geaggregeerde allocatiegegevens allocatiepunten” 
+Naar aanleiding van het bericht “Notificatie geaggregeerde allocatiegegevens allocatiepunten” heeft de 
+ontvanger de volgende controles en foutmeldingen tot zijn beschikking en voert deze controles uit voor zo 
+ver deze verplicht zijn dan wel relevant zijn voor de verwerking door de ontvanger: 
+Controle Foutmelding Rol Code 
+Tijdserie geaggregeerde allocatiegegevens    
+De EAN-code-18 van het netgebied is een valide EAN-code. EAN-code-18 is niet valide. BRP/LNB 651 
+Bij een dagbericht elektriciteit is de periode precies 1 
+kalenderdag. 
+De periode waarop het bericht 
+betrekking heeft is niet juist. 
+BRP/LNB 663 
+Alle producten passen bij de productsoort. Een of meerdere producten passen 
+niet bij de productsoort. 
+BRP/LNB 667 
+Alle energie-eenheden passen bij de producten. Een of meerdere energie-eenheden 
+passen niet bij het/de 
+product/producten. 
+BRP/LNB 668 
+Het aantal posities van alle tijdseries past bij de periode en 
+de resolutie. 
+Het aantal posities is onjuist. BRP/LNB 671 
+De eerste positie in een tijdserie is ‘1’. Eerste positie begint niet met ‘1’. BRP/LNB 676 
+De posities binnen een tijdserie lopen op met een increment 
+van ‘1’. 
+Het increment van een tijdserie is 
+geen ‘1’. 
+BRP/LNB 782 
+ 
+12 Zie Technical Guide - Measurements & Allocations Documents[8] voor vulling contentType. 
+13 Indien in de response foutcode 780 retour wordt gegeven, dan kan de ontvanger de inhoud van het CorrelationID in de 
+BusinessDocumentHeader negeren omdat die inhoud niet relevant is. Het CorrelationID in de SOAP-header is leidend. 
+14 Controle en foutmelding indien een ontvangen bericht niet correct is of niet bedoeld is voor betreffende ontvanger, en niet door 
+één van bovenstaande controles kan worden afgevangen. 
+15 Men dient in dit tekstveld een toelichting bij foutcode 999 op te nemen. 
+ 
+Pagina 17 / 52 
+Controle Foutmelding Rol Code 
+Het volume heeft een correct aantal decimalen. Volume heeft een onjuist aantal 
+decimalen. 
+BRP/LNB 776 
+Alle volumes in het bericht zijn positieve getallen (of nul)16. Volume met negatieve waarde. BRP/LNB 686 
+De EAN-code-18 van het netgebied of het allocatiepunt 
+i.c.m. de netbeheerder, is actief en geadministreerd bij de 
+landelijke netbeheerder. 
+Het netgebied of het allocatiepunt 
+i.c.m. de netbeheerder, komt niet 
+voor in de administratie van de 
+landelijke netbeheerder. 
+LNB 777 
+Het bericht bevat exact één keer de EAN 13 van een 
+marktpartij met de verwachte marktrol. 
+Ontbrekende of onjuiste EAN 13. BRP/LNB 758 
+De BRP is in de gehele berichtperiode volgens het 
+aansluitingenregister voor tenminste één allocatiepunt 
+binnen deze allocatiegroep in het betreffende netgebied 
+geregistreerd.  
+De BRP-er is niet actief als BRP-er in 
+het netgebied voor deze 
+allocatiegroep. 
+BRP 761 
+Het dagbericht met allocatiegegevens is tijdig opgeleverd. Het dagbericht met 
+allocatiegegevens is te laat 
+opgeleverd. 
+BRP/LNB 763 
+Het aantal tijdseries in het bericht past bij de allocatiegroep. Het aantal tijdseries in het bericht 
+past niet bij de allocatiegroep. 
+BRP/LNB 764 
+De BRP is volgens het BRP-erkenningenregister bekend en 
+erkend. 
+De BRP is volgens het BRP-
+erkenningenregister niet bekend en 
+erkend. 
+LNB 765 
+De allocatierun identificatie is uniek. Er is al eerder een 
+allocatiegegevens bericht met deze 
+allocatierun identificatie 
+ontvangen17. 
+BRP/LNB 769 
+Het vastgesteld afnametype past bij de profielcategorie. Het vastgesteld afnametype past 
+niet bij de profielcategorie. 
+BRP/LNB 771 
+De periode waarop het bericht betrekking heeft ligt 
+tenminste 1 dag in het verleden. 
+De gegevens hebben (deels) 
+betrekking op de toekomst. 
+BRP/LNB 772 
+De resolutie past bij de afspraken voor deze gegevens. Resolutie past niet bij deze 
+gegevens. 
+BRP/LNB 773 
+Het kenmerk van het bericht is uniek. Er is al eerder een bericht met dit 
+kenmerk ontvangen. 
+BRP/LNB 670 
+Header van het bericht    
+Het MessageID in de header van het bericht is uniek. Er is al eerder een bericht met dit 
+MessageID ontvangen. 
+BRP/LNB 669 
+Het ProcessTypeID in de header van het bericht past bij de 
+inhoud van het bericht. 
+ProcessTypeID past niet bij de 
+inhoud van het bericht. 
+BRP/LNB 681 
+Het ProcessTypeID in de header van het bericht past bij de 
+ontvanger van het bericht. 
+ProcessTypeID past niet bij de 
+ontvanger van het bericht. 
+BRP/LNB 747 
+Er is geen bericht ontvangen met een recentere creatie 
+datum/tijdstempel (“latest and greatest”). 
+Er is al een bericht ontvangen met 
+een recentere creatie 
+datum/tijdstempel. 
+BRP/LNB 704 
+Het senderID in de SOAP Header is gelijk aan het SenderID in 
+de Business Document Header. 
+senderID in de SOAP Header is niet 
+gelijk aan SenderID in de Business 
+Document Header. 
+BRP/LNB 701 
+Het receiverID in de SOAP Header is gelijk aan het ReceiverID 
+in de Business Document Header. 
+receiverID in de SOAP Header is 
+niet gelijk aan ReceiverID in de 
+Business Document Header. 
+BRP/LNB 745 
+Het contentType18 in de SOAP Header is in lijn met het 
+ProcessTypeID in de Business Document Header. 
+contentType in de SOAP Header is 
+niet in lijn met ProcessTypeID in de 
+Business Document Header. 
+BRP/LNB 754 
+ 
+16 Alle volumes in de allocatiegegevens berichten zijn positieve getallen (of nul) met uitzondering van volumes in de 
+allocatiegegevens voor Allocatiegroep PRF. Deze controle is derhalve niet van toepassing voor de set van allocatiegegevens voor 
+Allocatiegroep PRF. Zie paragraaf 1.3 Uitgangspunten. 
+17 Deze controle is bedoeld om een bericht af te kunnen wijzen indien een allocatierun identificatie is gebruikt uit een voorgaande 
+allocatierun. 
+18 Zie Technical Guide - Measurements & Allocations Documents[8] voor vulling contentType. 
+ 
+Pagina 18 / 52 
+Controle Foutmelding Rol Code 
+Het CorrelationID in de Business Document Header is, indien 
+gevuld, gelijk aan het correlationID in de SOAP Header19. 
+Het CorrelationID in de Business 
+Document Header is niet gelijk aan 
+het correlationID in de SOAP 
+Header. 
+BRP/LNB 780 
+Gehele bericht    
+Bericht is volledig, correct en gericht aan de juiste 
+ontvanger20. 
+[vrij tekstveld]21 BRP/LNB 999 
+ 
+3.6 Controles ontvanger voor bericht “Notificatie RestantvolumeCorrectieFactor en Profielfracties” 
+Naar aanleiding van het bericht “Notificatie RestantvolumeCorrectieFactor en Profielfracties” heeft de 
+ontvanger de volgende controles en foutmeldingen tot zijn beschikking en voert deze controles uit voor zo 
+ver deze verplicht zijn dan wel relevant zijn voor de verwerking door de ontvanger: 
+Controle Foutmelding Rol Code 
+Tijdserie    
+De EAN-code-18 van het netgebied is een valide EAN-code. EAN-code-18 is niet valide. BRP/LNB 651 
+Bij een dagbericht elektriciteit is de periode precies 1 
+kalenderdag. 
+De periode waarop het bericht 
+betrekking heeft is niet juist. 
+BRP/LNB 663 
+Het aantal posities van alle tijdseries past bij de periode en 
+de resolutie. 
+Het aantal posities is onjuist. BRP/LNB 671 
+De eerste positie in een tijdserie is ‘1’. Eerste positie begint niet met ‘1’. BRP/LNB 676 
+De posities binnen een tijdserie lopen op met een increment 
+van ‘1’. 
+Het increment van een tijdserie is 
+geen ‘1’. 
+BRP/LNB 782 
+De factor heeft een correct aantal decimalen. Factor heeft een onjuist aantal 
+decimalen. 
+BRP/LNB 774 
+De EAN-code-18 van het netgebied of het allocatiepunt 
+i.c.m. de netbeheerder, is actief en geadministreerd bij de 
+landelijke netbeheerder. 
+Het netgebied of het allocatiepunt 
+i.c.m. de netbeheerder, komt niet 
+voor in de administratie van de 
+landelijke netbeheerder. 
+LNB 777 
+Het dagbericht met allocatiegegevens is tijdig opgeleverd. Het dagbericht met 
+allocatiegegevens is te laat 
+opgeleverd. 
+BRP/LNB 763 
+De allocatierun identificatie is uniek. Er is al eerder een 
+allocatiegegevens bericht met deze 
+allocatierun identificatie 
+ontvangen22. 
+BRP/LNB 769 
+Het vastgesteld afnametype past bij de profielcategorie. Het vastgesteld afnametype past 
+niet bij de profielcategorie. 
+BRP/LNB 771 
+De periode waarop het bericht betrekking heeft ligt 
+tenminste 1 dag in het verleden. 
+De gegevens hebben (deels) 
+betrekking op de toekomst. 
+BRP/LNB 772 
+De resolutie past bij de afspraken voor deze gegevens. Resolutie past niet bij deze 
+gegevens. 
+BRP/LNB 773 
+Het aantal tijdseries met profielfacties past bij de 
+profielcategorie. 
+Het aantal tijdseries met 
+profielfacties past niet bij de 
+profielcategorie. 
+BRP/LNB 779 
+De status profielfracties past bij de profielcategorie. De status profielfracties past niet 
+bij de profielcategorie. 
+BRP/LNB 781 
+Het kenmerk van het bericht is uniek. Er is al eerder een bericht met dit 
+kenmerk ontvangen. 
+BRP/LNB 670 
+Header van het bericht    
+Het MessageID in de header van het bericht is uniek. Er is al eerder een bericht met dit 
+MessageID ontvangen. 
+BRP/LNB 669 
+ 
+19 Indien in de response foutcode 780 retour wordt gegeven, dan kan de ontvanger de inhoud van het CorrelationID in de 
+BusinessDocumentHeader negeren omdat die inhoud niet relevant is. Het CorrelationID in de SOAP-header is leidend. 
+20 Controle en foutmelding indien een ontvangen bericht niet correct is of niet bedoeld is voor betreffende ontvanger, en niet door 
+één van bovenstaande controles kan worden afgevangen. 
+21 Men dient in dit tekstveld een toelichting bij foutcode 999 op te nemen. 
+22 Deze controle is bedoeld om een bericht af te kunnen wijzen indien een allocatierun identificatie is gebruikt uit een voorgaande 
+allocatierun. 
+ 
+Pagina 19 / 52 
+Controle Foutmelding Rol Code 
+Het ProcessTypeID in de header van het bericht past bij de 
+inhoud van het bericht. 
+ProcessTypeID past niet bij de 
+inhoud van het bericht. 
+BRP/LNB 681 
+Het ProcessTypeID in de header van het bericht past bij de 
+ontvanger van het bericht. 
+ProcessTypeID past niet bij de 
+ontvanger van het bericht. 
+BRP/LNB 747 
+Er is geen bericht ontvangen met een recentere creatie 
+datum/tijdstempel (“latest and greatest”). 
+Er is al een bericht ontvangen met 
+een recentere creatie 
+datum/tijdstempel. 
+BRP/LNB 704 
+Het senderID in de SOAP Header is gelijk aan het SenderID in 
+de Business Document Header. 
+senderID in de SOAP Header is niet 
+gelijk aan SenderID in de Business 
+Document Header. 
+BRP/LNB 701 
+Het receiverID in de SOAP Header is gelijk aan het ReceiverID 
+in de Business Document Header. 
+receiverID in de SOAP Header is 
+niet gelijk aan ReceiverID in de 
+Business Document Header. 
+BRP/LNB 745 
+Het contentType23 in de SOAP Header is in lijn met het 
+ProcessTypeID in de Business Document Header. 
+contentType in de SOAP Header is 
+niet in lijn met ProcessTypeID in de 
+Business Document Header. 
+BRP/LNB 754 
+Het CorrelationID in de Business Document Header is, indien 
+gevuld, gelijk aan het correlationID in de SOAP Header24. 
+Het CorrelationID in de Business 
+Document Header is niet gelijk aan 
+het correlationID in de SOAP 
+Header. 
+BRP/LNB 780 
+Gehele bericht    
+Bericht is volledig, correct en gericht aan de juiste 
+ontvanger25. 
+[vrij tekstveld]26 BRP/LNB 999 
+ 
+  
+ 
+23 Zie Technical Guide - Measurements & Allocations Documents[8] voor vulling contentType. 
+24 Indien in de response foutcode 780 retour wordt gegeven, dan kan de ontvanger de inhoud van het CorrelationID in de 
+BusinessDocumentHeader negeren omdat die inhoud niet relevant is. Het CorrelationID in de SOAP-header is leidend. 
+25 Controle en foutmelding indien een ontvangen bericht niet correct is of niet bedoeld is voor betreffende ontvanger, en niet door 
+één van bovenstaande controles kan worden afgevangen. 
+26 Men dient in dit tekstveld een toelichting bij foutcode 999 op te nemen. 
+ 
+Pagina 20 / 52 
+3.7 Toepassing ProcessTypeID voor uitwisselen allocatiegegevens 
+Zoals beschreven in de BRS Allocatiegegevens[1] worden de berichtspecificaties voor allocatiegegevens 
+gebruikt voor verschillende toepassingen. In de EDSNBusinessDocumentHeader (functionele header) van het 
+bericht moet bij ProcessTypeID opgegeven worden welke toepassing het hier betreft. De verdere toelichting 
+van het gebruik van de EDSNBusinessDocumentHeader is opgenomen in de NEDU EDSN Ontwerpkeuzes[2]. 
+ 
+Toepassing Code 
+Dagbericht “allocatiegegevens per individueel allocatiepunt (allocatiemethode TMT)” naar BRP N101 
+Dagbericht “geaggregeerde allocatiegegevens allocatiepunten (allocatiemethode TMT)”, aggregatie 
+per netgebied per LV naar BRP 
+N102 
+Dagbericht “allocatiegegevens per individueel allocatiepunt (allocatiemethode TMT)” naar LNB N101 
+Dagbericht “geaggregeerde allocatiegegevens van allocatiepunten (allocatiemethode TMT)”, 
+aggregatie per netgebied per BRP naar LNB 
+N102 
+  
+Dagbericht “geaggregeerde allocatiegegevens allocatiepunten (allocatiemethode SMA)”, aggregatie 
+per netgebied per LV naar BRP 
+N111 
+Dagbericht “geaggregeerde allocatiegegevens allocatiepunten (allocatiemethode SMA)”, aggregatie 
+per netgebied per BRP naar LNB 
+N111 
+  
+Dagbericht “geaggregeerde allocatiegegevens allocatiepunten (allocatiemethode PRF)”, aggregatie 
+per netgebied per LV naar BRP 
+N121 
+Dagbericht “geaggregeerde allocatiegegevens allocatiepunten (allocatiemethode PRF)”, aggregatie 
+per netgebied per BRP naar LNB 
+N121 
+  
+Dagbericht “allocatiegegevens per individueel netverlies allocatiepunt (allocatiemethode TMT)” naar 
+BRP 
+N131 
+Dagbericht “geaggregeerde allocatiegegevens netverlies allocatiepunten (allocatiemethode TMT)”, 
+aggregatie per netgebied per LV naar BRP 
+N132 
+Dagbericht “geaggregeerde allocatiegegevens netverlies allocatiepunten (allocatiemethode TMT)”, 
+aggregatie per netgebied per BRP naar LNB 
+N132 
+  
+Dagbericht “allocatiegegevens per individueel gedimensioneerd allocatiepunt (allocatiemethode 
+TMT)” naar BRP 
+N141 
+Dagbericht “geaggregeerde allocatiegegevens gedimensioneerd allocatiepunten (allocatiemethode 
+TMT)”, aggregatie per netgebied per LV naar BRP 
+N142 
+Dagbericht “geaggregeerde allocatiegegevens gedimensioneerd allocatiepunten (allocatiemethode 
+TMT)”, aggregatie per netgebied per BRP naar LNB 
+N142 
+  
+Dagbericht “RestantvolumeCorrectieFactor (RCF) en Profielfracties per netgebied” naar BRP N151 
+Dagbericht “RestantvolumeCorrectieFactor (RCF) en Profielfracties per netgebied” naar LNB N151 
+ 
+ 
+ 
+Pagina 21 / 52 
+4 Functionele parameters 
+4.1 Notificatie Uitwisselen allocatiegegevens individueel allocatiepunt 
+Uitwisselen allocatiegegevens individueel allocatiepunt is een uitwisseling per TMT, NVL of DIM allocatiepunt 
+(één allocatiepunt in één bericht). Per allocatiepunt wordt de volgende informatie uitgewisseld: 
+Gegeven Elek 1/n Opmerking XML code 
+Kenmerk bericht V 1 Een UUID als uniek kenmerk van het bericht.  
+EAN code aansluiting V 1 EAN 18 allocatiepunt elektriciteit.  
+EAN code en marktrol BRP A 1 EAN 13 van de BRP. 
+ 
+Alleen verplicht voor de volgende allocatiegegevens: 
+• Allocatiegegevens individueel allocatiepunt 
+met allocatiemethode TMT naar LNB. 
+ 
+A 1 Marktrol van de BRP27. DDK 
+Productsoort V 1 Toegestane waarden (uit ebIX Code list[6] en incl. 
+een voorloop nul): 
+Elektriciteit 
+ 
+ 
+023 
+Allocatiegroep V 1 Een identificatie tot welke groep de betreffende 
+allocatiegegevens behoren28. 
+ 
+Toegestane waarden bij allocatiegegevens naar BRP: 
+Allocatiepunt (allocatiemethode TMT) 
+Netverlies allocatiepunt (allocatiemethode TMT) 
+Gedimensioneerd allocatiepunt (allocatiemethode 
+TMT) 
+ 
+Toegestane waarden bij allocatiegegevens naar LNB: 
+Allocatiepunt (allocatiemethode TMT) 
+ 
+ 
+ 
+ 
+TMT 
+NVL 
+DIM 
+ 
+ 
+ 
+TMT 
+Allocatierun identificatie V 1 Unieke identificatie (UUID) van de allocatierun.  
+ 
+De set van allocatiegegevens (allocatiegegevens 
+individuele allocatiepunten, geaggregeerde 
+allocatiegegevens, gebruikte RCF en gebruikte 
+Profielfracties) over een bepaalde kalenderdag en 
+voor een bepaald netgebied hebben dezelfde unieke 
+allocatierun identificatie29 zodat de consumer op 
+basis van deze identificatie de set van 
+allocatiegegevens kan relateren. 
+ 
+Referentie naar 
+herzieningsverzoek 
+A 1 Referentie naar het gerelateerde 
+herzieningsverzoek. 
+ 
+Alleen verplicht indien het bericht wordt gestuurd 
+naar aanleiding van een herzieningsverzoek 
+allocatiegegevens. 
+ 
+Startdatumtijd periode V 1 Per aaneengesloten periode dat een partij actief is 
+op een aansluiting wordt een periodiek bericht 
+gestuurd. 
+Startdatumtijd is in UTC en conform de ISO 8601 
+notatie[7]: YYYY-MM-DDThh:mm:ssZ 
+ 
+Einddatumtijd periode V 1 Einddatumtijd is in UTC en conform de ISO 8601 
+notatie[7]: YYYY-MM-DDThh:mm:ssZ 
+ 
+Energiesoort30 n  
+Onbalansverrekeningsperiode 
+(elektriciteit) 
+V 1 Resolutie is conform de ISO 8601 notatie[7] voor 
+Duration.  
+ 
+Toegestane waarden elektriciteit: 
+15 minuten 
+ 
+ 
+ 
+ 
+PT15M 
+ 
+27 Marktrol zoals gedefinieerd in ebIX Code list[6]. 
+28 Netverlies allocatiepunt en gedimensioneerd allocatiepunt ressorteren respectievelijk onder allocatiegroep NVL en allocatiegroep 
+DIM. 
+29 De allocatierun identificatie over een kalenderdag en netgebied is voor alle ontvangers van de berichten van die allocatierun 
+identiek. 
+30 Twee volledige tijdseries: 
+1. volume actieve energie (afname); 
+2. volume actieve energie (invoeding). 
+ 
+Pagina 22 / 52 
+Gegeven Elek 1/n Opmerking XML code 
+Product ID V 1 Toegestane waarden (uit ebIX Code list[6]) voor 
+elektriciteit: 
+Actieve energie 
+ 
+ 
+8716867000030 
+Energie eenheid V 1 Toegestane waarde actieve energie: 
+kWh 
+ 
+KWH 
+Energierichting V 1 Toegestane waarden (uit ebIX Code list[6]): 
+Afname 
+Invoeding 
+ 
+E17 
+E18 
+Volume per positie n  
+Positie V 1 Positie in de serie in hele getallen. 
+ 
+De eerste positie in serie is ‘1’ en vervolgens per 
+positie met 1 ophogend. 
+ 
+Volume V 1 Volume als decimaal getal, altijd 3 cijfers achter de 
+decimale punt. 
+ 
+Herkomstindicatie31 V 1 Toegestane waarden: 
+Gemeten 
+Gemeten update 
+Berekend 
+Ongemeten ‘nul’32 
+Zie BRS Bijlage A Status meetgegevens en 
+meterstanden[11].  
+ 
+MSR 
+UMS 
+CLC 
+NMS 
+Validatiestatus33 A 1 Toegestane waarden: 
+Valide 
+Niet Valide 
+Handmatig goedgekeurd 
+Zie BRS Bijlage A Status meetgegevens en 
+meterstanden[11].  
+ 
+VLD 
+NVL 
+MNL 
+Reparatiemethode34 A 1 Toegestane waarden: 
+Controle meter 
+Correctiefactor fout 
+Correctie inbouw fout 
+Interpolatie bij meterwissel 
+Nuldata bij spanningsloos 
+Correctie o.b.v. meterstanden 
+Extra informatie 
+Reclamatie BRP 
+Reclamatie NB 
+Geschat 
+Berekend door NB35 
+Zie BRS Bijlage A Status meetgegevens en 
+meterstanden[11].  
+ 
+VMT 
+CFF 
+CIN 
+IMC 
+NCD 
+CMR 
+ENF 
+RBR 
+RGR 
+GMR 
+CBD 
+ 
+Verplichte velden (V) zijn altijd gevuld; optionele velden (O) of afhankelijke velden (A) indien vereist voor de 
+context van het betreffende allocatiegegevens bericht.  
+ 
+31 Voor allocatiegegevens van Allocatiegroep NVL en DIM is Herkomstindicatie “Berekend” (CLC). 
+32 “Ongemeten ‘nul’” (NMS) wordt gebruikt als status voor Herkomstindicatie voor de nullen bij teruglevering indien deze niet 
+gemeten wordt. 
+33 Voor allocatiegegevens van Allocatiegroep NVL en DIM is Validatiestatus niet gevuld. 
+34 Voor allocatiegegevens van Allocatiegroep NVL en DIM is Reparatiemethode “Berekend door NB” (CBD). 
+35 Indien Reparatiemethode “Berekend door NB” (CBD) is, dan is Herkomstindicatie “Berekend” (CLC) en is Validatiestatus niet 
+gevuld. 
+ 
+Pagina 23 / 52 
+4.2 Notificatie Uitwisselen geaggregeerde allocatiegegevens allocatiepunten 
+Uitwisselen geaggregeerde allocatiegegevens allocatiepunten is een uitwisseling van geaggregeerde 
+allocatiegegevens van een TMT, SMA, PRF, NVL of DIM allocatiegroep (één aggregaat in één bericht) per 
+netgebied per BRP en per LV (voor de BRP) en per netgebied per BRP (voor de LNB). Per aggregaat wordt de 
+volgende informatie uitgewisseld: 
+Gegeven Elek 1/n Opmerking XML code 
+Kenmerk bericht V 1 Een UUID als uniek kenmerk van het bericht.  
+EAN code en marktrol V 1 Voor geaggregeerde allocatiegegevens naar LNB: 
+EAN 13 van de BRP. 
+ 
+Voor geaggregeerde allocatiegegevens naar BRP: 
+EAN 13 van de LV. 
+ 
+V 1 Voor geaggregeerde allocatiegegevens naar LNB: 
+Marktrol van de BRP36. 
+ 
+Voor geaggregeerde allocatiegegevens naar BRP: 
+Marktrol van de LV37. 
+ 
+DDK 
+ 
+ 
+DDQ 
+EAN code netgebied V 1 De identificerende EAN18-code van het netgebied.  
+Productsoort V 1 Toegestane waarden (uit ebIX Code list[6] en incl. 
+een voorloop nul): 
+Elektriciteit 
+ 
+ 
+023 
+Allocatiegroep V 1 Een identificatie tot welke groep de betreffende 
+allocatiegegevens behoren38. 
+ 
+Toegestane waarden: 
+Allocatiepunten geaggregeerd (allocatiemethode 
+TMT) 39 
+Allocatiepunten geaggregeerd (allocatiemethode 
+SMA) 
+Allocatiepunten geaggregeerd (allocatiemethode 
+PRF) 
+Netverlies allocatiepunten geaggregeerd 
+(allocatiemethode TMT) 
+Gedimensioneerde allocatiepunten geaggregeerd 
+(allocatiemethode TMT) 
+ 
+ 
+ 
+ 
+TMT 
+ 
+SMA 
+ 
+PRF 
+ 
+NVL 
+ 
+DIM 
+Allocatierun identificatie V 1 Unieke identificatie (UUID) van de allocatierun.  
+ 
+De set van allocatiegegevens (allocatiegegevens 
+individuele allocatiepunten, geaggregeerde 
+allocatiegegevens, gebruikte RCF en gebruikte 
+Profielfracties) over een bepaalde kalenderdag en 
+voor een bepaald netgebied hebben dezelfde unieke 
+allocatierun identificatie40 zodat de consumer op 
+basis van deze identificatie de set van 
+allocatiegegevens kan relateren. 
+ 
+Startdatumtijd periode V 1 Per aaneengesloten periode dat een partij actief is 
+op een aansluiting wordt een periodiek bericht 
+gestuurd. 
+Startdatumtijd is in UTC en conform de ISO 8601 
+notatie[7]: YYYY-MM-DDThh:mm:ssZ 
+ 
+Einddatumtijd periode V 1 Einddatumtijd is in UTC en conform de ISO 8601 
+notatie[7]: YYYY-MM-DDThh:mm:ssZ 
+ 
+ 
+  
+ 
+36 Marktrol zoals gedefinieerd in ebIX Code list[6]. 
+37 Marktrol zoals gedefinieerd in ebIX Code list[6]. 
+38 De tijdseries van geaggregeerde allocatiegegevens voor gedimensioneerde allocatiepunten en netverlies allocatiepunten worden 
+separaat uitgewisseld en zijn derhalve niet verwerkt in de geaggregeerde allocatiegegevens van allocatiepunten met 
+allocatiemethode telemetrie. 
+39 Exclusief de allocatiegegevens voor gedimensioneerde allocatiepunten en netverlies allocatiepunten. 
+40 De allocatierun identificatie over een kalenderdag en netgebied is voor alle ontvangers van de berichten van die allocatierun 
+identiek. 
+ 
+Pagina 24 / 52 
+Energiesoort41 n  
+Onbalansverrekeningsperiode 
+(elektriciteit) 
+V 1 Resolutie is conform de ISO 8601 notatie[7] voor 
+Duration.  
+ 
+Toegestane waarden elektriciteit: 
+15 minuten 
+ 
+ 
+ 
+ 
+PT15M 
+Product ID V 1 Toegestane waarden (uit ebIX Code list[6]) voor 
+elektriciteit: 
+Actieve energie 
+ 
+ 
+8716867000030 
+Energie eenheid V 1 Toegestane waarde actieve energie: 
+kWh 
+ 
+KWH 
+Energierichting V 1 Toegestane waarden (uit ebIX Code list[6]): 
+Afname 
+Invoeding 
+ 
+E17 
+E18 
+Profielcategorie A 1 Aanduiding van de profielcategorie. 
+ 
+Verplicht indien het een geaggregeerd 
+allocatiegegevens bericht voor allocatiegroep PRF 
+betreft. 
+Verplicht leeg indien het een geaggregeerd 
+allocatiegegevens bericht voor allocatiegroep TMT, 
+SMA, NVL of DIM betreft42. 
+ 
+Zie bijlage F van de Attributenlijst[9] voor de 
+toegestane waarden voor allocatiegroep PRF. 
+E1A 
+E1B 
+E1C 
+E2A 
+E2B 
+E3A 
+E3B 
+E3C 
+E3D 
+E4A 
+Vastgesteld afnametype A 1 Aanduiding of er sprake is van afname met invoeding 
+of afname zonder invoeding. 
+ 
+Verplicht indien het een tijdserie voor de 
+profielcategorie E1A, E1B, E1C, E2A of E2B betreft. 
+Verplicht leeg indien het een geaggregeerd 
+allocatiegegevens bericht voor allocatiegroep TMT, 
+SMA, NVL of DIM betreft42. 
+Verplicht leeg indien het een tijdserie voor de 
+profielcategorie E3A, E3B, E3C, E3D of E4A betreft42. 
+ 
+Toegestane waarden voor profielcategorie E1A, E1B, 
+E1C, E2A of E2B: 
+Afname met invoeding 
+Afname zonder invoeding 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+AMI 
+AZI 
+Herkomstindicatie 
+allocatieresultaat (voor SMA)43 
+A 1 Aanduiding wat de herkomstindicatie van de 
+geaggregeerde allocatiegegevens is. 
+ 
+Verplicht indien het een geaggregeerd 
+allocatiegegevens bericht voor allocatiegroep SMA 
+betreft. 
+Verplicht leeg indien het een geaggregeerd 
+allocatiegegevens bericht voor allocatiegroep PRF, 
+TMT,  NVL of DIM betreft42. 
+ 
+Toegestane waarden: 
+Gemeten 
+Berekend 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+MSR 
+CLC 
+ 
+ 
+41 Twee volledige tijdseries indien Allocatiegroep is TMT, SMA, NVL of DIM: 
+1. volume actieve energie (afname); 
+2. volume actieve energie (invoeding). 
+Indien Allocatiegroep is PRF, dan twee tijdseries (afname en invoeding) per Profielcategorie per Vastgesteld afnametype. 
+42 Verplicht leeg betekent dat het betreffende veld ontbreekt in het bericht. Lege velden in het XML bericht zijn op basis van de 
+UN/CEFACT NDR niet toegestaan. 
+43 Als gevolg van attribuut Herkomstindicatie allocatieresultaat worden altijd vier tijdseries met geaggregeerde SMA volumes  
+uitgewisseld: 
+1. volume actieve energie (afname, gemeten volumes); 
+2. volume actieve energie (invoeding, gemeten volumes); 
+3. volume actieve energie (afname, berekende volumes); 
+4. volume actieve energie (invoeding, berekende volumes). 
+ 
+Pagina 25 / 52 
+Volume per positie n  
+Positie V 1 Positie in de serie in hele getallen. 
+ 
+De eerste positie in serie is ‘1’ en vervolgens per 
+positie met 1 ophogend. 
+ 
+Volume V 1 Volume als decimaal getal, altijd 3 cijfers achter de 
+decimale punt. 
+ 
+ 
+Verplichte velden (V) zijn altijd gevuld; optionele velden (O) of afhankelijke velden (A) indien vereist voor de 
+context van het betreffende allocatiegegevens bericht. 
+  
+ 
+Pagina 26 / 52 
+4.3 Notificatie Uitwisselen RestantvolumeCorrectieFactor en Profielfracties 
+Uitwisselen RestantvolumeCorrectieFactor en Profielfracties is een uitwisseling per netgebied van de 
+volgende gecombineerde allocatiegegevens: 
+1. RestantvolumeCorrectieFactor (RCF): de factoren voor de verdeling van het restantvolume; 
+2. Profielfracties: de profielfracties elektriciteit (dynamisch profiel, dynamisch fallback (regionaal of 
+landelijk) profiel of standaard profiel); 
+die voor betreffende allocatierun zijn gebruikt. Per netgebied wordt de volgende informatie uitgewisseld: 
+Gegeven Elek 1/n Opmerking XML code 
+Kenmerk bericht V 1 Een UUID als uniek kenmerk van het bericht.  
+EAN code netgebied V 1 De identificerende EAN18-code van het netgebied.  
+Productsoort V 1 Toegestane waarden (uit ebIX Code list[6] en incl. 
+een voorloop nul): 
+Elektriciteit 
+ 
+ 
+023 
+Allocatierun identificatie V 1 Unieke identificatie (UUID) van de allocatierun.  
+ 
+De set van allocatiegegevens (allocatiegegevens 
+individuele allocatiepunten, geaggregeerde 
+allocatiegegevens, gebruikte RCF en gebruikte 
+Profielfracties) over een bepaalde kalenderdag en 
+voor een bepaald netgebied hebben dezelfde unieke 
+allocatierun identificatie44 zodat de consumer op 
+basis van deze identificatie de set van 
+allocatiegegevens kan relateren. 
+ 
+Datumversie RCF V 1 Datum/tijd berekening RCF. 
+ 
+Datumtijd is in UTC en conform de ISO 8601 
+notatie[7]: YYYY-MM-DDThh:mm:ssZ 
+ 
+Startdatumtijd periode V 1 Startdatumtijd is in UTC en conform de ISO 8601 
+notatie[7]: YYYY-MM-DDThh:mm:ssZ 
+ 
+Einddatumtijd periode V 1 Einddatumtijd is in UTC en conform de ISO 8601 
+notatie[7]: YYYY-MM-DDThh:mm:ssZ 
+ 
+Energiesoort45 n  
+Onbalansverrekeningsperiode 
+(elektriciteit) 
+V 1 Resolutie is conform de ISO 8601 notatie[7] voor 
+Duration.  
+ 
+Toegestane waarden elektriciteit: 
+15 minuten 
+ 
+ 
+ 
+ 
+PT15M 
+Energierichting A 1 Verplicht voor Profielfracties. 
+Verplicht leeg voor de RestantvolumeCorrectieFactor 
+(RCF)46. 
+ 
+Toegestane waarden (uit ebIX Code list[6]): 
+Afname 
+Invoeding 
+ 
+ 
+ 
+ 
+ 
+E17 
+E18 
+Profielcategorie A 1 Aanduiding van de profielcategorie. 
+ 
+Verplicht voor Profielfracties. Zie bijlage F van de 
+Attributenlijst[9] voor de toegestane waarden. 
+E1A 
+E1B 
+E1C 
+E2A 
+ 
+44 De allocatierun identificatie over een kalenderdag en netgebied is voor alle ontvangers van de berichten van die allocatierun 
+identiek. 
+45 Aantal volledige tijdseries voor RestantvolumeCorrectieFactor (RCF) is 1. 
+Aantal volledige tijdseries voor Profielfracties is 30: 
+E1A: 4 tijdseries (per energierichting per vastgesteld afnametype); 
+E1B: 4 tijdseries (per energierichting per vastgesteld afnametype); 
+E1C: 4 tijdseries (per energierichting per vastgesteld afnametype); 
+E2A: 4 tijdseries (per energierichting per vastgesteld afnametype); 
+E2B: 4 tijdseries (per energierichting per vastgesteld afnametype); 
+E3A: 2 tijdseries (per energierichting); 
+E3B: 2 tijdseries (per energierichting); 
+E3C: 2 tijdseries (per energierichting); 
+E3D: 2 tijdseries (per energierichting); 
+E4A: 2 tijdseries (per energierichting). 
+46 Verplicht leeg betekent dat het betreffende veld ontbreekt in het bericht. Lege velden in het XML bericht zijn op basis van de 
+UN/CEFACT NDR niet toegestaan. 
+ 
+Pagina 27 / 52 
+Gegeven Elek 1/n Opmerking XML code 
+Verplicht leeg voor de RestantvolumeCorrectieFactor 
+(RCF)46. 
+E2B 
+E3A 
+E3B 
+E3C 
+E3D 
+E4A 
+Vastgesteld afnametype A 1 Aanduiding of er sprake is van afname met invoeding 
+of afname zonder invoeding. 
+ 
+Verplicht voor Profielfracties indien het 
+profielcategorie E1A, E1B, E1C, E2A of E2B betreft. 
+Verplicht leeg voor de RestantvolumeCorrectieFactor 
+(RCF)46. 
+Verplicht leeg voor profielfracties indien het 
+profielcategorie E3A, E3B, E3C, E3D of E4A betreft46. 
+ 
+Toegestane waarden voor profielcategorie E1A, E1B, 
+E1C, E2A of E2B: 
+Afname met invoeding 
+Afname zonder invoeding 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+AMI 
+AZI 
+Status profielfracties A 1 Aanduiding of het een profielfractiereeks betreft die 
+berekend is op basis van de werkwijze en 
+rekenregels zoals vastgesteld voor de dynamische 
+profielfractiebepaling of dat er wordt teruggevallen 
+op het standaardprofiel of standaardprofielfracties. 
+ 
+Verplicht voor Profielfracties. 
+Verplicht leeg voor de RestantvolumeCorrectieFactor 
+(RCF)46. 
+ 
+Toegestane waarden voor profielcategorie E1A, E1B, 
+E1C, E2A en E2B: 
+Dynamische profielfracties 
+Fallback dynamische profielfracties (referentie 
+gebied) 
+Fallback dynamische profielfracties (landelijk) 
+Standaardprofielfracties 
+ 
+Toegestane waarden voor profielcategorie E3A, E3B, 
+E3C, E3D en E4A: 
+Standaardprofielfracties 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DYN 
+FBR 
+ 
+FBL 
+STD 
+ 
+ 
+ 
+STD 
+RestantvolumeCorrectieFactor (RCF) of 
+Profilefracties per positie n  
+Positie V 1 Positie in de serie in hele getallen. 
+ 
+De eerste positie in serie is ‘1’ en vervolgens per 
+positie met 1 ophogend. 
+ 
+RestantvolumeCorrectieFactor 
+(RCF) of Profilefractie 
+V 1 RestantvolumeCorrectieFactor (RCF): 
+Factor ter verdeling van het restantvolume als 
+decimaal getal, altijd 5 cijfers achter de decimale 
+punt. 
+ 
+Profielfractie: 
+Decimaal getal, altijd 8 decimalen achter de 
+decimale punt.  
+ 
+ 
+Verplichte velden (V) zijn altijd gevuld; optionele velden (O) of afhankelijke velden (A) indien vereist voor de 
+context van het betreffende RCF/Profielfractie bericht. 
+  
+ 
+Pagina 28 / 52 
+4.4 Antwoord Uitwisselen allocatiegegevens 
+Het antwoord bestaat uit een bevestiging of een afwijzing: 
+Gegeven Elek 1/n Opmerking XML code 
+Kenmerk antwoord bericht V 1 Een UUID als uniek kenmerk van het bericht.  
+Kenmerk notificatie bericht A47 1 Een UUID als uniek kenmerk van het bevestigde of afgewezen 
+notificatie bericht48. 
+ 
+Datum/tijd antwoord bericht V 1 Datumtijd is in UTC en conform de ISO 8601 notatie[7]: 
+YYYY-MM-DDThh:mm:ssZ 
+ 
+Code bevestiging/afwijzing V n Indien bevestiging (geen afwijzing!), dan moet code “000” retour 
+worden gegeven in het antwoord.  
+ 
+Indien afwijzing, dan moet er minimaal één code voor afwijzing 
+retour worden gegeven in het antwoord (zie paragraaf 3.3-3.6). 
+000 
+ 
+ 
+Code voor afwijzing: 
+zie paragraaf 3.3-
+3.6 
+Toelichting bij de afwijzing A n Optionele toelichting bij de afwijzing. 
+ 
+Alleen verplicht bij foutcode 999. 
+ 
+ 
+Verplichte velden (V) zijn altijd gevuld; optionele velden (O) of afhankelijke velden (A) indien vereist voor de 
+context van het betreffende allocatiegegevens bericht. 
+ 
+4.4.1 Toelichting op het correleren van het antwoord aan de notificatie 
+Correlatie op de volgende niveaus: 
+1. Via de CorrelationID in de EDSNBusinessDocumentHeader, is de technische correlatie tussen Notification 
+en Acknowledgement indien gevuld in de Notification door de aanbieder (provider)49; 
+2. Via het kenmerk van het bericht (UUID), is de verplichte procesmatige correlatie tussen Notification en 
+Acknowledgement. Dit kenmerk dient ook gebruikt te worden bij een herzieningsverzoek als verwijzing 
+naar het allocatiegegevens bericht. 
+ 
+Tevens is er nog een correlatie op niveau van de SOAP header mogelijk, zie document MMC Technical Guide 
+- Measurements & Allocations Documents[8]. 
+ 
+ 
+ 
+47 Als blijkt dat van een ontvangen bericht de integriteit en/of vertrouwelijkheid van het XML bericht niet kan worden gegarandeerd, 
+dan moet de ontvanger een afwijzing kunnen sturen naar de zender van het betreffende bericht zonder het kenmerk op te nemen 
+welk ontvangen bericht het betreft. Immers, het XML bericht is gecompromitteerd en het kenmerk is (mogelijk) niet meer 
+betrouwbaar of te achterhalen. De ontvanger wordt verzocht om direct daarna rechtstreeks contact op te nemen met 
+betreffende zender zodat zij gezamenlijk hiernaar kunnen kijken en eventueel corrigerende maatregelen kunnen nemen. 
+48 Is de Allocation_Series.mRID van het AllocationSeriesNotification bericht, de AggregatedAllocation_Series.mRID van het 
+AggregatedAllocationSeriesNotification bericht of de RCF_Series.mRID van het RCFSeriesNotification bericht. 
+49 CorrelationID kan gevuld worden door de aanbieder van allocatiegegevens (provider). Indien gevuld, dan dient de ontvangende 
+partij (consumer) dit CorrelationID te vermelden in het antwoord naar de aanbieder. Zie Ontwerpkeuzes[2] voor een toelichting 
+op het gebruik van CorrelationID. 
+ 
+Pagina 29 / 52 
+5 Sequence Diagram 
+5.1 Toelichting 
+Het sequence diagram toont de partijen en services als een object met een zgn. "lifeline". De interactie 
+tussen deze objecten wordt met pijlen weergegeven als één of meerdere berichten tussen objecten. De 
+berichten in het sequence diagram worden in het hoofdstuk Informatie Model nader toegelicht. Verdere 
+details over berichtstandaarden en wijze van toepassing staan beschreven in NEDU EDSN Ontwerpkeuzes[2]. 
+  
+ 
+Pagina 30 / 52 
+5.2 Uitwisselen allocatiegegevens individueel allocatiepunt 
+Onderstaand sequence diagram betreft het aanbieden van Allocatiegegevens individueel allocatiepunt door 
+de netbeheerder aan de MMC-hub. De MMC-hub zorgt voor het routeren, gereedzetten en doorsturen van 
+de betreffende allocatiegegevens in bericht AllocationSeriesNotification naar ontvanger. 
+ 
+ 
+Figuur 2 Het sequence diagram voor Uitwisselen allocatiegegevens individueel allocatiepunt tussen NB en BRP, LNB via de MMC-hub 
+ 
+  
+
+ 
+Pagina 31 / 52 
+5.3 Uitwisselen geaggregeerde allocatiegegevens allocatiepunten 
+Onderstaand sequence diagram betreft het aanbieden van Geaggregeerde allocatiegegevens 
+allocatiepunten door de netbeheerder aan de MMC-hub. De MMC-hub zorgt voor het routeren, 
+gereedzetten en doorsturen van de betreffende allocatiegegevens in bericht 
+AggregatedAllocationSeriesNotification naar ontvanger. 
+ 
+ 
+Figuur 3 Het sequence diagram voor Uitwisselen geaggregeerde allocatiegegevens allocatiepunten tussen NB en BRP, LNB via de 
+MMC-hub 
+  
+
+ 
+Pagina 32 / 52 
+5.4 Uitwisselen RestantvolumeCorrectieFactor (RCF) en Profielfracties 
+Onderstaand sequence diagram betreft het aanbieden van RCF/Profielfracties door de netbeheerder aan de 
+MMC-hub. De MMC-hub zorgt voor het routeren, gereedzetten en doorsturen van de betreffende 
+allocatiegegevens gecombineerd in bericht AllocationFactorSeriesNotification naar ontvanger. 
+ 
+ 
+Figuur 4 Het sequence diagram voor Uitwisselen RestantvolumeCorrectieFactor (RCF) en Profielfracties tussen NB en BRP, LNB 
+via de MMC-hub 
+ 
+
+ 
+Pagina 33 / 52 
+6 Eigenschappen service Uitwisselen allocatiegegevens 
+6.1 Eigenschappen service Uitwisselen allocatiegegevens individueel allocatiepunt 
+Uitwisselen allocatiegegevens individueel allocatiepunt (AllocationSeries) 
+Service AllocationSeries – Uitwisselen allocatiegegevens individueel allocatiepunt 
+Service ID BSCMF0074 
+Omschrijving Het uitwisselen van allocatiegegevens van individueel allocatiepunt tussen NB (provider) en de BRP, 
+LNB (consumer) 
+Service transactie patroon Notification/Acknowledgement 
+Preconditie(s) Notificeren Uitwisselen allocatiegegevens individueel allocatiepunt wordt ingediend door een partij 
+die hiervoor is geautoriseerd en geauthentiseerd. 
+Trigger NB biedt Notificeren Uitwisselen allocatiegegevens individueel allocatiepunt aan MMC-hub. 
+Postconditie(s) 
+• Notificeren Uitwisselen allocatiegegevens individueel allocatiepunt afgewezen; 
+of 
+• Notificeren Uitwisselen allocatiegegevens individueel allocatiepunt uitgevoerd. 
+Service gebruik50 
+Gebruikspatroon N.t.b. 
+Gemiddelde belasting N.t.b. 
+Piek belasting N.t.b. 
+Periode piek belasting N.t.b. 
+Periode inactiviteit N.t.b. 
+Max. response tijd consumer 100% van de inkomende Notifications moet binnen 15 minuten door de consumer door middel van 
+een Acknowledgement worden beantwoord. 
+Max. response tijd Soap response 
+MMC-hub Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Time-out Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Retry 
+De verzender (provider van de allocatiegegevens) voert alleen een ‘retry’ uit indien deze geen 
+positieve HTTP response van de MMC-hub heeft ontvangen.  
+ 
+Indien van de ontvanger (consumer van de allocatiegegevens) na de max. responsetijd een response 
+ontbreekt, is het advies om contact op te nemen met de ontvanger om de reden hiervan te 
+achterhalen. Indien noodzakelijk kan daarna contact opgenomen worden met de beheerder van de 
+MMC-hub. Na deze afstemming kan eventueel alsnog gekozen worden voor het herzenden van de 
+betreffende Notification. 
+Webservice 
+WSDL Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Versie Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Datum Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Soap address Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+ 
+50 Nader af te stemmen met TenneT. 
+ 
+Pagina 34 / 52 
+Operation 
+Gebruiker NB-er 
+Functie Indienen Notificeren Uitwisselen allocatiegegevens individueel allocatiepunt 
+Soap action Zie WSDL 
+ Input message AllocationSeriesNotification 
+ XSD AllocationSeriesNotification_1p0 
+ Output message AllocationSeriesAcknowledgement 
+ XSD AllocationSeriesAcknowledgement_1p0 
+ 
+  
+ 
+Pagina 35 / 52 
+6.2 Eigenschappen service Uitwisselen geaggregeerde allocatiegegevens allocatiepunten 
+Uitwisselen geaggregeerde allocatiegegevens allocatiepunten (AggregatedAllocationSeries) 
+Service AggregatedAllocationSeries – Uitwisselen geaggregeerde allocatiegegevens allocatiepunten 
+Service ID BSCMF0075 
+Omschrijving Het uitwisselen van geaggregeerde allocatiegegevens allocatiepunten tussen NB (provider) en de 
+BRP, LNB (consumer) 
+Service transactie patroon Notification/Acknowledgement 
+Preconditie(s) Notificeren Uitwisselen geaggregeerde allocatiegegevens allocatiepunten wordt ingediend door een 
+partij die hiervoor is geautoriseerd en geauthentiseerd. 
+Trigger NB biedt Notificeren Uitwisselen geaggregeerde allocatiegegevens allocatiepunten aan MMC-hub. 
+Postconditie(s) 
+• Notificeren Uitwisselen geaggregeerde allocatiegegevens allocatiepunten afgewezen; 
+of 
+• Notificeren Uitwisselen geaggregeerde allocatiegegevens allocatiepunten uitgevoerd. 
+Service gebruik51 
+Gebruikspatroon N.t.b. 
+Gemiddelde belasting N.t.b. 
+Piek belasting N.t.b. 
+Periode piek belasting N.t.b. 
+Periode inactiviteit N.t.b. 
+Max. response tijd consumer 100% van de inkomende Notifications moet binnen 15 minuten door de consumer door middel van 
+een Acknowledgement worden beantwoord. 
+Max. response tijd Soap response 
+MMC-hub Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Time-out Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Retry 
+De verzender (provider van de allocatiegegevens) voert alleen een ‘retry’ uit indien deze geen 
+positieve HTTP response van de MMC-hub heeft ontvangen.  
+ 
+Indien van de ontvanger (consumer van de allocatiegegevens) na de max. responsetijd een response 
+ontbreekt, is het advies om contact op te nemen met de ontvanger om de reden hiervan te 
+achterhalen. Indien noodzakelijk kan daarna contact opgenomen worden met de beheerder van de 
+MMC-hub. Na deze afstemming kan eventueel alsnog gekozen worden voor het herzenden van de 
+betreffende Notification. 
+Webservice 
+WSDL Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Versie Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Datum Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Soap address Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+ 
+  
+ 
+51 Nader af te stemmen met TenneT. 
+ 
+Pagina 36 / 52 
+Operation 
+Gebruiker NB-er 
+Functie Indienen Notificeren Uitwisselen geaggregeerde allocatiegegevens allocatiepunten 
+Soap action Zie WSDL 
+ Input message AggregatedAllocationSeriesNotification 
+ XSD AggregatedAllocationSeriesNotification_1p0 
+ Output message AggregatedAllocationSeriesAcknowledgement 
+ XSD AggregatedAllocationSeriesAcknowledgement_1p0 
+ 
+  
+ 
+Pagina 37 / 52 
+6.3 Eigenschappen service Uitwisselen RestantvolumeCorrectieFactor (RCF) en Profielfracties 
+Uitwisselen restant volume correctiefactor en profielfracties (AllocationFactorSeries) 
+Service AllocationFactorSeries – Uitwisselen restant volume correctiefactor en profielfracties gecombineerd 
+in bericht AllocationFactorSeriesNotification 
+Service ID BSCMF0076 
+Omschrijving Het uitwisselen van de RCF/Profielfracties tussen NB (provider) en de BRP, LNB (consumer) 
+Service transactie patroon Notification/Acknowledgement 
+Preconditie(s) Notificeren Uitwisselen RCF/Profielfracties wordt ingediend door een partij die hiervoor is 
+geautoriseerd en geauthentiseerd. 
+Trigger NB biedt Notificeren Uitwisselen RCF/Profielfracties aan MMC-hub. 
+Postconditie(s) 
+• Notificeren Uitwisselen RCF/Profielfracties afgewezen; 
+of 
+• Notificeren Uitwisselen RCF/Profielfracties uitgevoerd. 
+Service gebruik52 
+Gebruikspatroon N.t.b. 
+Gemiddelde belasting N.t.b. 
+Piek belasting N.t.b. 
+Periode piek belasting N.t.b. 
+Periode inactiviteit N.t.b. 
+Max. response tijd consumer 100% van de inkomende Notifications moet binnen 15 minuten door de consumer door middel van 
+een Acknowledgement worden beantwoord. 
+Max. response tijd Soap response 
+MMC-hub Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Time-out Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Retry 
+De verzender (provider van de allocatiegegevens) voert alleen een ‘retry’ uit indien deze geen 
+positieve HTTP response van de MMC-hub heeft ontvangen.  
+ 
+Indien van de ontvanger (consumer van de allocatiegegevens) na de max. responsetijd een response 
+ontbreekt, is het advies om contact op te nemen met de ontvanger om de reden hiervan te 
+achterhalen. Indien noodzakelijk kan daarna contact opgenomen worden met de beheerder van de 
+MMC-hub. Na deze afstemming kan eventueel alsnog gekozen worden voor het herzenden van de 
+betreffende Notification. 
+Webservice 
+WSDL Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Versie Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Datum Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+Soap address Zie MMC Technical Guide - Measurements & Allocations Documents[8] 
+ 
+  
+ 
+52 Nader af te stemmen met TenneT. 
+ 
+Pagina 38 / 52 
+Operation 
+Gebruiker NB-er 
+Functie Indienen Notificeren Uitwisselen RCF/Profielfracties 
+Soap action Zie WSDL 
+ Input message AllocationFactorSeriesNotification 
+ XSD AllocationFactorSeriesNotification_1p0 
+ Output message AllocationFactorSeriesAcknowledgement 
+ XSD AllocationFactorSeriesAcknowledgement_1p0 
+ 
+ 
+ 
+Pagina 39 / 52 
+7 Informatie model 
+7.1 Toelichting 
+Het informatie model wordt als een class diagram getoond. Elke class diagram wordt gevolgd door een tabel 
+met de beschrijving van de elementen, uitgezonderd de class diagrammen van "lege" berichten die ter 
+bevestiging worden uitgewisseld. 
+ 
+Multipliciteiten worden aangegeven bij de elementen. Notatie 0..1 betekent optioneel eenmalig, 1..1 
+betekent dat het element éénmalig (verplicht) voorkomt. Notatie 0..* betekent dat het element optioneel 
+meerdere keren mag voorkomen. Notatie 1..* betekent dat het element één of meerdere keren (verplicht) 
+voorkomt. 
+ 
+Datatypes bepalen welk type waarde een element kan bevatten. De datatypes zijn onderverdeeld in: 
+• Samengestelde datatypes (CDT): een samenstelling van meerdere (vaste) elementen, die vaker 
+hergebruikt wordt (bv. adres)[4]. 
+• Logische datatypes (LDT): een gedefinieerde set van eigenschappen van het element zoals minimale 
+lengte, maximale lengte, patroon[5]. 
+Voor meer informatie over datatypes wordt verwezen naar NEDU EDSN Ontwerpkeuzes[2]. 
+ 
+Gedetailleerde informatie over de waarden van de datatypes is beschikbaar als PDF document op mijnEDSN: 
+• EDSN Complex Data Type Specificatie (CDT). 
+• EDSN Logisch Data Type Specificatie (LDT). 
+Deze documenten beschrijven eveneens de waarden van de datatypes die in andere informatie modellen 
+worden gebruikt. 
+ 
+ 
+Pagina 40 / 52 
+7.2 Notificatie Uitwisselen allocatiegegevens individueel allocatiepunt (AllocationSeriesNotification) 
+ 
+ 
+Allocation_Series 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID DocumentIDT
+ype 
+1..1 A unique identification of 
+the time series. 
+Kenmerk bericht (UUID) 
+product EnergyProduct
+Type 
+1..1 The identification of the 
+energy product (electricity, 
+gas etc.). 
+Productsoort 
+group_businessTy
+pe 
+AllocationGro
+upType 
+1..1 The identification of the 
+nature of the time series. 
+Allocatiegroep 
+run_mRID AllocationVers
+ionType 
+1..1 The identification of the 
+version of the time series. 
+Allocatierun identificatie 
+referenceRevision
+Request_mRID 
+DocumentIDT
+ype 
+0..1 Reference to an earlier 
+received revision request. 
+Referentie naar 
+herzieningsverzoek 
+ 
+DateAndOrTime 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+startDateTime DateTime 1..1 Start date/time of the 
+period as per ISO 8601 
+YYYY-MM-DDThh:mm:ssZ. 
+Startdatumtijd periode 
+endDateTime DateTime 1..1 End date/time of the 
+period as per ISO 8601 
+YYYY-MM-DDThh:mm:ssZ. 
+Einddatumtijd periode 
+ 
+
+ 
+Pagina 41 / 52 
+Detail_Series 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+resolution DurationType 1..1 The definition of the 
+number of units of time 
+that compose an individual 
+step within a period.  
+Onbalansverrekeningsper
+iode (elektriciteit) 
+ 
+FlowDirection 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+direction EnergyFlowDir
+ectionType 
+1..1 The identification of the 
+direction. 
+Energierichting 
+ 
+MarketEvaluationPoint 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID GSRNEANCod
+e 
+1..1 The identification of the 
+evaluation point. 
+EAN code aansluiting 
+ 
+MarketParticipant 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID GLNEANCode 1..1 The identification of a party 
+in the energy market. 
+EAN code marktpartij 
+ 
+MarketRole 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+type MarketRoleTy
+pe 
+1..1 The identification of the 
+role played by a market 
+player. 
+Marktrol (DDK = Balance 
+Responsible Party) 
+ 
+Point 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+position Integer 1..1 A sequential value 
+representing the relative 
+position within a given time 
+interval. 
+Positie 
+quantity Decimal 1..1 The principal quantity or 
+the accepted offer quantity 
+identified for a point. 
+Volume 
+origin OriginType 1..1 The identification of the 
+origin. 
+Herkomstindicatie 
+validationStatus ValidationStat
+usType 
+0..1 The identification of the 
+validation status. 
+Validatiestatus 
+repairMethod RepairMethod
+Type 
+0..1 The identification of the 
+repair method. 
+Reparatiemethode 
+ 
+Product 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+identification EnergyProduct
+IdentifierType 
+1..1 The unique identification of 
+the product. 
+Product ID 
+measureUnit EnergyUnitTyp
+e 
+1..1 The identification of the 
+measure unit. 
+Energie eenheid 
+ 
+ 
+Pagina 42 / 52 
+7.3 Bevestiging/afwijzing notificatie allocatiegegevens individueel allocatiepunt 
+(AllocationSeriesAcknowledgement) 
+ 
+ 
+Acknowledgement_MarketDocument 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID DocumentIDT
+ype 
+1..1 The unique identification of 
+the document being 
+exchanged within a 
+business process flow. 
+Kenmerk bericht (UUID) 
+createdDateTime DateTime 1..1 The date and time of the 
+creation of the document 
+as per ISO 8601 YYYY-MM-
+DDThh:mm:ssZ. 
+Datum/tijd bericht 
+ 
+Reason 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+code ReasonCodeTy
+pe 
+1..1 The motivation of an act in 
+coded form. 
+Code 
+bevestiging/afwijzing 
+text ReasonTextTy
+pe 
+0..1 The textual explanation 
+corresponding to the 
+reason code. 
+Toelichting bij de 
+bevestiging/afwijzing 
+ 
+
+ 
+Pagina 43 / 52 
+Received_MarketDocument 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID DocumentIDT
+ype 
+1..1 The unique identification of 
+the document being 
+exchanged within a 
+business process flow. 
+Kenmerk notificatie 
+bericht (UUID) 
+ 
+  
+ 
+Pagina 44 / 52 
+7.4 Notificatie Uitwisselen geaggregeerde allocatiegegevens (AggregatedAllocationSeriesNotification) 
+ 
+ 
+AggregatedAllocation_Series 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID DocumentIDT
+ype 
+1..1 A unique identification of 
+the time series. 
+Kenmerk bericht (UUID) 
+product EnergyProduct
+Type 
+1..1 The identification of the 
+energy product (electricity, 
+gas etc.). 
+Productsoort 
+group_businessTy
+pe 
+AllocationGro
+upType 
+1..1 The identification of the 
+nature of the time series. 
+Allocatiegroep 
+run_mRID AllocationVers
+ionType 
+1..1 The identification of the 
+version of the time series. 
+Allocatierun identificatie 
+ 
+DateAndOrTime 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+startDateTime DateTime 1..1 Start date/time of the 
+period as per ISO 8601 
+YYYY-MM-DDThh:mm:ssZ. 
+Startdatumtijd periode 
+endDateTime DateTime 1..1 End date/time of the 
+period as per ISO 8601 
+YYYY-MM-DDThh:mm:ssZ. 
+Einddatumtijd periode 
+ 
+
+ 
+Pagina 45 / 52 
+Detail_Series 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+resolution DurationType 1..1 The definition of the 
+number of units of time 
+that compose an individual 
+step within a period.  
+Onbalansverrekeningsper
+iode (elektriciteit) 
+profileCategory_o
+bjectAggregation 
+ProfileCategor
+yType 
+0..1 Identification of the profile 
+category that is the 
+common denominator used 
+to aggregate a time series. 
+Profielcategorie 
+determinedEnergy
+Consumption_obj
+ectAggregation 
+DeterminedEn
+ergyConsumpt
+ionType 
+0..1 The identification of the 
+determined energy 
+consumption that is the 
+common denominator used 
+to aggregate a time series. 
+Vastgesteld afnametype 
+allocationResult_b
+usinessType 
+AllocationSMA
+ResultType 
+0..1 The identification of the 
+nature of the time series. 
+Herkomstindicatie 
+allocatieresultaat (voor 
+SMA) 
+ 
+Domain 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID GSRNEANCod
+e 
+1..1 The unique identification of 
+the domain. 
+EAN code netgebied 
+ 
+FlowDirection 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+direction EnergyFlowDir
+ectionType 
+1..1 The identification of the 
+direction. 
+Energierichting 
+ 
+MarketParticipant 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID GLNEANCode 1..1 The identification of a party 
+in the energy market. 
+EAN code marktpartij 
+ 
+MarketRole 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+type MarketRoleTy
+pe 
+1..1 The identification of the 
+role played by a market 
+player. 
+Marktrol (DDK = Balance 
+Responsible Party, DDQ = 
+Energy Supplier) 
+ 
+Point 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+position Integer 1..1 A sequential value 
+representing the relative 
+position within a given time 
+interval. 
+Positie 
+quantity Decimal 1..1 The principal quantity or 
+the accepted offer quantity 
+identified for a point. 
+Volume 
+ 
+ 
+Pagina 46 / 52 
+Product 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+identification EnergyProduct
+IdentifierType 
+1..1 The unique identification of 
+the product. 
+Product ID 
+measureUnit EnergyUnitTyp
+e 
+1..1 The identification of the 
+measure unit. 
+Energie eenheid 
+ 
+  
+ 
+Pagina 47 / 52 
+7.5 Bevestiging/afwijzing notificatie geaggregeerde allocatiegegevens 
+(AggregatedAllocationSeriesAcknowledgement) 
+ 
+ 
+Acknowledgement_MarketDocument 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID DocumentIDT
+ype 
+1..1 The unique identification of 
+the document being 
+exchanged within a 
+business process flow. 
+Kenmerk bericht (UUID) 
+createdDateTime DateTime 1..1 The date and time of the 
+creation of the document 
+as per ISO 8601 YYYY-MM-
+DDThh:mm:ssZ. 
+Datum/tijd bericht 
+ 
+Reason 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+code ReasonCodeTy
+pe 
+1..1 The motivation of an act in 
+coded form. 
+Code 
+bevestiging/afwijzing 
+text ReasonTextTy
+pe 
+0..1 The textual explanation 
+corresponding to the 
+reason code. 
+Toelichting bij de 
+bevestiging/afwijzing 
+ 
+
+ 
+Pagina 48 / 52 
+Received_MarketDocument 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID DocumentIDT
+ype 
+1..1 The unique identification of 
+the document being 
+exchanged within a 
+business process flow. 
+Kenmerk notificatie 
+bericht (UUID) 
+ 
+  
+ 
+Pagina 49 / 52 
+7.6 Notificatie Uitwisselen RCF/Profielfracties (AllocationFactorSeriesNotification) 
+ 
+ 
+AllocationFactor_Series 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID DocumentIDT
+ype 
+1..1 A unique identification of 
+the time series. 
+Kenmerk bericht (UUID) 
+product EnergyProduct
+Type 
+1..1 The identification of the 
+energy product (electricity, 
+gas etc.). 
+Productsoort 
+run_mRID AllocationVers
+ionType 
+1..1 The identification of the 
+version of the time series. 
+Allocatierun identificatie 
+dateRCF_version DateTime 1..1 The date version of the 
+time series as per ISO 8601 
+YYYY-MM-DDThh:mm:ssZ. 
+Datumversie RCF 
+ 
+DateAndOrTime 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+startDateTime DateTime 1..1 Start date/time of the 
+period as per ISO 8601 
+YYYY-MM-DDThh:mm:ssZ. 
+Startdatumtijd periode 
+endDateTime DateTime 1..1 End date/time of the 
+period as per ISO 8601 
+YYYY-MM-DDThh:mm:ssZ. 
+Einddatumtijd periode 
+ 
+
+ 
+Pagina 50 / 52 
+Detail_Series 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+resolution DurationType 1..1 The definition of the 
+number of units of time 
+that compose an individual 
+step within a period.  
+Onbalansverrekeningsper
+iode (elektriciteit) 
+profileCategory_o
+bjectAggregation 
+ProfileCategor
+yType 
+0..1 The identification of the 
+profile category that is the 
+common denominator used 
+to aggregate a time series. 
+ 
+Profielcategorie 
+determinedEnergy
+Consumption_obj
+ectAggregation 
+DeterminedEn
+ergyConsumpt
+ionType 
+0..1 The identification of the 
+determined energy 
+consumption that is the 
+common denominator used 
+to aggregate a time series. 
+Vastgesteld afnametype 
+profileStatus_qual
+ity 
+ProfileStatusT
+ype 
+0..1 The quality of the 
+information being 
+provided. This quality may 
+be estimated, not available, 
+as provided, etc. 
+Status profielfracties 
+ 
+Domain 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID GSRNEANCod
+e 
+1..1 The unique identification of 
+the domain. 
+EAN code netgebied 
+ 
+FlowDirection 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+direction EnergyFlowDir
+ectionType 
+1..1 The identification of the 
+direction. 
+Energierichting 
+ 
+Point 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+position Integer 1..1 A sequential value 
+representing the relative 
+position within a given time 
+interval. 
+Positie 
+quantity Decimal 1..1 The quantity of the factor 
+identified for a point. 
+RestantvolumeCorrectieF
+actor (RCF) of 
+Profilefractie 
+ 
+ 
+Pagina 51 / 52 
+7.7 Bevestiging/afwijzing notificatie RCF/Profielfracties (AllocationFactorSeriesAcknowledgement) 
+ 
+ 
+Acknowledgement_MarketDocument 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID DocumentIDT
+ype 
+1..1 The unique identification of 
+the document being 
+exchanged within a 
+business process flow. 
+Kenmerk bericht (UUID) 
+createdDateTime DateTime 1..1 The date and time of the 
+creation of the document 
+as per ISO 8601 YYYY-MM-
+DDThh:mm:ssZ. 
+Datum/tijd bericht 
+ 
+Reason 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+code ReasonCodeTy
+pe 
+1..1 The motivation of an act in 
+coded form. 
+Code 
+bevestiging/afwijzing 
+text ReasonTextTy
+pe 
+0..1 The textual explanation 
+corresponding to the 
+reason code. 
+Toelichting bij de 
+bevestiging/afwijzing 
+ 
+
+ 
+Pagina 52 / 52 
+Received_MarketDocument 
+XML element Datatype Multipliciteit Omschrijving Functionele parameter 
+mRID DocumentIDT
+ype 
+1..1 The unique identification of 
+the document being 
+exchanged within a 
+business process flow. 
+Kenmerk notificatie 
+bericht (UUID) 
+ 

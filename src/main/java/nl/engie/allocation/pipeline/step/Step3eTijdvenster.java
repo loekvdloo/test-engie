@@ -7,6 +7,7 @@ import nl.engie.allocation.pipeline.PipelineStep;
 import nl.engie.allocation.pipeline.StepResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,9 @@ import java.time.format.DateTimeParseException;
 public class Step3eTijdvenster implements PipelineStep {
 
     private static final Logger log = LoggerFactory.getLogger(Step3eTijdvenster.class);
+
+    @Value("${pipeline.max-delivery-delay-hours:48}")
+    private long maxDeliveryDelayHours;
 
     @Override
     public StepCode getStepCode() {
@@ -53,9 +57,9 @@ public class Step3eTijdvenster implements PipelineStep {
             }
         }
 
-        if (message.getReceivedAt() != null) {
-            LocalDateTime maxAge = LocalDateTime.now().minusDays(30);
-            if (message.getReceivedAt().isBefore(maxAge)) {
+        if (message.getReceivedAt() != null && message.getEndDateTime() != null) {
+            LocalDateTime latestAllowedDelivery = message.getEndDateTime().plusHours(maxDeliveryDelayHours);
+            if (message.getReceivedAt().isAfter(latestAllowedDelivery)) {
                 context.addValidationError(ErrorCode.E_763.getCode(),
                         ErrorCode.E_763.getFoutmelding());
             }

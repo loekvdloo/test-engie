@@ -22,6 +22,7 @@ nl\engie\allocation\model\enums\ResponseType.class
 nl\engie\allocation\model\entity\ProcessingStep.class
 nl\engie\allocation\model\entity\ValidationResult.class
 nl\engie\allocation\repository\DeliveryRecordRepository.class
+nl\engie\allocation\pipeline\PipelineContext$MessageHeaders.class
 nl\engie\allocation\model\entity\BrpRegisterEntry.class
 nl\engie\allocation\config\SecurityConfig.class
 nl\engie\allocation\model\entity\ValidationResult$ValidationResultBuilder.class
@@ -41,6 +42,7 @@ nl\engie\allocation\pipeline\step\Step2eUitvalOpnieuw.class
 nl\engie\allocation\model\entity\ProcessingLog.class
 nl\engie\allocation\pipeline\step\Step1bTechnischeOntvangst.class
 nl\engie\allocation\pipeline\step\Step2aClassificeer$1.class
+nl\engie\allocation\pipeline\AllocationValidationSpec.class
 nl\engie\allocation\model\entity\DeliveryRecord$DeliveryRecordBuilder.class
 nl\engie\allocation\pipeline\PipelineOrchestrator.class
 nl\engie\allocation\repository\MarketMessageRepository.class
@@ -48,6 +50,7 @@ nl\engie\allocation\pipeline\step\Step5bGeconfigureerdVersturen.class
 nl\engie\allocation\exception\GlobalExceptionHandler.class
 nl\engie\allocation\dto\ValidationErrorDto.class
 nl\engie\allocation\pipeline\step\Step2aClassificeer.class
+nl\engie\allocation\pipeline\step\Step4bGenereerNack$1.class
 nl\engie\allocation\config\InputSanitizer.class
 nl\engie\allocation\pipeline\step\Step4cFoutcodes.class
 nl\engie\allocation\service\MarketMessageService.class
@@ -72,11 +75,12 @@ nl\engie\allocation\model\entity\ProcessingLog$ProcessingLogBuilder.class
 nl\engie\allocation\pipeline\step\Step4dVastleggenResultaat.class
 nl\engie\allocation\pipeline\step\Step5aVersturenAckNack.class
 nl\engie\allocation\pipeline\step\Step3aBrpRegister.class
+nl\engie\allocation\pipeline\XmlFieldExtractor.class
 nl\engie\allocation\model\entity\ValidationRule.class
 nl\engie\allocation\pipeline\step\Step3eTijdvenster.class
-nl\engie\allocation\pipeline\step\Step3bMarktBusinessValidaties$1.class
 nl\engie\allocation\pipeline\step\Step4bGenereerNack.class
 nl\engie\allocation\model\entity\ProcessingStep$ProcessingStepBuilder.class
 nl\engie\allocation\pipeline\step\Step3dConfigureerbareRegels.class
+nl\engie\allocation\pipeline\step\Step4aGenereerAck$1.class
 nl\engie\allocation\pipeline\step\Step1dLoggingOntvangsttijd.class
 nl\engie\allocation\pipeline\StepResult.class

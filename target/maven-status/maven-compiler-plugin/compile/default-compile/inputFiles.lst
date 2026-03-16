@@ -25,6 +25,7 @@ C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\model\enums\MessageTy
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\model\enums\ResponseType.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\model\enums\StepCode.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\model\enums\StepStatus.java
+C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\pipeline\AllocationValidationSpec.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\pipeline\PipelineContext.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\pipeline\PipelineOrchestrator.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\pipeline\PipelineStep.java
@@ -58,6 +59,7 @@ C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\pipeline\step\Step5dZ
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\pipeline\step\Step6aDoorzetten.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\pipeline\step\Step6bAfleverstatus.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\pipeline\StepResult.java
+C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\pipeline\XmlFieldExtractor.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\repository\BrpRegisterRepository.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\repository\DeliveryRecordRepository.java
 C:\Users\loek\test-engie\src\main\java\nl\engie\allocation\repository\MarketMessageRepository.java

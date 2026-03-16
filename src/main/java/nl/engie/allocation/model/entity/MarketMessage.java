@@ -51,6 +51,9 @@ public class MarketMessage {
     @Column(name = "allocation_run_id", length = 36)
     private String allocationRunId;
 
+    @Column(name = "external_message_id", length = 100)
+    private String externalMessageId;
+
     @Column(name = "start_date_time")
     private LocalDateTime startDateTime;
 
@@ -106,7 +109,8 @@ public class MarketMessage {
     public MarketMessage(Long id, String messageUuid, MessageType messageType, String xmlContent,
                          MessageStatus status, Integer priority, StepCode currentStep,
                          String eanCode, String productType, String allocationGroup,
-                         String allocationRunId, LocalDateTime startDateTime, LocalDateTime endDateTime,
+                         String allocationRunId, String externalMessageId,
+                         LocalDateTime startDateTime, LocalDateTime endDateTime,
                          LocalDateTime receivedAt, LocalDateTime completedAt, Boolean isManualEntry,
                          LocalDateTime createdAt, LocalDateTime updatedAt,
                          List<ProcessingStep> processingSteps, List<ProcessingLog> processingLogs,
@@ -123,6 +127,7 @@ public class MarketMessage {
         this.productType = productType;
         this.allocationGroup = allocationGroup;
         this.allocationRunId = allocationRunId;
+        this.externalMessageId = externalMessageId;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.receivedAt = receivedAt;
@@ -159,6 +164,8 @@ public class MarketMessage {
     public void setAllocationGroup(String allocationGroup) { this.allocationGroup = allocationGroup; }
     public String getAllocationRunId() { return allocationRunId; }
     public void setAllocationRunId(String allocationRunId) { this.allocationRunId = allocationRunId; }
+    public String getExternalMessageId() { return externalMessageId; }
+    public void setExternalMessageId(String externalMessageId) { this.externalMessageId = externalMessageId; }
     public LocalDateTime getStartDateTime() { return startDateTime; }
     public void setStartDateTime(LocalDateTime startDateTime) { this.startDateTime = startDateTime; }
     public LocalDateTime getEndDateTime() { return endDateTime; }
@@ -200,6 +207,7 @@ public class MarketMessage {
         private String productType;
         private String allocationGroup;
         private String allocationRunId;
+        private String externalMessageId;
         private LocalDateTime startDateTime;
         private LocalDateTime endDateTime;
         private LocalDateTime receivedAt;
@@ -226,6 +234,7 @@ public class MarketMessage {
         public MarketMessageBuilder productType(String productType) { this.productType = productType; return this; }
         public MarketMessageBuilder allocationGroup(String allocationGroup) { this.allocationGroup = allocationGroup; return this; }
         public MarketMessageBuilder allocationRunId(String allocationRunId) { this.allocationRunId = allocationRunId; return this; }
+        public MarketMessageBuilder externalMessageId(String externalMessageId) { this.externalMessageId = externalMessageId; return this; }
         public MarketMessageBuilder startDateTime(LocalDateTime startDateTime) { this.startDateTime = startDateTime; return this; }
         public MarketMessageBuilder endDateTime(LocalDateTime endDateTime) { this.endDateTime = endDateTime; return this; }
         public MarketMessageBuilder receivedAt(LocalDateTime receivedAt) { this.receivedAt = receivedAt; return this; }
@@ -242,7 +251,7 @@ public class MarketMessage {
         public MarketMessage build() {
             return new MarketMessage(id, messageUuid, messageType, xmlContent, status, priority,
                     currentStep, eanCode, productType, allocationGroup, allocationRunId,
-                    startDateTime, endDateTime, receivedAt, completedAt, isManualEntry,
+                    externalMessageId, startDateTime, endDateTime, receivedAt, completedAt, isManualEntry,
                     createdAt, updatedAt, processingSteps, processingLogs, validationResults,
                     marketResponse, deliveryRecord);
         }

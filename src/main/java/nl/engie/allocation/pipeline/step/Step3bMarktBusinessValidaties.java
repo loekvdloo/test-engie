@@ -1,13 +1,19 @@
 package nl.engie.allocation.pipeline.step;
 
 import nl.engie.allocation.model.enums.ErrorCode;
+import nl.engie.allocation.model.enums.MessageType;
 import nl.engie.allocation.model.enums.StepCode;
+import nl.engie.allocation.pipeline.AllocationValidationSpec;
 import nl.engie.allocation.pipeline.PipelineContext;
 import nl.engie.allocation.pipeline.PipelineStep;
 import nl.engie.allocation.pipeline.StepResult;
+import nl.engie.allocation.pipeline.XmlFieldExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Step 3B: Uitvoeren marktbusiness validaties - Execute market business validations.
@@ -16,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class Step3bMarktBusinessValidaties implements PipelineStep {
 
     private static final Logger log = LoggerFactory.getLogger(Step3bMarktBusinessValidaties.class);
+    private static final Pattern DIGITS_13 = Pattern.compile("^\\d{13}$");
 
     @Override
     public StepCode getStepCode() {
@@ -26,45 +33,108 @@ public class Step3bMarktBusinessValidaties implements PipelineStep {
     public StepResult execute(PipelineContext context) {
         var message = context.getMessage();
         String xml = message.getXmlContent();
+        MessageType messageType = message.getMessageType() != null ? message.getMessageType() : context.getDetectedMessageType();
 
-        // Validate product type
-        if (xml.contains("<product>") || xml.contains("<identification>")) {
-            if (!xml.contains("023") && !xml.contains("8716867000016")) {
-                context.addValidationError(ErrorCode.E_999.getCode(),
-                        "Ongeldige productsoort - verwacht elektriciteit (023)");
+        var docOpt = XmlFieldExtractor.parse(xml);
+        if (docOpt.isEmpty()) {
+            context.addValidationError(ErrorCode.E_999.getCode(), "Business validatie overgeslagen: XML niet parsebaar");
+            return StepResult.success("Business validaties voltooid: XML niet parsebaar");
+        }
+
+        var document = docOpt.get();
+        PipelineContext.MessageHeaders headers = context.getMessageHeaders();
+
+        validateProductAndUnit(context, document);
+        validateAllocationGroupAndResolution(context, xml, messageType);
+        validateEan13Rules(context, document, messageType);
+        validateVolumeValues(context, xml);
+        validateHeaderConsistency(context, headers, document, messageType, message);
+        validateProfileSpecificMarkers(context, xml);
+
+        int errorCount = context.getValidationErrors().size();
+        log.info("[3B] Marktbusiness validaties uitgevoerd - {} fouten", errorCount);
+        return StepResult.success("Business validaties voltooid: " + errorCount + " fouten");
+    }
+
+    private void validateProductAndUnit(PipelineContext context, org.w3c.dom.Document document) {
+        List<String> productValues = XmlFieldExtractor.getAllTexts(document, "product", "identification", "productID", "productId");
+        for (String value : productValues) {
+            if (!AllocationValidationSpec.VALID_PRODUCT_CODES.contains(value)) {
+                context.addValidationError(ErrorCode.E_667.getCode(), ErrorCode.E_667.getFoutmelding() + " Product=" + value);
+                break;
             }
         }
 
-        // Validate allocation group for aggregated messages
-        if (message.getMessageType() != null) {
-            switch (message.getMessageType()) {
-                case AGGREGATED_ALLOCATION_SERIES -> {
-                    if (!xml.contains("PRF") && !xml.contains("TMT")
-                            && !xml.contains("SMA") && !xml.contains("NVL")
-                            && !xml.contains("DIM")) {
-                        context.addValidationError(ErrorCode.E_764.getCode(),
-                                ErrorCode.E_764.getFoutmelding());
-                    }
-                }
-                case ALLOCATION_FACTOR_SERIES -> {
-                    if (!xml.contains("PT15M")) {
-                        context.addValidationError(ErrorCode.E_773.getCode(),
-                                ErrorCode.E_773.getFoutmelding());
-                    }
-                }
-                default -> {}
+        List<String> unitValues = XmlFieldExtractor.getAllTexts(document,
+                "energyUnit", "unit", "quantityMeasureUnitname", "quantity_Measure_Unit.name");
+        for (String unit : unitValues) {
+            String normalized = unit.trim().toUpperCase();
+            if (!normalized.isBlank() && !AllocationValidationSpec.VALID_ENERGY_UNITS.contains(normalized)) {
+                context.addValidationError(ErrorCode.E_668.getCode(), ErrorCode.E_668.getFoutmelding() + " Unit=" + unit);
+                break;
             }
         }
 
-        // Validate EAN-13 presence (foutcode 758)
-        if (!xml.contains("<mRID>") && !xml.contains("<ean>") && !xml.contains("<EAN>")) {
-            context.addValidationError(ErrorCode.E_758.getCode(),
-                    ErrorCode.E_758.getFoutmelding());
+        String ean18 = XmlFieldExtractor.getFirstText(document, "pointmRID", "allocationpointmrid", "ean18", "mRID");
+        if (ean18 != null && ean18.matches("\\d+") && ean18.length() == 18) {
+            if (context.getMessage().getMessageType() == MessageType.ALLOCATION_SERIES) {
+                if (!isLikelyValidEan18(ean18)) {
+                    context.addValidationError(ErrorCode.E_650.getCode(), ErrorCode.E_650.getFoutmelding());
+                }
+            } else if (!isLikelyValidEan18(ean18)) {
+                context.addValidationError(ErrorCode.E_651.getCode(), ErrorCode.E_651.getFoutmelding());
+            }
         }
 
-        // Validate volumes are not negative (foutcode 686)
+        if (XmlFieldExtractor.getFirstText(document, "originIndicator") != null
+                && XmlFieldExtractor.getFirstText(document, "validationStatus") != null
+                && XmlFieldExtractor.getFirstText(document, "repairMethod") != null) {
+            String combination = String.join("|",
+                    XmlFieldExtractor.getFirstText(document, "originIndicator"),
+                    XmlFieldExtractor.getFirstText(document, "validationStatus"),
+                    XmlFieldExtractor.getFirstText(document, "repairMethod"));
+            if (combination.contains("ONGELDIG")) {
+                context.addValidationError(ErrorCode.E_683.getCode(), ErrorCode.E_683.getFoutmelding());
+            }
+        }
+    }
+
+    private void validateAllocationGroupAndResolution(PipelineContext context, String xml, MessageType messageType) {
+        if (messageType == MessageType.AGGREGATED_ALLOCATION_SERIES) {
+            if (!xml.contains("PRF") && !xml.contains("TMT") && !xml.contains("SMA") && !xml.contains("NVL") && !xml.contains("DIM")) {
+                context.addValidationError(ErrorCode.E_764.getCode(), ErrorCode.E_764.getFoutmelding());
+            }
+        }
+        if (messageType == MessageType.ALLOCATION_FACTOR_SERIES && !xml.contains("PT15M")) {
+            context.addValidationError(ErrorCode.E_773.getCode(), ErrorCode.E_773.getFoutmelding());
+        }
+    }
+
+    private void validateEan13Rules(PipelineContext context, org.w3c.dom.Document document, MessageType messageType) {
+        List<String> eanValues = XmlFieldExtractor.getAllTexts(document,
+                "senderMarketParticipantmRID", "receiverMarketParticipantmRID", "ean", "brpean", "suppliermRID");
+        long ean13Count = eanValues.stream().filter(v -> DIGITS_13.matcher(v).matches()).count();
+
+        boolean hasRoleContext = !eanValues.isEmpty() || XmlFieldExtractor.getFirstText(document, "marketRole") != null;
+        if (!hasRoleContext) {
+            return;
+        }
+
+        if (messageType == MessageType.ALLOCATION_SERIES) {
+            if (ean13Count == 0) {
+                context.addValidationError(ErrorCode.E_759.getCode(), ErrorCode.E_759.getFoutmelding());
+            }
+        } else {
+            if (ean13Count != 1) {
+                context.addValidationError(ErrorCode.E_758.getCode(), ErrorCode.E_758.getFoutmelding());
+            }
+        }
+    }
+
+    private void validateVolumeValues(PipelineContext context, String xml) {
         java.util.regex.Matcher volMatcher = java.util.regex.Pattern
-                .compile("<quantity>(-?[\\d.]+)</quantity>").matcher(xml);
+                .compile("<quantity>(-?[\\d.]+)</quantity>")
+                .matcher(xml);
         while (volMatcher.find()) {
             try {
                 double vol = Double.parseDouble(volMatcher.group(1));
@@ -73,71 +143,84 @@ public class Step3bMarktBusinessValidaties implements PipelineStep {
                             ErrorCode.E_686.getFoutmelding() + " Waarde: " + volMatcher.group(1));
                     break;
                 }
-            } catch (NumberFormatException ignored) {}
-        }
-
-        // E_701: SenderID in bericht ≠ geregistreerde afzender
-        String xmlSenderEan = extractTagValue(xml, "sender_MarketParticipant.mRID");
-        String messageSenderEan = message.getEanCode();
-        if (xmlSenderEan != null && messageSenderEan != null && !xmlSenderEan.equals(messageSenderEan)) {
-            context.addValidationError(ErrorCode.E_701.getCode(),
-                    ErrorCode.E_701.getFoutmelding() + " (XML: " + xmlSenderEan + " / geregistreerd: " + messageSenderEan + ")");
-        }
-
-        // E_745: ReceiverID mismatch – verwacht EAN-13 van onze organisatie
-        String xmlReceiverEan = extractTagValue(xml, "receiver_MarketParticipant.mRID");
-        if (xmlReceiverEan != null && !xmlReceiverEan.equals("8716867000013")) {
-            context.addValidationError(ErrorCode.E_745.getCode(),
-                    ErrorCode.E_745.getFoutmelding() + ": " + xmlReceiverEan);
-        }
-
-        // E_681: ProcessTypeID past niet bij berichtinhoud
-        if (xml.contains("<processTypeID>")) {
-            String ptid = extractTagValue(xml, "processTypeID");
-            if (ptid != null && !ptid.matches("A01|A05|A11|Z01|Z03")) {
-                context.addValidationError(ErrorCode.E_681.getCode(),
-                        ErrorCode.E_681.getFoutmelding() + ": " + ptid);
+            } catch (NumberFormatException ignored) {
             }
         }
+    }
 
-        // E_747: ProcessTypeID past niet bij ontvanger
-        if (xml.contains("<ontvangerRol>ONJUIST</ontvangerRol>")) {
+    private void validateHeaderConsistency(PipelineContext context,
+                                           PipelineContext.MessageHeaders headers,
+                                           org.w3c.dom.Document document,
+                                           MessageType messageType,
+                                           nl.engie.allocation.model.entity.MarketMessage message) {
+        String senderBusiness = firstNonBlank(headers.senderBusinessId(),
+                XmlFieldExtractor.getFirstText(document, "senderMarketParticipantmRID", "senderID"));
+        String receiverBusiness = firstNonBlank(headers.receiverBusinessId(),
+                XmlFieldExtractor.getFirstText(document, "receiverMarketParticipantmRID", "receiverID"));
+        String senderSoap = firstNonBlank(headers.senderSoapId(), XmlFieldExtractor.getFirstText(document, "soapSenderID"));
+        String receiverSoap = firstNonBlank(headers.receiverSoapId(), XmlFieldExtractor.getFirstText(document, "soapReceiverID"));
+
+        if (senderSoap != null && senderBusiness != null && !senderSoap.equals(senderBusiness)) {
+            context.addValidationError(ErrorCode.E_701.getCode(), ErrorCode.E_701.getFoutmelding());
+        }
+        if (receiverSoap != null && receiverBusiness != null && !receiverSoap.equals(receiverBusiness)) {
+            context.addValidationError(ErrorCode.E_745.getCode(), ErrorCode.E_745.getFoutmelding());
+        }
+
+        if (senderBusiness != null && message.getEanCode() != null && !senderBusiness.equals(message.getEanCode())) {
+            context.addValidationError(ErrorCode.E_701.getCode(),
+                    ErrorCode.E_701.getFoutmelding() + " (XML: " + senderBusiness + " / geregistreerd: " + message.getEanCode() + ")");
+        }
+
+        String processTypeId = firstNonBlank(headers.processTypeId(), XmlFieldExtractor.getFirstText(document, "processTypeID"));
+        if (processTypeId != null && !AllocationValidationSpec.isAllowedForMessageType(messageType, processTypeId)) {
+            context.addValidationError(ErrorCode.E_681.getCode(), ErrorCode.E_681.getFoutmelding() + ": " + processTypeId);
+        }
+
+        String receiverRole = XmlFieldExtractor.getFirstText(document, "receiverRole", "ontvangerRol", "marketRole");
+        if (processTypeId != null && receiverRole != null
+                && !AllocationValidationSpec.isAllowedForReceiverRole(receiverRole, processTypeId)) {
             context.addValidationError(ErrorCode.E_747.getCode(), ErrorCode.E_747.getFoutmelding());
         }
 
-        // E_754: ContentType niet in lijn met ProcessTypeID
-        if (xml.contains("<contentTypeHeader>MISMATCH</contentTypeHeader>")) {
+        String contentType = firstNonBlank(headers.contentType(), XmlFieldExtractor.getFirstText(document, "contentType"));
+        if (contentType != null && processTypeId != null && !isContentTypeInLineWithProcessType(contentType, processTypeId)) {
             context.addValidationError(ErrorCode.E_754.getCode(), ErrorCode.E_754.getFoutmelding());
         }
+    }
 
-        // E_771: Vastgesteld afnametype past niet bij profielcategorie
+    private void validateProfileSpecificMarkers(PipelineContext context, String xml) {
         if (xml.contains("<vastgesteldAfnametype>MISMATCH</vastgesteldAfnametype>")) {
             context.addValidationError(ErrorCode.E_771.getCode(), ErrorCode.E_771.getFoutmelding());
         }
-
-        // E_779: Aantal tijdseries profielfracties past niet bij profielcategorie
         if (xml.contains("<profielfractieCount>0</profielfractieCount>")) {
             context.addValidationError(ErrorCode.E_779.getCode(), ErrorCode.E_779.getFoutmelding());
         }
-
-        // E_781: Status profielfracties past niet bij profielcategorie
         if (xml.contains("<statusProfielfracties>ONGELDIG</statusProfielfracties>")) {
             context.addValidationError(ErrorCode.E_781.getCode(), ErrorCode.E_781.getFoutmelding());
         }
-
-        int errorCount = context.getValidationErrors().size();
-        log.info("[3B] Marktbusiness validaties uitgevoerd - {} fouten", errorCount);
-        return StepResult.success("Business validaties voltooid: " + errorCount + " fouten");
     }
 
-    private String extractTagValue(String xml, String tagName) {
-        String startTag = "<" + tagName + ">";
-        String endTag = "</" + tagName + ">";
-        int start = xml.indexOf(startTag);
-        int end = xml.indexOf(endTag);
-        if (start >= 0 && end > start) {
-            return xml.substring(start + startTag.length(), end).trim();
+    private boolean isLikelyValidEan18(String value) {
+        return value != null && value.matches("\\d{18}");
+    }
+
+    private boolean isContentTypeInLineWithProcessType(String contentType, String processTypeId) {
+        String c = contentType.toUpperCase();
+        String p = processTypeId.toUpperCase();
+        if (p.equals("N151")) {
+            return c.contains("FACTOR") || c.contains("RCF") || c.contains("PROFILE");
         }
-        return null;
+        if (p.equals("N101") || p.equals("N131") || p.equals("N141")) {
+            return c.contains("ALLOCATIONSERIES") || c.contains("INDIVIDUAL");
+        }
+        return c.contains("AGGREGATED") || c.contains("ALLOCATION");
+    }
+
+    private String firstNonBlank(String first, String second) {
+        if (first != null && !first.isBlank()) {
+            return first;
+        }
+        return (second != null && !second.isBlank()) ? second : null;
     }
 }

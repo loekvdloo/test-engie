@@ -14,4 +14,5 @@ public interface MarketMessageRepository extends JpaRepository<MarketMessage, Lo
     List<MarketMessage> findByStatus(MessageStatus status);
     List<MarketMessage> findByStatusOrderByPriorityAscReceivedAtAsc(MessageStatus status);
     boolean existsByMessageUuid(String messageUuid);
+    boolean existsByExternalMessageIdAndIdNot(String externalMessageId, Long id);
 }

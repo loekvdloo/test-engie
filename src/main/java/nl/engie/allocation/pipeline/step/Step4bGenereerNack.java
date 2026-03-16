@@ -59,8 +59,15 @@ public class Step4bGenereerNack implements PipelineStep {
             if (errorCodes.isEmpty()) errorCodes = "999";
         }
 
-        String nackXml = generateNackXml(responseUuid, message.getMessageUuid(),
-                context.getValidationErrors());
+        String receivedMessageId = message.getExternalMessageId() != null
+                ? message.getExternalMessageId()
+                : message.getMessageUuid();
+        String correlationId = preferredCorrelationId(context);
+
+        String nackXml = generateNackXml(responseUuid, receivedMessageId,
+                correlationId,
+                context.getValidationErrors(),
+                message.getMessageType());
 
         MarketResponse response = MarketResponse.builder()
                 .marketMessage(message)
@@ -80,8 +87,10 @@ public class Step4bGenereerNack implements PipelineStep {
         return StepResult.success("NACK gegenereerd: " + responseUuid);
     }
 
-    private String generateNackXml(String responseUuid, String originalUuid,
-                                    List<PipelineContext.ValidationError> errors) {
+    private String generateNackXml(String responseUuid, String receivedMessageId,
+                                    String correlationId,
+                                    List<PipelineContext.ValidationError> errors,
+                                    nl.engie.allocation.model.enums.MessageType messageType) {
         StringBuilder reasons = new StringBuilder();
         for (var error : errors) {
             reasons.append("""
@@ -100,22 +109,56 @@ public class Step4bGenereerNack implements PipelineStep {
                     """);
         }
 
+        String root = acknowledgementRoot(messageType);
+        String correlationXml = (correlationId == null || correlationId.isBlank())
+                ? ""
+                : "    <correlationID>" + escapeXml(correlationId) + "</correlationID>\n";
+
         return """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <Acknowledgement_MarketDocument>
+                <%s>
                     <mRID>%s</mRID>
                     <createdDateTime>%s</createdDateTime>
-                %s    <Received_MarketDocument>
+                %s%s    <Received_MarketDocument>
                         <mRID>%s</mRID>
                     </Received_MarketDocument>
-                </Acknowledgement_MarketDocument>
-                """.formatted(responseUuid,
+                </%s>
+                """.formatted(root,
+                responseUuid,
                 LocalDateTime.now().toString() + "Z",
-                reasons.toString(),
-                originalUuid);
+                correlationXml,
+                reasons,
+                escapeXml(receivedMessageId),
+                root);
+    }
+
+    private String preferredCorrelationId(PipelineContext context) {
+        if (context.getMessageHeaders() == null) {
+            return null;
+        }
+        if (context.getMessageHeaders().correlationIdSoap() != null
+                && !context.getMessageHeaders().correlationIdSoap().isBlank()) {
+            return context.getMessageHeaders().correlationIdSoap();
+        }
+        return context.getMessageHeaders().correlationIdBusiness();
+    }
+
+    private String acknowledgementRoot(nl.engie.allocation.model.enums.MessageType type) {
+        if (type == null) {
+            return "Acknowledgement_MarketDocument";
+        }
+        return switch (type) {
+            case ALLOCATION_SERIES -> "AllocationSeriesAcknowledgement";
+            case AGGREGATED_ALLOCATION_SERIES -> "AggregatedAllocationSeriesAcknowledgement";
+            case ALLOCATION_FACTOR_SERIES -> "AllocationFactorSeriesAcknowledgement";
+            default -> "Acknowledgement_MarketDocument";
+        };
     }
 
     private String escapeXml(String text) {
+        if (text == null) {
+            return "";
+        }
         return text.replace("&", "&amp;")
                 .replace("<", "&lt;")
                 .replace(">", "&gt;")

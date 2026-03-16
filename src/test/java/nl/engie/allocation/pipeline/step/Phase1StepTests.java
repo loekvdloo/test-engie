@@ -24,7 +24,7 @@ class Phase1StepTests {
             <?xml version="1.0" encoding="UTF-8"?>
             <AllocationSeries>
                 <mRID>a1b2c3d4-e5f6-7890-abcd-ef1234567890</mRID>
-                <product><identification>8716867000016</identification></product>
+                <product><identification>8716867000030</identification></product>
                 <startDateTime>2025-01-01T00:00:00Z</startDateTime>
                 <endDateTime>2025-01-02T00:00:00Z</endDateTime>
                 <resolution>PT15M</resolution>

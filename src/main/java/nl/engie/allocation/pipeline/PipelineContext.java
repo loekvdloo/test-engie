@@ -28,6 +28,7 @@ public class PipelineContext {
     private boolean parked = false;
     private boolean nack = false;
     private String responseXml;
+    private MessageHeaders messageHeaders = MessageHeaders.empty();
 
     public PipelineContext(MarketMessage message) {
         this.message = message;
@@ -72,6 +73,7 @@ public class PipelineContext {
     public boolean isParked() { return parked; }
     public boolean isNack() { return nack; }
     public String getResponseXml() { return responseXml; }
+    public MessageHeaders getMessageHeaders() { return messageHeaders; }
 
     public void setHalted(boolean halted) { this.halted = halted; }
     public void setTechnicallyValid(boolean technicallyValid) { this.technicallyValid = technicallyValid; }
@@ -81,9 +83,29 @@ public class PipelineContext {
     public void setParked(boolean parked) { this.parked = parked; }
     public void setNack(boolean nack) { this.nack = nack; }
     public void setResponseXml(String responseXml) { this.responseXml = responseXml; }
+    public void setMessageHeaders(MessageHeaders messageHeaders) { this.messageHeaders = messageHeaders != null ? messageHeaders : MessageHeaders.empty(); }
 
     /**
      * Represents a validation error with code and message.
      */
     public record ValidationError(String code, String message) {}
+
+    /**
+     * Parsed message header fields used across validation and response generation.
+     */
+    public record MessageHeaders(String messageId,
+                                 String processTypeId,
+                                 String senderBusinessId,
+                                 String receiverBusinessId,
+                                 String senderSoapId,
+                                 String receiverSoapId,
+                                 String correlationIdBusiness,
+                                 String correlationIdSoap,
+                                 String contentType,
+                                 String technicalMessageId,
+                                 String createdDateTime) {
+        public static MessageHeaders empty() {
+            return new MessageHeaders(null, null, null, null, null, null, null, null, null, null, null);
+        }
+    }
 }

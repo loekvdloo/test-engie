@@ -1,0 +1,72 @@
+Ontvang
+ 
+marktbericht
+Ontvangen
+ 
+marktbericht
+Technische
+ 
+ontvangstbevestiging
+Technische
+ 
+validatie
+Logging van 
+ontvangsttijd
+Identificatie
+ 
+berichttype
+Handmatige
+ 
+opvoer
+ 
+berichten
+Classificeer
+ 
+bericht
+Classificeer
+ van 
+berichttype
+Bepalen
+ 
+prioriteit
+ per 
+berichttype
+ 
+Plaatsen in wachtrij(event-
+driven
+)
+Uitzondering parkeren
+Uitval opnieuw verwerken
+Valideer bericht
+Operational
+ BRP register
+Uitvoeren 
+marktbusiness
+ 
+validaties
+Controle op verplichte velden
+Validatieregels configureerbaar
+Tijdvenster-
+validaties
+Controle op volgordelijkheid
+Herbruikbare validatieregels
+Bepaal uitkomst 
+Genereren ACK bij succes 
+Genereren NACK bij fouten
+Toevoegen foutcodes bij NACK 
+Vastleggen validatieresultaat
+Configuratie:NACK
+ wel/niet intern doorzetten
+Versuur
+ marktrespons
+Versturen ACK/NACK richting markt
+Geconfigureerd respons versturen
+Logging
+ verzendtijd
+Zeflstandig
+ versturen uitgaande berichten
+Lever bericht aan 
+mdp
+Doorzetten origineel bericht naar 
+raw-layer
+Vastleggen afleverstatus

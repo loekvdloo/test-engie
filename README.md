@@ -887,3 +887,16 @@ Dit document is de bron voor:
 - Validatieregels per berichttype
 - Berichtformaten en veldspecificaties
 - Procesafspraken tussen marktpartijen
+
+---
+
+## Bewust buiten scope (nu niet geïmplementeerd)
+
+Onderstaande punten zijn **bewust** (nog) niet volledig geïmplementeerd, omdat ze externe brondata of dynamische marktregels vereisen en daardoor niet betrouwbaar hard-codebaar zijn in deze codebase alleen:
+
+- **Register-afhankelijke controles** (o.a. actief/geadministreerd in landelijke registers) die live bronkoppelingen vereisen.
+- **“Latest and greatest” en historische vergelijking** wanneer hiervoor ketenbrede, complete berichtgeschiedenis nodig is buiten de lokale context.
+- **Dynamische marktwindow/SLA variaties** die per periode of operationele afspraak kunnen wijzigen.
+- **Diepe semantische controles per profielcategorie** waar aanvullende domeintabellen of externe classificatiedata nodig zijn.
+
+Deze keuzes zijn gemaakt om de implementatie stabiel, onderhoudbaar en voorspelbaar te houden zonder speculatieve of foutgevoelige aannames.
