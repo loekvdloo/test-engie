@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Controller voor het laden van test data (alleen beschikbaar in dev/test omgeving).
@@ -60,49 +63,69 @@ public class TestDataController {
         log.info("Seeding test data...");
 
         int count = 0;
+                String validAllocationXml1 = withDateWindow(VALID_ALLOCATION_XML_1, -12, 12);
+                String validAllocationXml2 = withDateWindow(VALID_ALLOCATION_XML_2, -18, 6);
+                String validAllocationXml3 = withDateWindow(VALID_ALLOCATION_XML_3, -10, 14);
+                String validAggregatedXml = withDateWindow(VALID_AGGREGATED_XML, -20, 4);
+                String validRcfXml = withDateWindow(VALID_RCF_XML, -16, 8);
+                String validNegativeVolumePrfXml = withDateWindow(VALID_NEGATIVE_VOLUME_PRF_XML, -22, 2);
+                String valid96PositionsXml = withDateWindow(VALID_96_POSITIONS_XML, -8, 16);
+                String validMultiSeriesXml = withDateWindow(VALID_MULTI_SERIES_XML, -6, 18);
+                String validAllocationXmlDdm = withDateWindow(VALID_ALLOCATION_XML_DDM, -14, 10);
 
         // =====================================================
         // GELDIGE BERICHTEN (verwacht: ACK)
         // =====================================================
 
+        // === 0. Drie expliciet geldige berichten met unieke IDs (garandeert ACK-voorbeelden) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                buildValidAllocationAckXml(UUID.randomUUID().toString()), false, "871686700000000001"));
+        count++;
+        messageService.submitMessage(new MessageSubmitRequest(
+                buildValidAggregatedAckXml(UUID.randomUUID().toString()), false, "871686700000000002"));
+        count++;
+        messageService.submitMessage(new MessageSubmitRequest(
+                buildValidFactorAckXml(UUID.randomUUID().toString()), false, "871686700000000003"));
+        count++;
+
         // === 1. Geldig allocatiebericht - Engie (DDK) ===
         messageService.submitMessage(new MessageSubmitRequest(
-                VALID_ALLOCATION_XML_1, false, "871686700000000001"));
+                validAllocationXml1, false, "871686700000000001"));
         count++;
 
         // === 2. Geldig allocatiebericht - Vattenfall (DDK) ===
         messageService.submitMessage(new MessageSubmitRequest(
-                VALID_ALLOCATION_XML_2, false, "871686700000000002"));
+                validAllocationXml2, false, "871686700000000002"));
         count++;
 
         // === 3. Geldig bericht met handmatige opvoer - Essent (DDQ) ===
         messageService.submitMessage(new MessageSubmitRequest(
-                VALID_ALLOCATION_XML_3, true, "871686700000000003"));
+                validAllocationXml3, true, "871686700000000003"));
         count++;
 
         // === 4. Geaggregeerd allocatiebericht met PRF groep ===
         messageService.submitMessage(new MessageSubmitRequest(
-                VALID_AGGREGATED_XML, false, "871686700000000001"));
+                validAggregatedXml, false, "871686700000000001"));
         count++;
 
         // === 5. RCF / Profielfracties bericht ===
         messageService.submitMessage(new MessageSubmitRequest(
-                VALID_RCF_XML, false, "871686700000000002"));
+                validRcfXml, false, "871686700000000002"));
         count++;
 
         // === 6. Negatief volume (PRF groep = toegestaan) ===
         messageService.submitMessage(new MessageSubmitRequest(
-                VALID_NEGATIVE_VOLUME_PRF_XML, false, "871686700000000001"));
+                validNegativeVolumePrfXml, false, "871686700000000001"));
         count++;
 
         // === 7. Groot bericht met 96 posities (volledige dag bij PT15M) ===
         messageService.submitMessage(new MessageSubmitRequest(
-                VALID_96_POSITIONS_XML, false, "871686700000000001"));
+                valid96PositionsXml, false, "871686700000000001"));
         count++;
 
         // === 8. Meerdere tijdseries in één bericht ===
         messageService.submitMessage(new MessageSubmitRequest(
-                VALID_MULTI_SERIES_XML, false, "871686700000000003"));
+                validMultiSeriesXml, false, "871686700000000003"));
         count++;
 
         // =====================================================
@@ -116,7 +139,7 @@ public class TestDataController {
 
         // === 10. Geen EAN-code (NACK - BRP onbekend 3A) ===
         messageService.submitMessage(new MessageSubmitRequest(
-                VALID_ALLOCATION_XML_1, false, null));
+                validAllocationXml1, false, null));
         count++;
 
         // === 11. Ongeldige XML - niet parseerbaar (technische fout 1C) ===
@@ -126,7 +149,7 @@ public class TestDataController {
 
         // === 12. Onbekende BRP EAN (NACK - foutcode 765) ===
         messageService.submitMessage(new MessageSubmitRequest(
-                VALID_ALLOCATION_XML_1, false, "999999999999999999"));
+                validAllocationXml1, false, "999999999999999999"));
         count++;
 
         // === 13. Foutieve resolutie PT1H (NACK - foutcode 773) ===
@@ -166,7 +189,7 @@ public class TestDataController {
 
         // === 20. Geldig bericht met DDM rol (Liander) ===
         messageService.submitMessage(new MessageSubmitRequest(
-                VALID_ALLOCATION_XML_DDM, false, "871686700000000004"));
+                validAllocationXmlDdm, false, "871686700000000004"));
         count++;
 
         // =====================================================
@@ -276,6 +299,31 @@ public class TestDataController {
         // === 41. Gat in positienummering (NACK - foutcode 782) ===
         messageService.submitMessage(new MessageSubmitRequest(
                 INVALID_POSITION_GAP_XML, false, "871686700000000001"));
+        count++;
+
+        // === 42. Aansluit-EAN18 heeft onjuiste checkdigit (NACK - foutcode 650) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_AANSLUITING_EAN18_CHECKDIGIT_XML, false, "871686700000000001"));
+        count++;
+
+        // === 43. Ongeldige energie-eenheid (NACK - foutcode 668) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_ENERGY_UNIT_XML, false, "871686700000000001"));
+        count++;
+
+        // === 44. Ongeldige herkomst/validatie/reparatiemethodiek-combinatie (NACK - foutcode 683) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_ORIGIN_VALIDATION_REPAIR_XML, false, "871686700000000001"));
+        count++;
+
+        // === 45. Aggregated bericht met onjuiste EAN-13 telling (NACK - foutcode 758) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_EAN13_COUNT_AGG_XML, false, "871686700000000001"));
+        count++;
+
+        // === 46. AllocationSeries zonder BRP EAN-13 (NACK - foutcode 759) ===
+        messageService.submitMessage(new MessageSubmitRequest(
+                INVALID_MISSING_BRP_EAN13_XML, false, "871686700000000001"));
         count++;
 
         log.info("Test data seeded: {} messages created", count);
@@ -693,6 +741,7 @@ public class TestDataController {
                 <mRID>74500000-0000-0000-0000-000000000001</mRID>
                 <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
                 <receiver_MarketParticipant.mRID>999999999999999999</receiver_MarketParticipant.mRID>
+                                <soapReceiverID>8716867000013</soapReceiverID>
                 <product><identification>023</identification></product>
                 <startDateTime>2025-07-13T00:00:00Z</startDateTime>
                 <endDateTime>2025-07-14T00:00:00Z</endDateTime>
@@ -710,7 +759,8 @@ public class TestDataController {
                 <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
                 <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
                 <product><identification>023</identification></product>
-                <ontvangerRol>ONJUIST</ontvangerRol>
+                                <receiverRole>LNB</receiverRole>
+                                <processTypeID>N131</processTypeID>
                 <startDateTime>2025-07-15T00:00:00Z</startDateTime>
                 <endDateTime>2025-07-16T00:00:00Z</endDateTime>
                 <resolution>PT15M</resolution>
@@ -727,7 +777,8 @@ public class TestDataController {
                 <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
                 <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
                 <product><identification>023</identification></product>
-                <contentTypeHeader>MISMATCH</contentTypeHeader>
+                                <processTypeID>N151</processTypeID>
+                                <contentType>AllocationSeries</contentType>
                 <startDateTime>2025-07-17T00:00:00Z</startDateTime>
                 <endDateTime>2025-07-18T00:00:00Z</endDateTime>
                 <resolution>PT15M</resolution>
@@ -894,6 +945,7 @@ public class TestDataController {
                 <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
                 <product><identification>023</identification></product>
                 <correlationID>MISMATCH</correlationID>
+                                <soapCorrelationID>SOAP-CORR-OTHER</soapCorrelationID>
                 <startDateTime>2025-08-07T00:00:00Z</startDateTime>
                 <endDateTime>2025-08-08T00:00:00Z</endDateTime>
                 <resolution>PT15M</resolution>
@@ -935,4 +987,168 @@ public class TestDataController {
                 <position>5</position><quantity>150.000</quantity>
             </AllocationSeries>
             """;
+
+        /** Foutcode 650: aansluiting EAN-18 heeft onjuiste checkdigit */
+        private static final String INVALID_AANSLUITING_EAN18_CHECKDIGIT_XML = """
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <AllocationSeries>
+                                <mRID>65000000-0000-0000-0000-000000000001</mRID>
+                                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                                <pointmRID>871686700000000002</pointmRID>
+                                <product><identification>023</identification></product>
+                                <startDateTime>2025-08-13T00:00:00Z</startDateTime>
+                                <endDateTime>2025-08-14T00:00:00Z</endDateTime>
+                                <resolution>PT15M</resolution>
+                                <position>1</position><quantity>100.000</quantity>
+                                <position>2</position><quantity>200.000</quantity>
+                        </AllocationSeries>
+                        """;
+
+        /** Foutcode 668: energie-eenheid past niet bij product */
+        private static final String INVALID_ENERGY_UNIT_XML = """
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <AllocationSeries>
+                                <mRID>66800000-0000-0000-0000-000000000001</mRID>
+                                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                                <product><identification>023</identification></product>
+                                <energyUnit>MWH</energyUnit>
+                                <startDateTime>2025-08-15T00:00:00Z</startDateTime>
+                                <endDateTime>2025-08-16T00:00:00Z</endDateTime>
+                                <resolution>PT15M</resolution>
+                                <position>1</position><quantity>100.000</quantity>
+                                <position>2</position><quantity>200.000</quantity>
+                        </AllocationSeries>
+                        """;
+
+        /** Foutcode 683: ongeldige combinatie herkomstindicatie/validatiestatus/reparatiemethodiek */
+        private static final String INVALID_ORIGIN_VALIDATION_REPAIR_XML = """
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <AllocationSeries>
+                                <mRID>68300000-0000-0000-0000-000000000001</mRID>
+                                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                                <receiver_MarketParticipant.mRID codingScheme="A10">8716867000013</receiver_MarketParticipant.mRID>
+                                <product><identification>023</identification></product>
+                                <originIndicator>ONGELDIG</originIndicator>
+                                <validationStatus>ONGELDIG</validationStatus>
+                                <repairMethod>ONGELDIG</repairMethod>
+                                <startDateTime>2025-08-17T00:00:00Z</startDateTime>
+                                <endDateTime>2025-08-18T00:00:00Z</endDateTime>
+                                <resolution>PT15M</resolution>
+                                <position>1</position><quantity>100.000</quantity>
+                                <position>2</position><quantity>200.000</quantity>
+                        </AllocationSeries>
+                        """;
+
+        /** Foutcode 758: geaggregeerd bericht met onjuiste EAN-13 telling */
+        private static final String INVALID_EAN13_COUNT_AGG_XML = """
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <AggregatedAllocationSeriesNotification>
+                                <mRID>75800000-0000-0000-0000-000000000001</mRID>
+                                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                                <receiver_MarketParticipant.mRID codingScheme="A10">871686700000000002</receiver_MarketParticipant.mRID>
+                                <product><identification>023</identification></product>
+                                <group_businessType>TMT</group_businessType>
+                                <startDateTime>2025-08-19T00:00:00Z</startDateTime>
+                                <endDateTime>2025-08-20T00:00:00Z</endDateTime>
+                                <resolution>PT15M</resolution>
+                                <position>1</position><quantity>100.000</quantity>
+                                <position>2</position><quantity>200.000</quantity>
+                        </AggregatedAllocationSeriesNotification>
+                        """;
+
+        /** Foutcode 759: individueel bericht zonder BRP EAN-13 */
+        private static final String INVALID_MISSING_BRP_EAN13_XML = """
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <AllocationSeries>
+                                <mRID>75900000-0000-0000-0000-000000000001</mRID>
+                                <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                                <receiver_MarketParticipant.mRID codingScheme="A10">871686700000000002</receiver_MarketParticipant.mRID>
+                                <product><identification>023</identification></product>
+                                <marketRole>BRP</marketRole>
+                                <startDateTime>2025-08-21T00:00:00Z</startDateTime>
+                                <endDateTime>2025-08-22T00:00:00Z</endDateTime>
+                                <resolution>PT15M</resolution>
+                                <position>1</position><quantity>100.000</quantity>
+                                <position>2</position><quantity>200.000</quantity>
+                        </AllocationSeries>
+                        """;
+
+        private String withDateWindow(String xml, int startOffsetHours, int endOffsetHours) {
+                LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+                String start = now.plusHours(startOffsetHours).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z";
+                String end = now.plusHours(endOffsetHours).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z";
+
+                return xml
+                                .replaceAll("<startDateTime>[^<]+</startDateTime>", "<startDateTime>" + start + "</startDateTime>")
+                                .replaceAll("<endDateTime>[^<]+</endDateTime>", "<endDateTime>" + end + "</endDateTime>");
+        }
+
+        private String buildValidAllocationAckXml(String messageId) {
+                LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+                String start = now.minusHours(12).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z";
+                String end = now.plusHours(12).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z";
+                return """
+                                <?xml version="1.0" encoding="UTF-8"?>
+                                <AllocationSeries>
+                                        <mRID>%s</mRID>
+                                        <sender_MarketParticipant.mRID codingScheme="A10">871686700000000001</sender_MarketParticipant.mRID>
+                                        <receiver_MarketParticipant.mRID codingScheme="A10">871686700000000010</receiver_MarketParticipant.mRID>
+                                        <suppliermRID>8716867000013</suppliermRID>
+                                        <product><identification>023</identification></product>
+                                        <startDateTime>%s</startDateTime>
+                                        <endDateTime>%s</endDateTime>
+                                        <resolution>PT15M</resolution>
+                                        <position>1</position><quantity>100.000</quantity>
+                                        <position>2</position><quantity>200.000</quantity>
+                                </AllocationSeries>
+                                """.formatted(messageId, start, end);
+        }
+
+        private String buildValidAggregatedAckXml(String messageId) {
+                LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+                String start = now.minusHours(12).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z";
+                String end = now.plusHours(12).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z";
+                return """
+                                <?xml version="1.0" encoding="UTF-8"?>
+                                <AggregatedAllocationSeriesNotification>
+                                        <mRID>%s</mRID>
+                                        <sender_MarketParticipant.mRID codingScheme="A10">871686700000000002</sender_MarketParticipant.mRID>
+                                        <receiver_MarketParticipant.mRID codingScheme="A10">871686700000000011</receiver_MarketParticipant.mRID>
+                                        <suppliermRID>8716867000013</suppliermRID>
+                                        <product><identification>023</identification></product>
+                                        <group_businessType>TMT</group_businessType>
+                                        <startDateTime>%s</startDateTime>
+                                        <endDateTime>%s</endDateTime>
+                                        <resolution>PT15M</resolution>
+                                        <position>1</position><quantity>100.000</quantity>
+                                        <position>2</position><quantity>200.000</quantity>
+                                </AggregatedAllocationSeriesNotification>
+                                """.formatted(messageId, start, end);
+        }
+
+        private String buildValidFactorAckXml(String messageId) {
+                LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+                String start = now.minusHours(12).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z";
+                String end = now.plusHours(12).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z";
+                return """
+                                <?xml version="1.0" encoding="UTF-8"?>
+                                <AllocationFactorSeriesNotification>
+                                        <mRID>%s</mRID>
+                                        <sender_MarketParticipant.mRID codingScheme="A10">871686700000000003</sender_MarketParticipant.mRID>
+                                        <receiver_MarketParticipant.mRID codingScheme="A10">871686700000000012</receiver_MarketParticipant.mRID>
+                                        <suppliermRID>8716867000013</suppliermRID>
+                                        <processTypeID>N151</processTypeID>
+                                        <contentType>AllocationFactorSeries</contentType>
+                                        <product><identification>023</identification></product>
+                                        <dateRCF_version>2026-03-16</dateRCF_version>
+                                        <startDateTime>%s</startDateTime>
+                                        <endDateTime>%s</endDateTime>
+                                        <resolution>PT15M</resolution>
+                                        <position>1</position><quantity>0.450</quantity>
+                                        <position>2</position><quantity>0.520</quantity>
+                                </AllocationFactorSeriesNotification>
+                                """.formatted(messageId, start, end);
+        }
 }

@@ -202,7 +202,19 @@ public class Step3bMarktBusinessValidaties implements PipelineStep {
     }
 
     private boolean isLikelyValidEan18(String value) {
-        return value != null && value.matches("\\d{18}");
+        if (value == null || !value.matches("\\d{18}")) {
+            return false;
+        }
+        int sum = 0;
+        // GS1 check digit: positie van rechts, even posities *3
+        for (int i = 0; i < 17; i++) {
+            int digit = value.charAt(i) - '0';
+            int positionFromRight = 17 - i;
+            sum += (positionFromRight % 2 == 0) ? digit * 3 : digit;
+        }
+        int expectedCheckDigit = (10 - (sum % 10)) % 10;
+        int actualCheckDigit = value.charAt(17) - '0';
+        return expectedCheckDigit == actualCheckDigit;
     }
 
     private boolean isContentTypeInLineWithProcessType(String contentType, String processTypeId) {
