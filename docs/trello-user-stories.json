@@ -1,0 +1,1230 @@
+{
+  "board": {
+    "name": "ENGIE Allocation Processor - 29 User Stories",
+    "description": "29 user stories op basis van de 29 pipeline-stappen (1A t/m 6B), geordend in exacte uitvoervolgorde, aangevuld met uitgewerkte frontend- en dashboard-scope.",
+    "mvpFasering": {
+      "fase-1": "End-to-end",
+      "fase-2": "Validaties",
+      "fase-3": "Configuratie",
+      "fase-4": "Dashboarding"
+    },
+    "masterFlow": [
+      "US-01",
+      "US-02",
+      "US-03",
+      "US-04",
+      "US-05",
+      "US-06",
+      "US-07",
+      "US-19",
+      "US-28",
+      "US-29",
+      "US-12",
+      "US-13",
+      "US-14",
+      "US-15",
+      "US-20",
+      "US-21",
+      "US-22",
+      "US-23",
+      "US-24",
+      "US-08",
+      "US-09",
+      "US-16",
+      "US-17",
+      "US-25",
+      "US-26",
+      "US-10",
+      "US-11",
+      "US-18",
+      "US-27"
+    ],
+    "lists": [
+      {
+        "name": "MVP Fasering",
+        "cards": [
+          {
+            "id": "MVP-1",
+            "title": "Fase 1 (Blauw) - End-to-end",
+            "description": "Programmeer eerst alle blauwe stories.",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Alle stories met label fase-1 zijn gepland en geordend voor implementatie.",
+              "Na afronding van fase-1 start fase-2."
+            ]
+          },
+          {
+            "id": "MVP-2",
+            "title": "Fase 2 (Geel) - Validaties",
+            "description": "Na blauw volgt alle gele validatiewerkzaamheden.",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "acceptanceCriteria": [
+              "Alle stories met label fase-2 zijn ingepland na fase-1.",
+              "Validatielogica is coherent over de geselecteerde stories."
+            ]
+          },
+          {
+            "id": "MVP-3",
+            "title": "Fase 3 (Oranje) - Configuratie",
+            "description": "Na geel volgt configuratiegericht werk in oranje.",
+            "labels": [
+              "fase-3",
+              "oranje"
+            ],
+            "acceptanceCriteria": [
+              "Alle stories met label fase-3 zijn ingepland na fase-2.",
+              "Configuratiegedrag is aantoonbaar per story."
+            ]
+          },
+          {
+            "id": "MVP-4",
+            "title": "Fase 4 (Groen) - Dashboarding",
+            "description": "Na oranje volgt dashboarding en afrondend werk in groen.",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "acceptanceCriteria": [
+              "Alle stories met label fase-4 zijn ingepland na fase-3.",
+              "Dashboarding/doelrapportage is af te leiden uit de stories."
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Ontvang marktbericht",
+        "cards": [
+          {
+            "id": "US-01",
+            "title": "US-01 - STEP_1A - Ontvangen marktbericht",
+            "description": "Als systeem wil ik een marktbericht ontvangen zodat verwerking kan starten.",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Lege xmlContent faalt direct in stap 1A.",
+              "Gevulde xmlContent start de pipeline met een messageUuid."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-02",
+            "title": "US-02 - STEP_1B - Technische ontvangstbevestiging",
+            "description": "Als systeem wil ik technische ontvangst bevestigen zodat ontvangst traceerbaar is.",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Er wordt een unieke ontvangstreferentie vastgelegd.",
+              "Stap krijgt COMPLETED als 1A succesvol was."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-03",
+            "title": "US-03 - STEP_1C - Technische validatie",
+            "description": "Als systeem wil ik XML technisch valideren zodat ongeldige XML wordt afgekeurd.",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Parseerbare XML slaagt in 1C.",
+              "Onparseerbare XML faalt in 1C en stopt vervolgstappen."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-04",
+            "title": "US-04 - STEP_1D - Logging van ontvangsttijd",
+            "description": "Als operations wil ik ontvangsttijd loggen zodat auditing mogelijk is.",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Ontvangsttijd wordt opgeslagen bij geldige berichten.",
+              "Timestamp is zichtbaar in stapinformatie."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-05",
+            "title": "US-05 - STEP_1E - Identificatie berichttype",
+            "description": "Als systeem wil ik berichttype herkennen zodat juiste route gebruikt wordt.",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Bekend root-element wordt gemapt naar ondersteund berichttype.",
+              "Onbekend root-element faalt in 1E."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-06",
+            "title": "US-06 - STEP_1F - Handmatige opvoer berichten",
+            "description": "Als operations wil ik handmatige invoer markeren zodat herkomst zichtbaar is.",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "manualEntry=true wordt vastgelegd op het bericht.",
+              "Markering is zichtbaar in metadata/status."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Classificeer bericht",
+        "cards": [
+          {
+            "id": "US-07",
+            "title": "US-07 - STEP_2A - Classificeer van berichttype",
+            "description": "Als systeem wil ik berichttype classificeren zodat het juiste pad wordt gebruikt.",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Elk ondersteund type krijgt classificatie.",
+              "Classificatie is beschikbaar voor vervolgstappen."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-08",
+            "title": "US-08 - STEP_2B - Bepalen prioriteit per type",
+            "description": "Als systeem wil ik prioriteit bepalen zodat urgente berichten eerder lopen.",
+            "labels": [
+              "fase-3",
+              "oranje"
+            ],
+            "acceptanceCriteria": [
+              "Er wordt een prioriteitswaarde toegekend.",
+              "Prioriteit wordt opgeslagen bij het bericht."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-09",
+            "title": "US-09 - STEP_2C - Plaatsen in wachtrij",
+            "description": "Als systeem wil ik queue-routing bepalen zodat event-driven verwerking mogelijk is.",
+            "labels": [
+              "fase-3",
+              "oranje"
+            ],
+            "acceptanceCriteria": [
+              "Queue/route wordt bepaald en vastgelegd.",
+              "Stap eindigt succesvol als queuebepaling lukt."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-10",
+            "title": "US-10 - STEP_2D - Uitzondering parkeren",
+            "description": "Als operations wil ik uitzonderingen parkeren zodat ze niet onterecht doorlopen.",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "acceptanceCriteria": [
+              "Uitzonderingsberichten krijgen status PARKED.",
+              "Geparkeerde berichten zijn herkenbaar gemarkeerd."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-11",
+            "title": "US-11 - STEP_2E - Uitval opnieuw verwerken",
+            "description": "Als operations wil ik retry-informatie beheren zodat herverwerking beheerst gebeurt.",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "acceptanceCriteria": [
+              "Retry-informatie wordt vastgelegd op uitval.",
+              "Eerste verwerking en herverwerking zijn onderscheidbaar."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Valideer bericht",
+        "cards": [
+          {
+            "id": "US-12",
+            "title": "US-12 - STEP_3A - Operational BRP register",
+            "description": "Als systeem wil ik BRP/EAN valideren zodat alleen erkende partijen doorgaan.",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "errorCodes": [
+              "761",
+              "765",
+              "777"
+            ],
+            "acceptanceCriteria": [
+              "EAN wordt gecontroleerd tegen BRP-register.",
+              "Ongeldige BRP/EAN levert validatiefout op."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-13",
+            "title": "US-13 - STEP_3B - Uitvoeren marktbusiness validaties",
+            "description": "Als systeem wil ik marktbusinessregels valideren zodat inhoudelijk onjuiste data stopt.",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "errorCodes": [
+              "650",
+              "651",
+              "667",
+              "668",
+              "683",
+              "686",
+              "701",
+              "745",
+              "681",
+              "747",
+              "754",
+              "758",
+              "759",
+              "764",
+              "771",
+              "773",
+              "779",
+              "781",
+              "999"
+            ],
+            "acceptanceCriteria": [
+              "Businessregels worden gecontroleerd op berichtinhoud.",
+              "Overtredingen geven foutcodes terug."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-14",
+            "title": "US-14 - STEP_3C - Controle op verplichte velden",
+            "description": "Als systeem wil ik verplichte velden controleren zodat incomplete berichten falen.",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "errorCodes": [
+              "999"
+            ],
+            "acceptanceCriteria": [
+              "Verplichte velden worden gecontroleerd.",
+              "Ontbrekende velden leveren validatiefouten op."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-15",
+            "title": "US-15 - STEP_3D - Validatieregels configureerbaar",
+            "description": "Als beheerder wil ik regels configureerbaar uitvoeren zodat codewijziging niet nodig is.",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "acceptanceCriteria": [
+              "Actieve configureerbare regels worden uitgevoerd.",
+              "Regelovertredingen worden geregistreerd."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-16",
+            "title": "US-16 - STEP_3E - Tijdvenster-validaties",
+            "description": "Als systeem wil ik tijdvensters valideren zodat onlogische periodes worden afgekeurd.",
+            "labels": [
+              "fase-3",
+              "oranje"
+            ],
+            "errorCodes": [
+              "663",
+              "763",
+              "772"
+            ],
+            "acceptanceCriteria": [
+              "startDateTime ligt vóór endDateTime.",
+              "Te verre toekomstige data geeft validatiefout."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-17",
+            "title": "US-17 - STEP_3F - Controle op volgordelijkheid",
+            "description": "Als systeem wil ik sequentie van posities controleren zodat reeksen logisch zijn.",
+            "labels": [
+              "fase-3",
+              "oranje"
+            ],
+            "errorCodes": [
+              "671",
+              "676",
+              "782"
+            ],
+            "acceptanceCriteria": [
+              "Posities zijn oplopend en zonder gaten.",
+              "Afwijkende volgorde geeft validatiefout."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-18",
+            "title": "US-18 - STEP_3G - Herbruikbare validatieregels",
+            "description": "Als systeem wil ik herbruikbare regels toepassen zodat controles consistent blijven.",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "errorCodes": [
+              "651",
+              "669",
+              "670",
+              "704",
+              "769",
+              "774",
+              "776",
+              "780",
+              "999"
+            ],
+            "acceptanceCriteria": [
+              "Generieke regels worden op bericht toegepast.",
+              "Gevonden fouten worden vastgelegd als foutcodes/meldingen."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Bepaal uitkomst",
+        "cards": [
+          {
+            "id": "US-19",
+            "title": "US-19 - STEP_4A - Genereren ACK bij succes",
+            "description": "Als marktpartij wil ik ACK bij succes zodat acceptatie bevestigd is.",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Bij geen validatiefouten wordt ACK gegenereerd.",
+              "ACK bevat referentie naar ontvangen bericht."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-20",
+            "title": "US-20 - STEP_4B - Genereren NACK bij fouten",
+            "description": "Als marktpartij wil ik NACK bij fouten zodat afkeur duidelijk is.",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "acceptanceCriteria": [
+              "Bij validatiefouten wordt NACK gegenereerd.",
+              "NACK bevat minimaal één foutreden."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-21",
+            "title": "US-21 - STEP_4C - Toevoegen foutcodes bij NACK",
+            "description": "Als marktpartij wil ik foutcodes in NACK zodat gericht herstel mogelijk is.",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "acceptanceCriteria": [
+              "NACK bevat relevante foutcodes.",
+              "Foutcodes zijn herleidbaar en opgeslagen."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-22",
+            "title": "US-22 - STEP_4D - Vastleggen validatieresultaat",
+            "description": "Als operations wil ik uitkomst opslaan zodat audit en rapportage mogelijk zijn.",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "acceptanceCriteria": [
+              "Overall verwerkingsresultaat wordt opgeslagen.",
+              "Resultaat bevat status passend bij uitkomst."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-23",
+            "title": "US-23 - STEP_4E - NACK configuratie",
+            "description": "Als beheerder wil ik NACK-doorzetgedrag configureren zodat procesafspraken gevolgd worden.",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "acceptanceCriteria": [
+              "Configuratie bepaalt intern doorzetten van NACK.",
+              "Uitkomst wordt vastgelegd in stapresultaat."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Verstuur marktrespons",
+        "cards": [
+          {
+            "id": "US-24",
+            "title": "US-24 - STEP_5A - Versturen ACK/NACK",
+            "description": "Als systeem wil ik ACK/NACK versturen zodat marktrespons wordt afgehandeld.",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "acceptanceCriteria": [
+              "Respons wordt als verzonden gemarkeerd.",
+              "Verzendmoment wordt vastgelegd."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-25",
+            "title": "US-25 - STEP_5B - Geconfigureerd respons versturen",
+            "description": "Als beheerder wil ik configuratie op responsverzending zodat doorzetten beheersbaar is.",
+            "labels": [
+              "fase-3",
+              "oranje"
+            ],
+            "acceptanceCriteria": [
+              "Verzending volgt ingestelde configuratieregels.",
+              "Resultaat van configuratiecheck is zichtbaar."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-26",
+            "title": "US-26 - STEP_5C - Logging verzendtijd",
+            "description": "Als operations wil ik verzendtijd loggen zodat transport traceerbaar is.",
+            "labels": [
+              "fase-3",
+              "oranje"
+            ],
+            "acceptanceCriteria": [
+              "Verzendtijd wordt gelogd bij respons.",
+              "Timestamp is terug te vinden in statusinformatie."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-27",
+            "title": "US-27 - STEP_5D - Zelfstandig versturen",
+            "description": "Als systeem wil ik zelfstandig uitgaande berichten kunnen versturen voor toekomstige functionaliteit.",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "acceptanceCriteria": [
+              "Stap is aanwezig in pipeline met vaste plek.",
+              "Huidige implementatie kan deze stap overslaan zonder fout."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Lever bericht aan MDP",
+        "cards": [
+          {
+            "id": "US-28",
+            "title": "US-28 - STEP_6A - Doorzetten naar raw-layer",
+            "description": "Als data-platform wil ik origineel bericht in raw-layer zodat brondata behouden blijft.",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Origineel bericht wordt naar raw-layer geschreven.",
+              "Pad/locatie wordt vastgelegd in resultaat."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "US-29",
+            "title": "US-29 - STEP_6B - Vastleggen afleverstatus",
+            "description": "Als operations wil ik definitieve afleverstatus vastleggen zodat ketenstatus compleet is.",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Definitieve afleverstatus wordt opgeslagen.",
+              "Pipeline eindigt met actuele eindstatus."
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Project Scope (Code-backed)",
+        "cards": [
+          {
+            "id": "SCOPE-1",
+            "title": "Project Infrastructure - Java + PostgreSQL",
+            "description": "Spring Boot 3.x + Maven + PostgreSQL database.\n\nTechnologie Stack:\n- Framework: Spring Boot 3.x with Spring Data JPA, Spring Security, Spring Web (REST)\n- Build: Maven with JUnit 5 test framework\n- Database: PostgreSQL with transactional service layer\n- Pipeline: 29-step synchronous orchestration with phase-blocking logic\n\nSecurity:\n- CORS: Same-origin only\n- Headers: CSP, X-Frame-Options SAMEORIGIN, HSTS (31536000s), Referrer-Policy, Permissions-Policy\n- XXE Protection: XML parsing with XXE-safe configuration\n- Rate Limiting: Per-IP with 3 buckets (30/min submit, 5/min seed, 120/min general)\n- Input Validation: UUID/EAN patterns, 2MB size limit, control-character sanitization",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Project compileert en draait op Spring Boot 3.x met Maven",
+              "PostgreSQL database is geconfigureerd en transactioneel",
+              "Alle security headers zijn actief in SecurityConfig.java",
+              "Rate limiting werkt per IP-adres met metrieke limits per endpoint"
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "SCOPE-2",
+            "title": "API Contract - POST /api/messages",
+            "description": "Submit JSON bericht naar pipeline.\n\nFile: MarketMessageController.java (lines 32-39)\nMetode: submitMessage(SubmitMessageRequest)\nResponse: MarketMessageResponse with UUID en initiële status RECEIVED\n\nValidation:\n- Content-Type: application/json\n- Body: JSON conforming to Business-Service v4.0 schema\n- Status: 201 Created on success, 400 Bad Request on validation fail, 429 Too Many Requests on rate limit",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Endpoint accepteert geldige JSON berichten en retourneert UUID",
+              "Validation fouten resulteren in 400 met foutcode",
+              "Rate limiting (30/min) wordt gehandhaafd per IP",
+              "Message status wordt op RECEIVED gezet en opgeslagen"
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "SCOPE-3",
+            "title": "API Contract - POST /api/messages/xml",
+            "description": "Submit raw XML bericht naar pipeline (convenience endpoint).\n\nFile: MarketMessageController.java (lines 46-59)\nMetode: submitXmlMessage(String xmlContent)\nResponse: MarketMessageResponse with UUID en initiële status RECEIVED\n\nValidation:\n- Content-Type: application/xml\n- XML is XXE-safe geparsed\n- Status: 201 Created on success, 400 Bad Request on parse fail",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Endpoint accepteert raw XML en integreert met JSON pipeline",
+              "XXE-attacks zijn door sanitatie voorkomen",
+              "Rate limiting (30/min) wordt gehandhaafd",
+              "XML-naar-JSON conversie verloopt foutloos"
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "SCOPE-4",
+            "title": "API Contract - GET /api/messages/{uuid}",
+            "description": "Fetch volledige berichtstatus met alle 29 stapresultaten.\n\nFile: MarketMessageController.java (lines 67-73)\nMetode: getMessageStatus(UUID uuid)\nResponse: CompleteMessageStatus with all 29 step results\n\nStatus codes:\n- 200 OK: Message found with full pipeline state\n- 404 Not Found: UUID not in database\n- 429 Too Many Requests: Rate limit exceeded",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Endpoint retourneert volledige message-state inclusief alle 29 stappen",
+              "Step resultaten bevatten status, timestamps, en evt. foutcodes",
+              "Response is gecached wanneer message in COMPLETED/FAILED/PARKED state is",
+              "Rate limiting (120/min general) wordt gehandhaafd"
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "SCOPE-5",
+            "title": "API Contract - GET /api/messages/status/{status}",
+            "description": "Filter berichten op status (RECEIVED/PROCESSING/COMPLETED/FAILED/PARKED/etc).\n\nFile: MarketMessageController.java (lines 87-95)\nMetode: getMessagesByStatus(MessageStatus status)\nResponse: List<MessageSummary>\n\nValidatie:\n- Query parameter: status moet bij MessageStatus enum horen\n- Pagination: offset/limit parameters voor grote resultsets\n- Status codes: 200 OK, 400 Bad Request (unknown status), 429 Too Many Requests",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "acceptanceCriteria": [
+              "Endpoint retourneert alle berichten met gevraagde status",
+              "Pagination werkt correct voor grote resultsets",
+              "Rate limiting (120/min) wordt gehandhaafd",
+              "Unknown status values geven 400 Bad Request"
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "SCOPE-6",
+            "title": "API Contract - POST /api/messages/{uuid}/reprocess",
+            "description": "Retry FAILED of PARKED berichten door pipeline opnieuw uit te voeren.\n\nFile: MarketMessageController.java (lines 102-113)\nMetode: reprocessMessage(UUID uuid)\nResponse: MarketMessageResponse with UUID en status RECEIVED\n\nLimitations:\n- Alleen FAILED/PARKED berichten mogen reprocessed worden\n- Oude stapresultaten worden verwijderd\n- Pipeline wordt opnieuw geïnitialiseerd",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "acceptanceCriteria": [
+              "Reprocess werkt alleen voor FAILED/PARKED berichten",
+              "Oude stapresultaten worden verwijderd voordat herstart",
+              "Pipeline initialiseert opnieuw van STEP_1A",
+              "Rate limiting (30/min submit) wordt gehandhaafd"
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "SCOPE-7",
+            "title": "Reprocess Logic Implementation",
+            "description": "Logica voor retry van FAILED/PARKED berichten.\n\nFile: MarketMessageService.java (lines 177-200)\nMetode: reprocessMessage(UUID uuid)\n\nLogic:\n1. Valideer bericht bestaat en status is FAILED of PARKED\n2. Reset message status naar RECEIVED\n3. Verwijder alle bestaande step-resultaten\n4. Reinitializeer pipelinestappen (1A-6B)\n5. Trigger pipeline orchestrator\n6. Return nieuwe MessageResponse",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "acceptanceCriteria": [
+              "Status check voorkomt reprocessing van non-FAILED/PARKED berichten",
+              "Alle oude step-resultaten worden verwijderd",
+              "Pipeline draait volledig opnieuw (1A → 6B) zonder state-carryover",
+              "Transactioneel: alles succeeds of alles fails (geen partial reprocessing)"
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "SCOPE-8",
+            "title": "Error Translation Layer",
+            "description": "Centralized exception handling met gestandaardiseerde JSON responses.\n\nFile: GlobalExceptionHandler.java (lines 24-121)\n\n5 exception types:\n1. ValidationException (400 Bad Request) → foutcode + message\n2. BusinessRuleException (400 Bad Request) → foutcode + message\n3. PipelineException (500 Internal Server Error) → generic message (no internal details)\n4. RateLimitException (429 Too Many Requests) → X-RateLimit headers\n5. Generic Exception (500 Internal Server Error) → generic message\n\nResponse format:\n{ errorCode: string, message: string, timestamp: ISO-8601, path: string }",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Alle exceptions worden naar JSON vertaald met geen-interne-details",
+              "ErrorCode enum waarden worden gebruikt in responses",
+              "HTTP status-codes correleren met exception type",
+              "Timestamp en request-path zijn altijd in response opgenomen"
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "SCOPE-9",
+            "title": "Security Headers Implementation",
+            "description": "Implementatie van 5 security headers in SecurityConfig.java (lines 29-105).\n\nHeaders:\n1. Content-Security-Policy: default-src 'self' (blokkeert externe resources)\n2. X-Frame-Options: SAMEORIGIN (blokkeert clickjacking)\n3. Strict-Transport-Security: max-age=31536000 (force HTTPS 1 jaar)\n4. Referrer-Policy: strict-origin-when-cross-origin (controleert referrer-lekken)\n5. Permissions-Policy: denieert camera, microphone, geolocation, payment\n\nCORS: Restricted to same-origin only (geen cross-origin requests)",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Alle 5 security headers worden op elke response toegevoegd",
+              "CSP default policy blokkeert inline scripts en externe resources",
+              "CORS is ingesteld op same-origin (geen cross-origin allowed)",
+              "HSTS force HTTPS voor toekomstige requests naar domein"
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "SCOPE-10",
+            "title": "Rate Limiting per IP",
+            "description": "Per-IP rate limiting met 3 metrieke buckets in RateLimitFilter.java (lines 34-112).\n\nBuckets:\n1. POST /api/messages/submit: 30 requests / 60 secondes per IP\n2. POST /api/test/seed: 5 requests / 60 secondes per IP (test endpoint)\n3. All other endpoints: 120 requests / 60 secondes per IP\n\nOn overage:\n- HTTP 429 Too Many Requests\n- X-RateLimit-Limit: maximum allowed\n- X-RateLimit-Remaining: requests left in window\n- Retry-After: seconds totilwindow reset",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "Per-IP rate limiting werkt met correcte limits per bucket",
+              "Bucket window reset op 60 seconden",
+              "429 response with X-RateLimit headers op overage",
+              "Retry-After header helpt clients met exponential backoff"
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "SCOPE-11",
+            "title": "Input Validation & Sanitization",
+            "description": "Centralized input validation in InputSanitizer.java (lines 13-66).\n\nValidaties:\n1. UUID Format: 8-4-4-4-12 hex digits (standard UUID format)\n2. EAN Format: 13 of 18 digits (EAN-13 of EAN-18)\n3. Payload Size: Maximum 2MB per bericht\n4. Character Sanitization: Removes control chars except \\t \\n \\r\n\nResponse:\n- ValidationException on pattern mismatch with specific error code\n- ValidationException on size overage\n- Sanitized string output safe for database storage",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "UUID regex validatie werkt voor alle standaard UUID vormen",
+              "EAN validatie accepteert zowel 13 als 18 digits",
+              "2MB size limit wordt gehandhaafd op alle payload types",
+              "Control characters zijn uit input verwijderd (except \\t \\n \\r)"
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "SCOPE-12",
+            "title": "Test Data Generatie & Opschonen",
+            "description": "Ondersteuning voor testdata in de API via TestDataController.\n\nFile: TestDataController.java\nEndpoints:\n- POST /api/test/seed: maakt representatieve testberichten aan in de database\n- POST /api/test/clear: verwijdert testdata voor een schone herstart\n\nDoel:\n- Snelle demo- en testsetup zonder handmatig berichten in te voeren\n- Reproduceerbare scenarios voor pipeline, validaties en dashboarding",
+            "labels": [
+              "fase-1",
+              "blauw"
+            ],
+            "acceptanceCriteria": [
+              "POST /api/test/seed maakt testberichten aan met verschillende statussen",
+              "POST /api/test/clear ruimt eerder aangemaakte testdata op",
+              "Seed-data is bruikbaar voor end-to-end pipeline tests",
+              "Rate limiting voor /api/test/seed (5/min) blijft actief"
+            ],
+            "definitionOfDone": [
+              "Code is geïmplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Dashboard",
+        "cards": [
+          {
+            "id": "FE-00",
+            "title": "FE-00 - Frontend scope & UX-architectuur",
+            "description": "Werk de frontend uit als een operationeel dashboard voor operations, support en demo-doeleinden, geserveerd als static resource vanuit Spring Boot op http://localhost:8080. Deze kaart beschrijft de functionele en technische kapstok voor alle FE-stories in deze lijst.\n\nDoel van de frontend:\n- In 1 scherm inzicht geven in status, foutcodes en voortgang van marktberichten\n- Detailonderzoek ondersteunen zonder database- of API-tooling\n- Demo- en testflows versnellen via seed, refresh en export\n\nSchermdelen / UX-flow:\n1. Sticky header met export-acties, seed-knop en refresh\n2. KPI-zone met operationele samenvatting\n3. Filter- en sorteerlaag voor snelle triage\n4. Klikbare berichtenlijst als primaire werktafel\n5. Detail slide-in voor onderzoek van 1 bericht\n6. Pipeline-tijdlijn per fase en stap\n7. Feedback states: loading, empty, error en toast\n\nTechnische uitgangspunten:\n- Vanilla HTML, CSS en JavaScript; geen framework of build-stap\n- Geserveerd uit src/main/resources/static\n- CSP-compliant: geen inline scripts of handlers\n- XSS-safe rendering via escapeHtml op alle dynamische content\n- Frontend gebruikt alleen bestaande backend-endpoints; geen extra API-laag\n\nNiet-doel in deze fase:\n- Realtime updates via WebSockets\n- Login/rollenmodel in de UI\n- In-place editing van berichten of pipeline-configuratie",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "acceptanceCriteria": [
+              "De frontend-scope maakt duidelijk voor wie het dashboard bedoeld is en welk operationeel probleem het oplost.",
+              "Alle FE-kaarten in deze lijst zijn herleidbaar naar een concreet schermdeel of UX-flow uit deze scope-kaart.",
+              "Technische randvoorwaarden zijn expliciet: static resources, vanilla JS, CSP-compliant en XSS-safe rendering.",
+              "Niet-doelen zijn benoemd zodat Trello-scope geen realtime of admin-functionaliteit impliceert."
+            ],
+            "definitionOfDone": [
+              "Frontend-scope is reviewed op functionele volledigheid en technische haalbaarheid.",
+              "Alle FE-vervolgkaarten refereren impliciet of expliciet aan deze scope-kaart.",
+              "De scope-kaart is bruikbaar als startpunt voor refinement of demo-uitleg."
+            ]
+          },
+          {
+            "id": "DASH-1",
+            "title": "Dashboard & Monitoring - Fase 4",
+            "description": "Frontend dashboard gebouwd met vanilla HTML, CSS en JavaScript (geen framework), geserveerd via Spring Boot op http://localhost:8080. Deze epic bundelt alle frontend-onderdelen die samen het operationele dashboard vormen.\n\nBestandsstructuur:\n- index.html: hoofd-HTML met header, KPI-zones, filterbalk, lijst en detailpanel\n- css/ (10 bestanden): variables.css, base.css, header.css, stats.css, filters.css,\n  messages.css, detail-panel.css, pipeline.css, errors.css, components.css\n- js/api.js: alle HTTP-calls naar de backend (fetchMessages, fetchMessageDetail, seedTestData)\n- js/app.js: state management (filter, sort, messages), event binding, detail-open/sluit, export\n- js/render.js: alle DOM-rendering (messageList, messageItem, updateStats, detailPanel,\n  metaSection, errorSection, xmlSection, pipelineSection)\n- js/utils.js: helpers (formatTime, escapeHtml, showToast, getStepIcon, responseBadgeClass)\n\nGebruikerswaarde:\n- Operations kan snel zien welke berichten succesvol, gefaald of geparkeerd zijn\n- Support kan zonder API-client inzoomen op foutcodes, input-XML en pipeline-uitval\n- Demo/test-gebruikers kunnen seed-data laden en exports trekken zonder extra tooling\n\nFunctionele scope:\n1. Header met export-acties, testdata-seeding en handmatige refresh\n2. KPI-balk met operationele kengetallen en foutcode-samenvatting\n3. Filter & sortering voor triage en werkvoorraad\n4. Berichtenlijst met status, type, EAN, voortgang en foutindicatie\n5. Detail slide-in panel met metadata, foutcodes, XML en pipeline-tijdlijn\n6. Pipeline-visualisatie per fase met duidelijke fout- en warning-markering\n7. Client-side export naar JSON en CSV\n8. Feedback states voor loading, empty, succes en fout\n9. Responsieve layout voor laptop en small-screen gebruik in demo of support-context\n\nTechnische aandachtspunten:\n- Geen frontend-framework of build-tool, direct geserveerd als static resource\n- CSP-compliant: alle event handlers via addEventListener (geen inline onclick)\n- XSS-bescherming via escapeHtml() op alle dynamische content\n- Overlay + slide-in detail-panel (CSS transform transitie)\n- Auto-refresh alleen via handmatige knop (geen setInterval of WebSocket)",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "acceptanceCriteria": [
+              "De kaart beschrijft expliciet de frontend als operationeel dashboard voor operations/support/demo.",
+              "Header toont Export-dropdown, 'Laad testdata'- en 'Vernieuwen'-knop op alle schermgroottes.",
+              "Stats-balk toont alle 8 KPI's correct berekend op basis van beschikbare berichten.",
+              "Top-5 foutcodes zijn gesorteerd op frequentie en bijgewerkt na elke refresh.",
+              "Gemiddelde doorlooptijd per fase wordt berekend uit step-timestamps (startedAt/completedAt).",
+              "Filter (Alle/Geslaagd/Gefaald) en sortering (Nieuwste/Oudste) werken correct en combineerbaar.",
+              "Berichtenrij toont statusicon, respons-badge, berichttype, EAN, stap-progress en foutcode-badge.",
+              "Klik op bericht opent detail slide-in panel met meta-grid, foutcodes, XML en pipeline-tijdlijn.",
+              "Pipeline-tijdlijn groepeert stappen per fase, elke stap toont status-icon, tijdstip en foutmelding.",
+              "NACK/WARNING stappen zijn oranje gemarkeerd in de pipeline-visualisatie.",
+              "Export JSON/CSV downloadt bestand client-side zonder extra server-call.",
+              "Toast-notificaties verschijnen bij seed, refresh en API-fouten.",
+              "Loading-spinner zichtbaar bij initieel laden; leeg-bericht bij geen data; foutmelding bij API-fail.",
+              "Layout blijft bruikbaar op laptopbreedte en small screens zonder dat primaire acties wegvallen.",
+              "Alle dynamische content is XSS-safe via escapeHtml(), geen inline event handlers (CSP-compliant)."
+            ],
+            "definitionOfDone": [
+              "Alle acceptance criteria zijn aantoonbaar gevalideerd in browser (Chrome + Firefox).",
+              "Geen console-errors of XSS-vectoren aantoonbaar via handmatige test.",
+              "Frontend-scope, UX-flow en technische randvoorwaarden zijn begrijpelijk voor refinement in Trello.",
+              "Code peer-reviewed door teamlid.",
+              "Pagina laadt en is functioneel direct na mvn spring-boot:run zonder extra stappen."
+            ]
+          },
+          {
+            "id": "FE-01",
+            "title": "FE-01 - Stats-balk: 8 KPI-tegels",
+            "description": "Implementeer de 8 KPI-tegels in de stats-balk (Render.updateStats in render.js).\n\nTegels:\n- Totaal berichten\n- ACK-count (responseType === 'ACK')\n- NACK/FAILED-count\n- Laatste ontvangsttijd (meest recente receivedAt)\n- ACK% en NACK% als percentage van totaal\n- Top-5 foutcodes gesorteerd op frequentie\n- Gemiddelde doorlooptijd per fase (berekend uit step startedAt/completedAt)\n\nImplementatielocatie: js/render.js - updateStats(messages)",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "acceptanceCriteria": [
+              "Alle 8 KPI's worden correct getoond en bijgewerkt na elke refresh.",
+              "Top-5 foutcodes zijn op frequentie gesorteerd, VALIDATION_FAILED uitgefilterd.",
+              "Gem. doorlooptijd per fase verschijnt als 'FaseNaam: X ms/s/min' per regel.",
+              "Bij 0 berichten tonen alle KPI's '0' of '-' zonder errors."
+            ],
+            "definitionOfDone": [
+              "Code is geimplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "FE-02",
+            "title": "FE-02 - Berichtenlijst met filter & sortering",
+            "description": "Implementeer de berichtenlijst met filter/sorteer-balk (app.js + render.js).\n\nPer berichtrij:\n- Statusicon: ACK=, NACK=, PENDING=\n- Respons-badge (ACK/NACK/PENDING) met kleurcodering\n- Berichttype, EAN-code, ontvangstijdstip\n- Stap-progress indicator (N/29 completed)\n- Foutcode-badge met aantal errors\n- Klikbaar: opent detail slide-in panel\n\nFilter-opties: Alle berichten / Geslaagd (ACK) / Gefaald (NACK + FAILED)\nSorteer-opties: Nieuwste eerst / Oudste eerst (op receivedAt)\n\nImplementatielocatie: js/app.js - setFilter, setSort, applyAndRender;\njs/render.js - messageList, messageItem",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "acceptanceCriteria": [
+              "Berichtenrij toont alle velden correct: statusicon, badge, type, EAN, tijd, progress, errors.",
+              "Filter 'Geslaagd' toont alleen ACK-berichten; 'Gefaald' toont NACK en FAILED.",
+              "Sortering op nieuwste/oudste werkt correct obv receivedAt timestamp.",
+              "Filter en sortering zijn combineerbaar zonder race-conditions.",
+              "Klik op rij opent detail slide-in panel met juiste UUID."
+            ],
+            "definitionOfDone": [
+              "Code is geimplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "FE-03",
+            "title": "FE-03 - Detail slide-in panel",
+            "description": "Implementeer het detail slide-in panel dat opent bij klik op een berichtrij (app.js + render.js).\n\nSecties in detailBody:\n1. Meta-grid: messageType, messageUuid, EAN-code, prioriteit, receivedAt,\n   completedAt, antwoord-badge\n2. Foutcode-sectie: lijst van alle errorCodes met code + omschrijving (indien NACK)\n3. XML-sectie: originele inputXml weergegeven in <pre> met syntax highlighting\n4. Pipeline-tijdlijn: stappen gegroepeerd per fase (zie FE-04)\n\nUX-detail:\n- Panel schuift in van rechts via CSS transform transitie\n- Overlay (#overlay) op achtergrond, klik sluit panel\n- Sluitknop ('#closeDetailBtn') sluit panel\n- UUID gekopieerd naar klenbord functionaliteit\n\nImplementatielocatie: js/app.js - openDetail(uuid), closeDetail();\njs/render.js - detailPanel, metaSection, errorSection, xmlSection;\njs/api.js - fetchMessageDetail(uuid)",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "acceptanceCriteria": [
+              "Panel opent met slide-animatie en toont meta-grid met alle velden ingevuld.",
+              "Foutcode-sectie zichtbaar bij NACK-berichten, verborgen bij ACK.",
+              "Originele XML is zichtbaar in <pre>-blok, correct geescaped (XSS-safe).",
+              "Overlay-klik en sluitknop sluiten het panel correct.",
+              "Panel laadt detail via GET /api/messages/{uuid} en toont loading-state tijdens fetch."
+            ],
+            "definitionOfDone": [
+              "Code is geimplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "FE-04",
+            "title": "FE-04 - Pipeline-tijdlijn per fase",
+            "description": "Implementeer de pipeline-tijdlijn in het detailpanel (render.js - pipelineSection).\n\nWeergave:\n- Stappen gegroepeerd per fase (phaseName)\n- Per stap: status-icon (COMPLETED/FAILED/SKIPPED/PENDING),\n  stap-code (1A-6B), stap-naam, startedAt/completedAt timestamps,\n  resultMessage, errorMessage indien aanwezig\n- NACK/WARNING-stappen zijn oranje gemarkeerd\n- Fase-label als header boven elke groep\n\nCSS-locatie: pipeline.css (.phase-group, .phase-label, .step-list, .step-item)\nImplementatielocatie: js/render.js - pipelineSection(steps, responseType, errorCodes)",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "acceptanceCriteria": [
+              "Alle 29 stappen zichtbaar, gegroepeerd per fase in de juiste volgorde (1A t/m 6B).",
+              "Status-icon per stap correct: groen=COMPLETED, rood=FAILED, grijs=SKIPPED/PENDING.",
+              "NACK/WARNING stappen oranje gemarkeerd via CSS-klasse.",
+              "Timestamps per stap (startedAt, completedAt) worden geformateerd getoond.",
+              "Stap-foutmeldingen (errorMessage) zijn zichtbaar bij FAILED-stappen."
+            ],
+            "definitionOfDone": [
+              "Code is geimplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "FE-05",
+            "title": "FE-05 - Export, seed en toast-notificaties",
+            "description": "Implementeer de export-functionaliteit, test-data seeder en toast-notificaties (app.js).\n\nExport (exportErrorOverview):\n- Export JSON: volledige errorcodes per bericht als JSON-blob download\n- Export CSV: errorcodes als CSV-bestand met headers (uuid, type, errorCode, message)\n- Client-side via URL.createObjectURL + Blob, geen server-roundtrip\n- Aangeboden via dropdown-menu (#exportMenu) in header\n\nSeed testdata:\n- POST /api/test/seed aanroepen via Api.seedTestData()\n- Daarna automatisch refresh() aanroepen\n- Toast tonen bij succes en bij fout\n\nToast-notificaties (Utils.showToast):\n- Verschijnt rechtsonder, 3 seconden zichtbaar\n- Gebruikt bij: seed succes, seed fout, refresh fout, export\n\nImplementatielocatie: js/app.js - seedTestData, exportErrorOverview, downloadFile;\njs/utils.js - showToast",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "acceptanceCriteria": [
+              "Export JSON downloadt geldig JSON-bestand met errorcodes per bericht.",
+              "Export CSV downloadt geldig CSV-bestand met correcte headers en data.",
+              "Export werkt client-side zonder extra server-call.",
+              "'Laad testdata' roept POST /api/test/seed aan en ververst daarna de lijst.",
+              "Toast-notificatie verschijnt bij seed (succes en fout) en bij refresh-fout.",
+              "Toast verdwijnt automatisch na 3 seconden."
+            ],
+            "definitionOfDone": [
+              "Code is geimplementeerd en peer-reviewed volgens teamafspraken.",
+              "Unit/integratietests voor de story zijn groen en opgenomen in CI.",
+              "Documentatie (API/functioneel) is bijgewerkt waar relevant.",
+              "Acceptance criteria zijn aantoonbaar gevalideerd in test of demo."
+            ]
+          },
+          {
+            "id": "FE-06",
+            "title": "FE-06 - Responsiviteit, toegankelijkheid en state-afhandeling",
+            "description": "Borg dat het dashboard ook buiten happy-flow bruikbaar blijft: responsieve layout, keyboard-bediening en consistente states voor loading, empty en errors.\n\nOnderwerpen:\n- Responsieve layout voor header, KPI-zones, filterbalk, berichtenlijst en detailpanel\n- Focus states en keyboard-bediening voor knoppen, dropdown en detailpanel\n- Duidelijke empty/loading/error states zonder layout-shift of onduidelijke CTA's\n- Leesbare tekst en voldoende contrast voor status-badges en pipeline-state kleuren\n\nImplementatielocatie:\n- index.html: semantische structuur en aria-attributen waar nodig\n- css/: responsive breakpoints, focus styles, layout fallback\n- js/app.js: ESC/sluiten, menu-state en foutafhandeling\n- js/render.js: consistente rendering van empty/loading/error states",
+            "labels": [
+              "fase-4",
+              "groen"
+            ],
+            "acceptanceCriteria": [
+              "Header-acties blijven bereikbaar en bruikbaar op small screens zonder horizontale scroll voor primaire acties.",
+              "Export-menu en detailpanel zijn met keyboard te bedienen en correct te sluiten met Escape waar van toepassing.",
+              "Loading-, empty- en error-state hebben elk een duidelijke boodschap en behouden consistente layout.",
+              "Status- en foutindicaties blijven onderscheidbaar bij normaal gebruik door kleur en tekst/icon samen.",
+              "Detailpanel blijft leesbaar op small screens en blokkeert de hoofdactie sluiten niet."
+            ],
+            "definitionOfDone": [
+              "Responsieve weergave is handmatig gecontroleerd op minimaal desktop en small-screen viewport.",
+              "Belangrijkste interacties zijn met muis en keyboard getest.",
+              "State-afhandeling is aantoonbaar consistent voor loading, empty en error scenario's."
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Foutcodes referentie",
+        "cards": [
+          {
+            "id": "REF-ERR-01",
+            "title": "Officiële foutcodes (Business-Service v4.0)",
+            "description": "Bron: Business-Service-Uitwisselen-allocatiegegevens-elektriciteit-v4.0.pdf (p17-19).\n\n650 EAN-18 aansluiting niet valide\n651 EAN-18 netgebied/allocatiepunt niet valide\n663 Periode onjuist\n667 Product past niet bij productsoort\n668 Energie-eenheid past niet bij product\n669 MessageID niet uniek\n670 Kenmerk bericht niet uniek\n671 Aantal posities onjuist\n676 Eerste positie begint niet met 1\n681 ProcessTypeID past niet bij berichtinhoud\n683 Herkomst/validatie/reparatie combinatie ongeldig\n686 Negatief volume (behalve PRF-uitzondering)\n701 SenderID SOAP ≠ SenderID BDH\n704 Recentere versie al ontvangen\n745 ReceiverID SOAP ≠ ReceiverID BDH\n747 ProcessTypeID past niet bij ontvanger\n754 ContentType niet in lijn met ProcessTypeID\n758 Ontbrekende of onjuiste EAN-13\n759 Ontbrekende EAN-13 van BRP\n761 BRP niet actief in netgebied\n763 Dagbericht te laat opgeleverd\n764 Aantal tijdseries past niet bij allocatiegroep\n765 BRP niet bekend/erkend\n769 Allocatierun identificatie niet uniek\n771 Vastgesteld afnametype past niet bij profielcategorie\n772 Gegevens (deels) in de toekomst\n773 Resolutie past niet bij afspraken\n774 Factor heeft onjuist aantal decimalen\n776 Volume heeft onjuist aantal decimalen\n777 Netgebied/allocatiepunt niet in landelijke administratie\n779 Aantal profielfractie-tijdseries onjuist\n780 CorrelationID BDH ≠ SOAP\n781 Status profielfracties past niet bij profielcategorie\n782 Increment van tijdserie is geen 1\n999 Generieke fout / vrij tekstveld",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "acceptanceCriteria": [
+              "Alle officiële foutcodes zijn aanwezig in deze referentiekaart.",
+              "Betekenis per foutcode is eenduidig opgenomen."
+            ]
+          },
+          {
+            "id": "REF-ERR-02",
+            "title": "Foutcodes per validatiestap (3A-3G)",
+            "description": "3A (US-12): 761, 765, 777\n3B (US-13): 650, 651, 667, 668, 683, 686, 701, 745, 681, 747, 754, 758, 759, 764, 771, 773, 779, 781, 999\n3C (US-14): 999\n3E (US-16): 663, 772, 763\n3F (US-17): 671, 676, 782\n3G (US-18): 651, 669, 670, 704, 769, 774, 776, 780, 999",
+            "labels": [
+              "fase-2",
+              "geel"
+            ],
+            "acceptanceCriteria": [
+              "Per validatiestap is de foutcode-set expliciet vastgelegd.",
+              "Koppeling tussen US-kaarten en foutcodes is traceerbaar."
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Backlog",
+        "cards": []
+      },
+      {
+        "name": "To Do",
+        "cards": []
+      },
+      {
+        "name": "Doing",
+        "cards": []
+      },
+      {
+        "name": "Testing",
+        "cards": []
+      },
+      {
+        "name": "Done",
+        "cards": []
+      }
+    ]
+  }
+}

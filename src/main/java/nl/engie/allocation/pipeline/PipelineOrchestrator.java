@@ -224,7 +224,7 @@ public class PipelineOrchestrator {
                 + " | result=" + (result.isSuccess() ? "SUCCESS" : (result.isSkipped() ? "SKIPPED" : "FAILED"))
                 + " | message=" + (result.getMessage() != null ? result.getMessage() : "-")
                 + " | isNack=" + context.isNack()
-            + " | responseType=" + responseType
+                + " | responseType=" + responseType
                 + " | validationErrors=" + validationCount
                 + " | pipelineErrors=" + errorCount
                 + " | responseXmlLength=" + (context.getResponseXml() != null ? context.getResponseXml().length() : 0)

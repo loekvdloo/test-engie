@@ -1,0 +1,169 @@
+[
+  {
+    "text": "Ontvang marktbericht",
+    "colors": [
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Ontvangen marktbericht",
+    "colors": [
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Technische ontvangstbevestiging",
+    "colors": [
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Technische validatie",
+    "colors": [
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Logging van ontvangsttijd",
+    "colors": [
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Classificeer bericht",
+    "colors": [
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Classificeer van berichttype",
+    "colors": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Plaatsen in wachtrij(event- driven )",
+    "colors": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Uitzondering parkeren",
+    "colors": [
+      null
+    ]
+  },
+  {
+    "text": "Valideer bericht",
+    "colors": [
+      null
+    ]
+  },
+  {
+    "text": "Operational BRP register",
+    "colors": [
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Uitvoeren marktbusiness validaties",
+    "colors": [
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Validatieregels configureerbaar",
+    "colors": [
+      null
+    ]
+  },
+  {
+    "text": "Tijdvenster- validaties",
+    "colors": [
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Herbruikbare validatieregels",
+    "colors": [
+      null
+    ]
+  },
+  {
+    "text": "Bepaal uitkomst",
+    "colors": [
+      null
+    ]
+  },
+  {
+    "text": "Genereren ACK bij succes",
+    "colors": [
+      null
+    ]
+  },
+  {
+    "text": "Genereren NACK bij fouten",
+    "colors": [
+      null
+    ]
+  },
+  {
+    "text": "Toevoegen foutcodes bij NACK",
+    "colors": [
+      null
+    ]
+  },
+  {
+    "text": "Vastleggen validatieresultaat",
+    "colors": [
+      null
+    ]
+  },
+  {
+    "text": "Configuratie:NACK wel/niet intern doorzetten",
+    "colors": [
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Versturen ACK/NACK richting markt",
+    "colors": [
+      null
+    ]
+  },
+  {
+    "text": "Lever bericht aan mdp",
+    "colors": [
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Doorzetten origineel bericht naar raw-layer",
+    "colors": [
+      null,
+      null
+    ]
+  },
+  {
+    "text": "Vastleggen afleverstatus",
+    "colors": [
+      null
+    ]
+  }
+]
